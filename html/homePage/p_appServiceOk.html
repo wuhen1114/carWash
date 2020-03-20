@@ -1,0 +1,745 @@
+<!DOCTYPE HTML>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="maximum-scale=1.0, minimum-scale=1.0, user-scalable=0, initial-scale=1.0, width=device-width" />
+    <meta name="format-detection" content="telephone=no, email=no, date=no, address=no">
+    <title>确认订单</title>
+    <link href="../../css/api.css" rel="stylesheet" type="text/css" />
+    <link href="../../css/Hui.css" rel="stylesheet" type="text/css" />
+    <style>
+        header {
+            height: 40px;
+        }
+        #main {
+            width: 100%;
+            padding: 0px 2%;
+            box-sizing: border-box;
+        }
+        footer span {
+            background-color: #4FA4F3;
+            border-radius: 2px;
+            font-weight: bold;
+        }
+        div {
+            position: relative;
+        }
+        .bgColor {
+            background-color: #4FA4F3;
+            color: #FFF!important;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="VUE_BOX">
+        <!-- 头部导航 start -->
+        <header class=" H-theme-background-color9" id="header">
+            <span tapmode="" onclick="H.closeWin();" class="H-icon H-position-relative H-display-inline-block H-float-left H-vertical-middle H-theme-font-color-black H-padding-vertical-top-8 H-padding-horizontal-left-5 H-z-index-100">
+                <i class="H-iconfont H-icon-arrow-left H-font-size-18 H-vertical-middle"></i>
+                <label class="H-display-block H-vertical-middle H-font-size-15"></label>
+            </span>
+            <div class="H-header-title H-center-all H-font-size-18 H-text-show-row-1 H-theme-font-color-black H-position-absolute H-padding-vertical-top-8 H-width-100-percent">确认订单</div>
+        </header>
+        <!-- 头部导航 end -->
+        <div id="main">
+            <!-- 基本信息 -->
+            <div class="H-margin-vertical-top-10 H-theme-background-color-white H-border-vertical-both-after">
+                <div class="H-text-list H-flexbox-horizontal  H-theme-background-color-white H-border-vertical-bottom-margin-left-10-after H-vertical-middle H-touch-active">
+                    <div class="H-flex-item H-padding-horizontal-both-10 H-font-size-16 H-padding-vertical-both-12">客户姓名<span style="margin-left: 12px;width: 55%;outline: none">{{userData.mess.custom.customerName}}</span></div>
+                </div>
+                <div class="H-text-list H-flexbox-horizontal  H-theme-background-color-white H-border-vertical-bottom-margin-left-10-after H-vertical-middle H-touch-active">
+                    <div class="H-flex-item H-padding-horizontal-both-10 H-font-size-16 H-padding-vertical-both-12">手机号码<span style="margin-left: 12px;width: 55%;outline: none">{{userData.mess.custom.customerMobile}}</span></div>
+                </div>
+                <div class="H-text-list H-flexbox-horizontal  H-theme-background-color-white H-border-vertical-bottom-margin-left-10-after H-vertical-middle H-touch-active">
+                    <div class="H-flex-item H-padding-horizontal-both-10 H-font-size-16 H-padding-vertical-both-12">车辆型号<span style="margin-left: 12px;width: 55%;outline: none">{{userData.chooseCar.carBrand}}</span></div>
+                </div>
+                <div class="H-text-list H-flexbox-horizontal  H-theme-background-color-white H-border-vertical-bottom-margin-left-10-after H-vertical-middle H-touch-active">
+                    <div class="H-flex-item H-padding-horizontal-both-10 H-font-size-16 H-padding-vertical-both-12">车牌号码<span style="margin-left: 12px;width: 55%;outline: none">{{userData.chooseCar.plateNo}}</span></div>
+                </div>
+                <div class="H-text-list H-flexbox-horizontal  H-theme-background-color-white H-border-vertical-bottom-margin-left-10-after H-vertical-middle H-touch-active">
+                    <div class="H-flex-item H-padding-horizontal-both-10 H-font-size-16 H-padding-vertical-both-12">进厂里程<input type="number" :value="userData.userMessage.enterMileage" style="margin-left: 12px;width: 30%;outline: none;border: 1px solid #eee;margin-right: 7px">km</div>
+                </div>
+                <div @click="oilMass()" class="H-text-list H-flexbox-horizontal  H-theme-background-color-white H-border-vertical-bottom-margin-left-10-after H-vertical-middle H-touch-active">
+                    <div class="H-flex-item H-padding-horizontal-both-10 H-font-size-16 H-padding-vertical-both-12">现存油量<span style="margin-left: 12px;width: 55%;outline: none">{{userData.userMessage.oilMass}}</span></div>
+                    <span class="H-icon H-padding-horizontal-right-10 H-display-block"><i class="H-iconfont H-icon-arrow-right H-theme-font-color-999 H-font-size-14 H-vertical-middle"></i></span>
+                </div>
+                <div class="H-text-list H-flexbox-horizontal  H-theme-background-color-white H-border-vertical-bottom-margin-left-10-after H-vertical-middle H-touch-active">
+                    <div class="H-flex-item H-padding-horizontal-both-10 H-font-size-16 H-padding-vertical-both-12">进场时间<span style="margin-left: 12px;width: 55%;outline: none">{{time}}</span></div>
+                </div>
+                <div @click="carryPeo()" class="H-text-list H-flexbox-horizontal  H-theme-background-color-white H-border-vertical-bottom-margin-left-10-after H-vertical-middle H-touch-active">
+                    <div class="H-flex-item H-padding-horizontal-both-10 H-font-size-16 H-padding-vertical-both-12">接车人员<span style="margin-left: 12px;width: 55%;outline: none">{{carryPeople}}</span></div>
+                    <span class="H-icon H-padding-horizontal-right-10 H-display-block"><i class="H-iconfont H-icon-arrow-right H-theme-font-color-999 H-font-size-14 H-vertical-middle"></i></span>
+                </div>
+                <div @click="sellPeo()" class="H-text-list H-flexbox-horizontal  H-theme-background-color-white H-border-vertical-bottom-margin-left-10-after H-vertical-middle H-touch-active">
+                    <div class="H-flex-item H-padding-horizontal-both-10 H-font-size-16 H-padding-vertical-both-12">销售人员<span style="margin-left: 12px;width: 55%;outline: none">{{sellPeople}}</span></div>
+                    <span class="H-icon H-padding-horizontal-right-10 H-display-block"><i class="H-iconfont H-icon-arrow-right H-theme-font-color-999 H-font-size-14 H-vertical-middle"></i></span>
+                </div>
+                <div @click="subDate()" class="H-text-list H-flexbox-horizontal  H-theme-background-color-white H-border-vertical-bottom-margin-left-10-after H-vertical-middle H-touch-active">
+                    <div class="H-flex-item H-padding-horizontal-both-10 H-font-size-16 H-padding-vertical-both-12">预交车时间<span style="margin-left: 12px;width: 55%;outline: none">{{subData}}</span></div>
+                    <span class="H-icon H-padding-horizontal-right-10 H-display-block"><i class="H-iconfont H-icon-arrow-right H-theme-font-color-999 H-font-size-14 H-vertical-middle"></i></span>
+                </div>
+            </div>
+            <!-- 服务项目 -->
+            <template v-for="(chooseLi,ind) in chooseList" v-if="userData.choose.length!==0">
+                <div class="H-margin-vertical-top-10 H-theme-background-color-white H-border-vertical-both-after">
+
+                    <div class="H-text-list H-flexbox-horizontal  H-theme-background-color-white H-border-vertical-bottom-margin-left-10-after H-vertical-middle H-touch-active">
+                        <div class="H-flex-item H-padding-horizontal-both-10 H-font-size-16 H-padding-vertical-both-12">服务项目<span style="margin-left: 12px;width: 55%;outline: none">{{chooseLi.serviceName}}</span></div>
+                    </div>
+                    <div class="H-text-list H-flexbox-horizontal  H-theme-background-color-white H-border-vertical-bottom-margin-left-10-after H-vertical-middle H-touch-active">
+                        <div class="H-flex-item H-padding-horizontal-both-10 H-font-size-16 H-padding-vertical-both-12">项目价格<span style="margin-left: 12px;width: 55%;outline: none;color: #FF4646">{{chooseLi.marketPrice}}元</span></div>
+                    </div>
+                    <div v-if="chooseLi.dictId==9" class="H-text-list H-flexbox-horizontal  H-theme-background-color-white H-border-vertical-bottom-margin-left-10-after H-vertical-middle H-touch-active">
+                        <div class="H-flex-item H-padding-horizontal-both-10 H-font-size-16 H-padding-vertical-both-12">商品个数<span style="margin-left: 12px;width: 55%;outline: none">{{chooseLi.number}}件</span></div>
+                    </div>
+                    <!-- <div @click="chosPeo(ind)" class="H-text-list H-flexbox-horizontal  H-theme-background-color-white H-border-vertical-bottom-margin-left-10-after H-vertical-middle H-touch-active">
+                        <div class="H-flex-item H-padding-horizontal-both-10 H-font-size-16 H-padding-vertical-both-12">服务人员<span style="margin-left: 12px;width: 55%;outline: none">{{arrSer[ind].sellP}}</span></div>
+                        <span class="H-icon H-padding-horizontal-right-10 H-display-block"><i class="H-iconfont H-icon-arrow-right H-theme-font-color-999 H-font-size-14 H-vertical-middle"></i></span>
+                    </div> -->
+                </div>
+
+            </template>
+            <!-- 套餐项目 -->
+            <template v-for="(chooseLi,ind) in chooseList" v-if="userData.choosePack.length!==0">
+                <div class="H-margin-vertical-top-10 H-theme-background-color-white H-border-vertical-both-after">
+
+                    <div class="H-text-list H-flexbox-horizontal  H-theme-background-color-white H-border-vertical-bottom-margin-left-10-after H-vertical-middle H-touch-active">
+                        <div class="H-flex-item H-padding-horizontal-both-10 H-font-size-16 H-padding-vertical-both-12">服务项目<span style="margin-left: 12px;width: 55%;outline: none">{{chooseLi.serviceName}}</span></div>
+                    </div>
+                    <div class="H-text-list H-flexbox-horizontal  H-theme-background-color-white H-border-vertical-bottom-margin-left-10-after H-vertical-middle H-touch-active">
+                        <div class="H-flex-item H-padding-horizontal-both-10 H-font-size-16 H-padding-vertical-both-12">项目价格<span style="margin-left: 12px;width: 55%;outline: none;color: #FF4646">套餐</span></div>
+                    </div>
+                    <!-- <div @click="chosPeo(ind)" class="H-text-list H-flexbox-horizontal  H-theme-background-color-white H-border-vertical-bottom-margin-left-10-after H-vertical-middle H-touch-active">
+                        <div class="H-flex-item H-padding-horizontal-both-10 H-font-size-16 H-padding-vertical-both-12">服务人员<span style="margin-left: 12px;width: 55%;outline: none">{{arrSer[ind].sellP}}</span></div>
+                        <span class="H-icon H-padding-horizontal-right-10 H-display-block"><i class="H-iconfont H-icon-arrow-right H-theme-font-color-999 H-font-size-14 H-vertical-middle"></i></span>
+                    </div> -->
+                </div>
+
+            </template>
+            <div class="H-theme-background-color-white H-border-vertical-both-after">
+                <div class="H-text-list H-flexbox-horizontal  H-theme-background-color-white H-border-vertical-bottom-margin-left-10-after H-vertical-middle H-touch-active">
+                    <div @click="addService()" class="H-flex-item H-padding-horizontal-both-10 H-font-size-16 H-padding-vertical-both-12">
+                        <span style="margin-left: 50%;outline: none;transform: translateX(-50%);color: #66B0F5;">
+                            <span style="border: 1px solid #66B0F5;border-radius: 50%;display: inline-block;width: 24px;margin-left: 4px;text-align:center">+</span>
+                            添加服务
+                        </span>
+                    </div>
+                </div>
+            </div>
+            <!-- 费用 -->
+            <div class="H-margin-vertical-top-10 H-theme-background-color-white H-border-vertical-both-after">
+                <div class="H-text-list H-flexbox-horizontal  H-theme-background-color-white H-border-vertical-bottom-margin-left-10-after H-vertical-middle H-touch-active">
+                    <div class="H-flex-item H-padding-horizontal-both-10 H-font-size-16 H-padding-vertical-both-12">服务金额<span style="margin-left: 12px;width: 55%;outline: none;color: #FF4646">{{totalPrice}}元</span></div>
+                </div>
+                <!-- <div class="H-text-list H-flexbox-horizontal  H-theme-background-color-white H-border-vertical-bottom-margin-left-10-after H-vertical-middle H-touch-active">
+                    <div class="H-flex-item H-padding-horizontal-both-10 H-font-size-16 H-padding-vertical-both-12">预收金额<span style="margin-left: 12px;width: 55%;outline: none"></span></div>
+                </div>
+                <div class="H-text-list H-flexbox-horizontal  H-theme-background-color-white H-border-vertical-bottom-margin-left-10-after H-vertical-middle H-touch-active">
+                    <div class="H-flex-item H-padding-horizontal-both-10 H-font-size-16 H-padding-vertical-both-12">预收金收款方式<span style="margin-left: 12px;width: 55%;outline: none"></span></div>
+                </div> -->
+            </div>
+            <!-- 服务状态 -->
+            <div class="H-margin-vertical-top-10 H-theme-background-color-white H-border-vertical-both-after">
+                <div class="H-text-list H-flexbox-horizontal  H-theme-background-color-white H-border-vertical-bottom-margin-left-10-after H-vertical-middle H-touch-active">
+                    <div class="H-flex-item H-padding-horizontal-both-10 H-font-size-16 H-padding-vertical-both-12">服务状态<span style="margin-left: 12px;width: 55%;outline: none;color: #6EB4F5">未分配</span></div>
+                </div>
+                <div class="H-text-list H-flexbox-horizontal  H-theme-background-color-white H-border-vertical-bottom-margin-left-10-after H-vertical-middle H-touch-active">
+                    <div class="H-flex-item H-padding-horizontal-both-10 H-font-size-16 H-padding-vertical-both-12">支付状态<span style="margin-left: 12px;width: 55%;outline: none;color: #6EB4F5">未结算</span></div>
+                </div>
+                <div class="H-text-list H-flexbox-horizontal  H-theme-background-color-white H-border-vertical-bottom-margin-left-10-after H-vertical-middle H-touch-active">
+                    <div @click="choosPay()" v-if="userData.choose.length!==0" class="H-flex-item H-padding-horizontal-both-10 H-font-size-16 H-padding-vertical-both-12">支付方式<span style="margin-left: 12px;width: 55%;outline: none">{{choPay}}</span></div>
+                    <div v-if="userData.choosePack.length!==0" class="H-flex-item H-padding-horizontal-both-10 H-font-size-16 H-padding-vertical-both-12">支付方式<span style="margin-left: 12px;width: 55%;outline: none">套餐</span></div>
+                    <span v-if="userData.choose.length!==0" class="H-icon H-padding-horizontal-right-10 H-display-block"><i class="H-iconfont H-icon-arrow-right H-theme-font-color-999 H-font-size-14 H-vertical-middle"></i></span>
+                </div>
+            </div>
+            <!-- 服务信息 -->
+            <div class="H-margin-vertical-top-10 H-theme-background-color-white H-border-vertical-both-after">
+                <div @click="startDatechoose()" class="H-text-list H-flexbox-horizontal  H-theme-background-color-white H-border-vertical-bottom-margin-left-10-after H-vertical-middle H-touch-active">
+                    <div class="H-flex-item H-padding-horizontal-both-10 H-font-size-16 H-padding-vertical-both-12">开单时间<span style="margin-left: 12px">{{openDate}}</span></div>
+                    <span class="H-icon H-padding-horizontal-right-10 H-display-block"><i class="H-iconfont H-icon-arrow-right H-theme-font-color-999 H-font-size-14 H-vertical-middle"></i></span>
+                </div>
+                <!-- <div class="H-text-list H-flexbox-horizontal  H-theme-background-color-white H-border-vertical-bottom-margin-left-10-after H-vertical-middle H-touch-active">
+                    <div class="H-flex-item H-padding-horizontal-both-10 H-font-size-16 H-padding-vertical-both-12">服务时间<input style="margin-left: 12px;width: 55%;outline: none;border: 1px solid #eee;margin-right: 7px"></div>
+                </div>
+                <div class="H-text-list H-flexbox-horizontal  H-theme-background-color-white H-border-vertical-bottom-margin-left-10-after H-vertical-middle H-touch-active">
+                    <div class="H-flex-item H-padding-horizontal-both-10 H-font-size-16 H-padding-vertical-both-12">施工时长<input style="margin-left: 12px;width: 55%;outline: none;border: 1px solid #eee;margin-right: 7px"></div>
+                </div> -->
+            </div>
+
+            <div class="H-margin-vertical-top-10 H-theme-background-color-white H-border-vertical-both-after">
+                <div class="H-text-list H-flexbox-horizontal  H-theme-background-color-white H-border-vertical-bottom-margin-left-10-after H-vertical-middle H-touch-active">
+                    <div class="H-flex-item H-padding-horizontal-both-10 H-font-size-16 H-padding-vertical-both-12">车身情况<span style="margin-left: 12px;width: 55%;outline: none"></span></div>
+                </div>
+                <div class="H-text-list H-flexbox-horizontal  H-theme-background-color-white H-border-vertical-bottom-margin-left-10-after H-vertical-middle H-touch-active">
+                    <div class="H-flex-item H-padding-horizontal-both-10 H-font-size-16 H-padding-vertical-both-12">
+                        <p><span @click="addBgcolor($event)" :class="{bgColor: addColor[0].istrue}" ref="carBody" style="margin-left: 12px;border: 1px solid #4FA4F3;color:#4FA4F3;padding:3px 10px;border-radius: 18px;font-size: 13px">车身有破损擦伤</span></p>
+                        <p><span @click="addBgcolor($event)" :class="{bgColor: addColor[1].istrue}" ref="carBody" style="margin: 13px 0px 13px 12px;border: 1px solid #4FA4F3;color:#4FA4F3;padding:3px 10px;border-radius: 18px;font-size: 13px;">车内有破损擦伤</span></p>
+                        <p><span @click="addBgcolor($event)" :class="{bgColor: addColor[2].istrue}" ref="carBody" style="margin-left: 12px;border: 1px solid #4FA4F3;color:#4FA4F3;padding:3px 10px;border-radius: 18px;font-size: 13px">车内有贵重物品</span></p>
+                    </div>
+                </div>
+                <!-- 施工前照片 -->
+                <div class="H-text-list H-flexbox-horizontal  H-theme-background-color-white H-border-vertical-bottom-margin-left-10-after H-vertical-middle">
+                    <div class="H-flex-item H-padding-horizontal-both-10 H-font-size-16 H-padding-vertical-both-12">施工前照片<span style="margin-left: 12px;width: 55%;outline: none"></span></div>
+                </div>
+                <div class="H-text-list H-flexbox-horizontal  H-theme-background-color-white H-border-vertical-bottom-margin-left-10-after H-vertical-middle H-touch-active">
+                    <template>
+                        <span style="display: inline-block; width: 18%; height: 60px; margin: 0 1%" v-for="(item,index) in imgList">
+                            <img @click="chooseImg(index)" style="width: 100%;height: 60px;object-fit: cover;" :src="item.url" alt="">
+                        </span>
+                    </template>
+                </div>
+                <!-- 施工后照片 -->
+                <!-- <div class="H-text-list H-flexbox-horizontal  H-theme-background-color-white H-border-vertical-bottom-margin-left-10-after H-vertical-middle H-touch-active">
+                    <div class="H-flex-item H-padding-horizontal-both-10 H-font-size-16 H-padding-vertical-both-12">施工后照片<span style="margin-left: 12px;width: 55%;outline: none"></span></div>
+                </div>
+                <div class="H-text-list H-flexbox-horizontal  H-theme-background-color-white H-border-vertical-bottom-margin-left-10-after H-vertical-middle H-touch-active">
+                    <template>
+                        <span style="display: inline-block; width: 15%; height: 40px; margin: 0 1%" v-for="(item,index) in imgList1">
+                            <img @click="chooseImg1(index)" style="width: 100%;height: 40px;object-fit: cover;" :src="item.url" alt="">
+                        </span>
+                    </template>
+                </div> -->
+                <div @click="keyDates()" class="H-text-list H-flexbox-horizontal  H-theme-background-color-white H-border-vertical-bottom-margin-left-10-after H-vertical-middle H-touch-active">
+                    <div class="H-flex-item H-padding-horizontal-both-10 H-font-size-16 H-padding-vertical-both-12">取钥匙时间<span style="margin-left: 12px;width: 55%;outline: none">{{keyDate}}</span></div>
+                    <span class="H-icon H-padding-horizontal-right-10 H-display-block"><i class="H-iconfont H-icon-arrow-right H-theme-font-color-999 H-font-size-14 H-vertical-middle"></i></span>
+                </div>
+                <!-- <div class="H-text-list H-flexbox-horizontal  H-theme-background-color-white H-border-vertical-bottom-margin-left-10-after H-vertical-middle H-touch-active">
+                    <div class="H-flex-item H-padding-horizontal-both-10 H-font-size-16 H-padding-vertical-both-12">客户所在地<input v-model="userLocation" style="margin-left: 12px;width: 55%;outline: none"></div>
+                </div> -->
+            </div>
+            <div class="H-margin-vertical-top-10 H-theme-background-color-white H-border-vertical-both-after">
+                <div class="H-text-list H-flexbox-horizontal  H-theme-background-color-white H-border-vertical-bottom-margin-left-10-after H-vertical-middle H-touch-active">
+                    <div class="H-flex-item H-padding-horizontal-both-10 H-font-size-16 H-padding-vertical-both-12">备注<span style="margin-left: 12px;width: 55%;outline: none"></span></div>
+                </div>
+                <textarea v-model="comment" name="" id="" cols="30" rows="5" style="outline: none;padding: 3px 15px"></textarea>
+            </div>
+            <!-- 确定 start -->
+            <footer @click="btnSubmit()" class="H-text-align-center H-margin-vertical-top-15 H-position-relative">
+                <span class="H-theme-font-color-white H-font-size-18 H-margin-vertical-bottom-15 H-display-block H-position-absolute H-padding-vertical-both-10" style="left:10px;right:10px;">完成</span>
+            </footer>
+            <!-- 确定 end -->
+        </div>
+
+
+
+    </div>
+    <script type="text/javascript" src="../../script/api.js"></script>
+    <script type="text/javascript" src="../../script/hui/H.js"></script>
+    <script type="text/javascript" src="../../script/vue.min.js"></script>
+    <script type="text/javascript" src="../../script/jquery.min.js"></script>
+    <script type="text/javascript" src="../../script/appUtils.js"></script>
+    <script type="text/javascript" src="../../script/plugIn.js"></script>
+    <script type="text/javascript">
+        apiready = function() {
+            setStatusBarStyleFn('dark'); // 状态栏颜色
+            // 头部沉侵
+            var header = $api.dom('header');
+            var headerH = $api.fixStatusBar(header);
+            // 修改时间格式
+            function timeCycle(datetime){
+                y=datetime.getFullYear(),
+                m=datetime.getMonth()+1,
+                d=datetime.getDate(),
+                x= y+"-"+(m<10 ? "0" +m:m)+"-"+(d<10 ? "0" +d:d)+" "+datetime.toTimeString().substr(0,8);
+                return x;
+            }
+
+            // 接收页面传递过来的参数
+            var userData=api.pageParam.data;
+            console.log(JSON.stringify(userData))
+            var shopId=userData.shop.shopId;
+            var chooseList=[];
+            var totalPrice=0;
+            var time=userData.startDate;
+            var subData='';
+            var ase='';
+            var payInd={"现金": 1,"刷卡": 2,"支付宝": 3,"微信": 4}
+            // 判断用户是否输入接车人员
+            if(userData.carryPeople){
+                ase=userData.carryPeople.staffName;
+                userData.sellPeople=userData.carryPeople;
+            }
+            if(userData.endDate){
+                subData=userData.endDate;
+            }
+            var arrSer=[];
+            var s=0;
+            // 获取选中产品将其放入同一个数组中
+            for(var i=0;i<userData.serviceItem.length;i++){
+                for(var n=0;n<userData.serviceItem[i].length;n++){
+                    for(var j=0;j<userData.serviceItem[i][n].serviceVoList.length;j++){
+                        for(var k=0;k<userData.choose.length;k++){
+                            if(userData.choose[k]==userData.serviceItem[i][n].serviceVoList[j].serviceId){
+                                userData.serviceItem[i][n].serviceVoList[j].dictId=userData.serviceItem[i][n].dictId;
+                                chooseList[chooseList.length]=userData.serviceItem[i][n].serviceVoList[j];
+                                totalPrice+=(userData.serviceItem[i][n].serviceVoList[j].marketPrice)*(userData.serviceItem[i][n].serviceVoList[j].number);
+                                arrSer[s]=new Object();
+                                arrSer[s].sellP='--';
+                                s++;
+                            }
+                        }
+                    }
+                }
+
+            }
+            // 获取选中服务并放入同一个数组中
+            if(userData.packageItem){
+                for(var i=0;i<userData.packageItem.length;i++){
+                    for(var j=0;j<userData.packageItem[i].packageServiceVos.length;j++){
+                        for(var k=0;k<userData.choosePack.length;k++){
+                            if(userData.packageItem[i].packageServiceVos[j].qcpsId==userData.choosePack[k]){
+                                chooseList[chooseList.length]=userData.packageItem[i].packageServiceVos[j];
+                                arrSer[s]=new Object();
+                                arrSer[s].sellP='--';
+                                s++;
+                            }
+                        }
+
+                    }
+                }
+            }
+
+            console.log(JSON.stringify(chooseList))
+            var imgList=[{a:1,url:'../../image/userCenter/upphone.png'},
+                {a:2,url:'../../image/userCenter/upphone.png'},
+                {a:3,url:'../../image/userCenter/upphone.png'},
+                {a:4,url:'../../image/userCenter/upphone.png'},
+                {a:5,url:'../../image/userCenter/upphone.png'}]
+            var imgList1=[{a:1,url:'../../image/userCenter/upphone.png'},
+                {a:2,url:'../../image/userCenter/upphone.png'},
+                {a:3,url:'../../image/userCenter/upphone.png'},
+                {a:4,url:'../../image/userCenter/upphone.png'},
+                {a:5,url:'../../image/userCenter/upphone.png'}]
+            var addColor=[
+                {istrue: 0,inde: 1},
+                {istrue: 0,inde: 1},
+                {istrue: 0,inde: 1}
+            ]
+
+            // 默认开单日期
+            var startDat=new Date().Format("yyyy-MM-dd hh:mm:ss");
+            var addUser=new Vue({
+                el: '#VUE_BOX',
+                data: {
+                    userData: userData,
+                    chooseList: chooseList,
+                    totalPrice: totalPrice,
+                    openDate: startDat,
+                    time: time,
+                    carryPeople: ase,
+                    sellPeople: ase,
+                    subData: subData,
+                    comment: '',
+                    arrSer: arrSer,
+                    choPay: '',
+                    isInd: 0,
+                    userLocation: '',
+                    keyDate: '', //取钥匙时间
+                    worn: '',
+                    imgList: imgList,
+                    imgList1: imgList1,
+                    addColor: addColor
+                },
+                methods: {
+                    // 添加服务
+                    addService: function(){
+                        api.closeWin({
+                            name: 'p_appServiceOk',
+                            url: 'p_appServiceOk.html'
+                        })
+                        api.openWin({
+                            name: 'p_appServices',
+                            url: 'p_appServices.html'
+                        })
+
+                    },
+                    // 接车人员
+                    carryPeo: function(){
+                        request({
+                            url: 'app/staff/staff_list?shopId='+userData.shop.shopId
+                        },function(res){
+                            var arr=[]
+                            for(var i=0;i<res.length;i++){
+                                arr[i]=res[i].staffName;
+                            }
+                            api.actionSheet({
+                                title: "请选择接车人员",
+                                cancelTitle: '取消',
+                                buttons: arr
+                            }, function(ret, err) {
+                                var index = ret.buttonIndex;
+                                if(index!==(arr.length+1)){
+                                    addUser.carryPeople=arr[index-1];
+                                    userData.carryPeople=res[index-1];
+                                } else {
+
+                                }
+                            });
+                        })
+                    },
+                    // 选择剩余油量
+                    oilMass: function(){
+                        var data=['F',"3/4","1/2","1/4","E"];
+                        api.actionSheet({
+                            title: "请选择剩余油量",
+                            cancelTitle: '取消',
+                            buttons: data
+                        }, function(ret, err) {
+                            var index = ret.buttonIndex;
+                            if(index!==(data.length+1)){
+                                addUser.userData.userMessage.oilMass=data[index-1];
+                                userData.oilMass=data[index-1];
+                            } else {
+
+                            }
+                        });
+
+                    },
+                    // 销售人员
+                    sellPeo: function(){
+                        request({
+                            url: 'app/staff/staff_list?shopId='+userData.shop.shopId
+                        },function(res){
+                            var arr=[]
+                            for(var i=0;i<res.length;i++){
+                                arr[i]=res[i].staffName;
+                            }
+                            api.actionSheet({
+                                title: "请选择销售人员",
+                                cancelTitle: '取消',
+                                buttons: arr
+                            }, function(ret, err) {
+                                var index = ret.buttonIndex;
+                                if(index!==(arr.length+1)){
+                                    addUser.sellPeople=arr[index-1];
+                                    userData.sellPeople=res[index-1];
+                                } else {
+
+                                }
+                            });
+                        })
+                    },
+                    // 服务人员
+                    chosPeo: function(ind){
+                        console.log('app/staff/staff_list?shopId='+userData.shop.shopId)
+                        request({
+                            url: 'app/staff/staff_list?shopId='+userData.shop.shopId
+                        },function(res){
+                            console.log(JSON.stringify(res))
+                            var arr=[]
+                            for(var i=0;i<res.length;i++){
+                                arr[i]=res[i].staffName;
+                            }
+                            var data={};
+                            data.title='请选择服务人员';
+                            data.arr=arr;
+                            var mess='';
+                            api.openFrame({
+                                name: 'plugIn',
+                                url: '../plugIn/plugIn.html',
+                                bgColor: 'rgba(0,0,0,0)',
+                                rect: {
+                                    x: 20,
+                                    y: api.winHeight-208,
+                                    w: api.winWidth-40,
+                                    h: 188
+                                },
+                                animation: {
+                                    type:"push",
+                                    subType:"from_bottom",
+                                    duration:300
+                                },
+                                pageParam: {
+                                    data: data
+                                }
+                            })
+                            api.addEventListener({
+                                name: 'choseDate'
+                            },function(ret,err){
+                                var arrs='';
+                                for(var i=0;i<ret.value.data.length;i++){
+                                    if(i==0){
+                                        arrs+=ret.value.data[i];
+                                    } else {
+                                        arrs+=' '+ret.value.data[i];
+                                    }
+
+                                }
+                                addUser.arrSer[ind].sellP=arrs;
+                            })
+                        })
+                        // 底部弹出选择框（多选）
+                        // function multipleChoice(title,arr){
+
+                        // }
+                    },
+                    // 选择支付方式
+                    choosPay: function(){
+                        var data=['现金',"刷卡","支付宝","微信"];
+
+                        api.actionSheet({
+                            title: "请选择支付方式",
+                            cancelTitle: '取消',
+                            buttons: data
+                        }, function(ret, err) {
+                            var index = ret.buttonIndex;
+                            if(index!==(data.length+1)){
+                                addUser.choPay=data[index-1];
+                                userData.choPay=data[index-1];
+                            } else {
+
+                            }
+                        });
+                    },
+                    // 预交车时间
+                    subDate: function(){
+                        // api.openPicker({
+                        //     type: 'date',
+                        //     date: '',
+                        //     title: '选择时间'
+                        // }, function(ret, err) {
+                        //     if (ret) {
+                        //         addUser.subData=""+ret.year+"-"+(ret.month<10?'0'+ret.month:ret.month)+"-"+(ret.day<10?'0'+ret.day:ret.day)+" "+(ret.hour<10?"0"+ret.hour:ret.hour)+":"+(ret.minute<10?'0'+ret.minute:ret.minute)+"";
+                        //     } else {
+                        //         // alert(JSON.stringify(err));
+                        //     }
+                        // });
+                        var UIActionSelector = api.require('UIActionSelector');
+                        UIActionSelector.open({
+                            datas: chooseTime,
+                            layout: {
+                                row: 5,
+                                col: 3,
+                                height: 30,
+                                size: 12,
+                                sizeActive: 14,
+                                rowSpacing: 5,
+                                colSpacing: 10,
+                                maskBg: 'rgba(0,0,0,0.2)',
+                                bg: '#fff',
+                                color: '#888',
+                                colorActive: '#f00',
+                                colorSelected: '#f00'
+                            },
+                            animation: true,
+                            cancel: {
+                                text: '取消',
+                                size: 12,
+                                w: 90,
+                                h: 35,
+                                bg: '#fff',
+                                bgActive: '#ccc',
+                                color: '#888',
+                                colorActive: '#fff'
+                            },
+                            ok: {
+                                text: '确定',
+                                size: 12,
+                                w: 90,
+                                h: 35,
+                                bg: '#fff',
+                                bgActive: '#ccc',
+                                color: '#888',
+                                colorActive: '#fff'
+                            },
+                            title: {
+                                text: '请选择',
+                                size: 12,
+                                h: 44,
+                                bg: '#eee',
+                                color: '#888'
+                            },
+                            fixedOn: api.frameName
+                        }, function(ret, err) {
+                            if (ret.eventType=="ok") {
+                                // console.log(JSON.stringify(ret))
+                                var hour=ret.level2.substring(0,2);
+                                var mintus=ret.level3.substring(0,2);
+                                addUser.subData=ret.level1+' '+hour+':'+mintus;
+                                console.log(addUser.subData)
+                            }
+                        });
+                    },
+                    // 选择开单日期
+                    startDatechoose: function(){
+                        api.openPicker({
+                            type: 'date_time',
+                            date: '',
+                            title: '选择时间'
+                        }, function(ret, err) {
+                            if (ret) {
+                                addUser.openDate=""+ret.year+"-"+(ret.month<10?'0'+ret.month:ret.month)+"-"+(ret.day<10?'0'+ret.day:ret.day)+" "+(ret.hour<10?"0"+ret.hour:ret.hour)+":"+(ret.minute<10?'0'+ret.minute:ret.minute)+"";
+                            } else {
+                                // alert(JSON.stringify(err));
+                            }
+                        });
+                    },
+                    // 选择是否有破损
+                    addBgcolor: function(e){
+
+                        var txt=e.currentTarget.innerText;
+                        console.log(txt)
+                        if(txt=='车身有破损擦伤'){
+                            if(addUser.addColor[0].inde==1){
+                                addUser.addColor[0].istrue=1;
+                                addUser.addColor[0].inde=2;
+                            } else {
+                                addUser.addColor[0].istrue=0;
+                                addUser.addColor[0].inde=1;
+                            }
+                        }
+                        if(txt=='车内有破损擦伤'){
+                            if(addUser.addColor[1].inde==1){
+                                addUser.addColor[1].istrue=1;
+                                addUser.addColor[1].inde=2;
+                            } else {
+                                addUser.addColor[1].istrue=0;
+                                addUser.addColor[1].inde=1;
+                            }
+                        }
+                        if(txt=='车内有贵重物品'){
+                            if(addUser.addColor[2].inde==1){
+                                addUser.addColor[2].istrue=1;
+                                addUser.addColor[2].inde=2;
+                            } else {
+                                addUser.addColor[2].istrue=0;
+                                addUser.addColor[2].inde=1;
+                            }
+                        }
+                    },
+                    //选择图片
+                    chooseImg: function(index){
+                        selectUploadImgType({
+                            maxCount: 1, // 本次最多上传几张照片
+                        }, function (ret) {
+                            addUser.imgList[index].url=ret;
+                        });
+
+                    },
+                    // 完成后照片选择
+                    chooseImg1: function(index){
+                        selectUploadImgType({
+                            maxCount: 1, // 本次最多上传几张照片
+                        }, function (ret) {
+                            addUser.imgList1[index].url=ret;
+                        });
+
+                    },
+                    // 取钥匙时间
+                    keyDates: function(){
+                        // api.openPicker({
+                        //     type: 'date_time',
+                        //     date: '',
+                        //     title: '选择时间'
+                        // }, function(ret, err) {
+                        //     if (ret) {
+                        //         addUser.keyDate=""+ret.year+"-"+(ret.month<10?'0'+ret.month:ret.month)+"-"+(ret.day<10?'0'+ret.day:ret.day)+" "+(ret.hour<10?"0"+ret.hour:ret.hour)+":"+(ret.minute<10?'0'+ret.minute:ret.minute)+"";
+                        //     } else {
+                        //         // alert(JSON.stringify(err));
+                        //     }
+                        // });
+                        var UIActionSelector = api.require('UIActionSelector');
+                        UIActionSelector.open({
+                            datas: chooseTime,
+                            layout: layout,
+                            animation: true,
+                            cancel: cancel,
+                            ok: ok,
+                            title: title,
+                            fixedOn: api.frameName
+                        }, function(ret, err) {
+                            if (ret.eventType=="ok") {
+                                var hour=ret.level2.substring(0,2);
+                                var mintus=ret.level3.substring(0,2);
+                                addUser.keyDate=ret.level1+' '+hour+':'+mintus;
+                                // console.log(addUser.keyDate)
+                            }
+                        });
+                    },
+                    // 提交订单
+                    btnSubmit: function(){
+                        console.log(subData)
+                        addUser.subData=new Date(addUser.subData).getTime();
+                        var imgArr1=[];
+                        for(var i=0;i<addUser.imgList.length;i++){
+                            imgArr1[i]=addUser.imgList[i].url;
+                        }
+                        var imgArr2=[];
+                        for(var i=0;i<addUser.imgList1.length;i++){
+                            imgArr2[i]=addUser.imgList1[i].url;
+                        }
+                        if(userData.carryPeop){
+                            var receiveStaff=userData.sellPeople.staffId;
+                        } else {
+                            var receiveStaff='';
+                        }
+                        var arr=[];
+                        for(var i=0;i<addUser.chooseList.length;i++){
+                            arr[i]=new Object();
+                            arr[i].serviceName=addUser.chooseList[i].serviceName;
+                            arr[i].serviceType=userData.packageItem?1:(addUser.chooseList[i].serviceType);
+                            arr[i].goodsQty=userData.packageItem?1:(addUser.chooseList[i].number);
+                            arr[i].unitPrice=userData.packageItem?0:(addUser.chooseList[i].marketPrice);
+                            arr[i].totalPrice=userData.packageItem?0:(addUser.chooseList[i].marketPrice*addUser.chooseList[i].number);
+                            // arr[i].serviceId=userData.packageItem?(addUser.chooseList[i].serviceId):(addUser.chooseList[i].serviceType);
+                            arr[i].serviceId=addUser.chooseList[i].serviceId;
+                            arr[i].qcpsId=addUser.chooseList[i].qcpsId;
+
+                        }
+                        var pays=addUser.choPay;
+                        // console.log(addUser.sellPeople.staffId)
+                        request({
+                            url: 'app/shop_order/open',
+                            method: 'post',
+                            data: {body: {
+                                shopId: userData.shop.shopId,
+                                customerId: userData.mess.custom.customerId,
+                                carId: userData.chooseCar.carId,
+                                enterTime: new Date(userData.startDate).getTime(),
+                                totalMoney: userData.packageItem?0:addUser.totalPrice,
+                                orderDetailConditions: arr,
+                                paymentMethod:payInd.pays,
+                                orderRemark:addUser.comment,
+                                getKeyTime:addUser.keyDate,
+                                initialPhoto: imgArr1.join(","),
+                                finalPhoto: imgArr2.join(","),
+                                hasPrecious:addUser.addColor[2].istrue,
+                                insideScratch:addUser.addColor[0].istrue,
+                                bodyScratch:addUser.addColor[1].istrue,
+                                enterMileage:addUser.userData.userMessage.enterMileage,
+                                currentOil:addUser.userData.userMessage.oilMass,
+                                estimateTime:addUser.subData,
+                                receiveStaff:userData.carryPeople.staffId,
+                                sellStaff:userData.sellPeople.staffId,//addUser.sellPeople.staffId
+                            }}
+                        },function(res){
+                            api.toast({
+                                msg: '订单创建成功',
+                                duration: 2000,
+                                location: 'bottom'
+                            })
+                            api.sendEvent({
+                                name: 'openCard'
+                            })
+                            setTimeout(function(){
+                                api.closeWin({
+                                    name: 'p_appServices'
+                                })
+                                api.closeWin()
+                            },1000)
+                        })
+                    }
+
+                }
+            })
+
+
+
+
+        }
+    </script>
+</body>
+
+</html>

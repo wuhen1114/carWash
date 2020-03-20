@@ -1,0 +1,690 @@
+<!DOCTYPE HTML>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="maximum-scale=1.0, minimum-scale=1.0, user-scalable=0, initial-scale=1.0, width=device-width" />
+    <meta name="format-detection" content="telephone=no, email=no, date=no, address=no">
+    <title></title>
+    <link href="../../css/api.css" rel="stylesheet" type="text/css" />
+    <link href="../../css/Hui.css" rel="stylesheet" type="text/css" />
+    <style>
+        ul, li{ /* 重置样式 */
+            margin: 0;
+            padding: 0;
+        }
+        .status-box{ /* 订单状态块 */
+            padding: 15px 32px 0;
+            box-sizing: border-box;
+        }
+        .status-item-img{
+            width: 6.8259%;
+        }
+        .status-item-line{
+            border-bottom: 1px dashed rgba(204,204,204,1);
+            height: 1px;
+            width: 39.761%;
+            position: relative;
+            top: 8px;
+        }
+        .status-text-box{
+            padding: 10px 10px 0;
+            box-sizing: border-box;
+            display: flex;
+            justify-content: space-between;
+        }
+        .box{
+            margin: 10px 10px 0;
+        }
+        .border-bottom{
+            border-bottom: 1px solid rgba(240, 240, 240, 1);
+        }
+        .font-color{
+            color: #4EA5F3;
+        }
+        .car-situation-item{
+            margin-right: 10px;
+            padding: 3px 10px;
+            border: 1px solid #4FA4F3;
+            border-radius: 20px;
+            margin-bottom: 10px;
+        }
+        .bottom{
+            display: flex;
+            justify-content: space-around;
+        }
+        .bottom .bottom-img{
+            width: 25px;
+        }
+        .bottom-box{
+            box-shadow: 0 -5px 5px #eee;
+        }
+        .border-color{
+            border-color: #4FA4F3;
+        }
+        .construction-img{ /* 施工照片 */
+            height: 50px;
+            object-fit: cover;
+        }
+    </style>
+</head>
+
+<body class="hRelative">
+    <div id="VUE_BOX">
+        <!-- =================================== 头部 开始 =================================== -->
+        <header class="hHeader" id="header">
+            <span @click="closeWin" class="hIconBox hPaddingLeft_10">
+                <i class="hIcon H-icon-arrow-left"></i>
+            </span>
+            <div class="hChannelTitle">订单详情</div>
+        </header>
+        <!-- =================================== 头部 结束 =================================== -->
+
+        <div v-if="succ">
+            <!-- =================================== 状态和店铺 开始 =================================== -->
+            <div class="hpadding_horizontal_both_10 hPaddingtop_10 hFontSize_16">
+                <div class="hBgColor_white hBorderRadius_10">
+                    <ul class="status-box H_displayFlex hWidth_100">
+                        <li class="status-item-img">
+                            <img v-bind:src="1 <= pageParam.orderStatus ? '../../image/order/selected.png' : '../../image/order/not_to_choose.png'" class="hWidth_100 H_displayBlock"/>
+                        </li>
+                        <li class="status-item-line" v-bind:class="{'border-color': 2 <= pageParam.orderStatus}"></li>
+                        <li class="status-item-img">
+                            <img v-bind:src="2 <= pageParam.orderStatus ? '../../image/order/selected.png' : '../../image/order/not_to_choose.png'" class="hWidth_100 H_displayBlock"/>
+                        </li>
+                        <li class="status-item-line" v-bind:class="{'border-color': 3 <= pageParam.orderStatus}"></li>
+                        <li class="status-item-img">
+                            <img v-bind:src="3 <= pageParam.orderStatus ? '../../image/order/selected.png' : '../../image/order/not_to_choose.png'" class="hWidth_100 H_displayBlock"/>
+                        </li>
+                    </ul>
+                    <ul class="status-text-box">
+                        <li class="status-text-item hFontColor_999">分配人员</li>
+                        <li class="status-text-item hFontColor_999">施工中</li>
+                        <li class="status-text-item hFontColor_999">施工完成</li>
+                    </ul>
+
+                    <div class="hFontSize_16 hPadding_10">
+                        <span class="hFontColor_999 hMarginRight_10">服务店铺</span>
+                        <span class="hFontColor_333" v-text="pageParam.shopName"></span>
+                    </div>
+                </div>
+            </div>
+            <!-- =================================== 状态和店铺 结束 =================================== -->
+
+            <!-- =================================== 客户和车辆信息 开始 =================================== -->
+            <ul class="box hFontSize_16 hBgColor_white hBorderRadius_10">
+                <li class="item hPaddingLeft_10">
+                    <div class="border-bottom hpadding_horizontal_voth_10">
+                        <span class="hFontColor_999 hMarginRight_10">客户名称</span>
+                        <span class="hFontColor_333" v-text="pageParam.customerName">大头</span>
+                    </div>
+                </li>
+                <li class="item hPaddingLeft_10">
+                    <div class="border-bottom hpadding_horizontal_voth_10">
+                        <span class="hFontColor_999 hMarginRight_10">手机号码</span>
+                        <span class="hFontColor_333" v-text="pageParam.customerMobile"></span>
+                        <span @click="call(pageParam.customerMobile)" class="H_displayInlineBlock hFloatRight hMarginRight_10">
+                            <img class="H-vertical-align-middle hRelative" style="width: 28px; top: -2px;" src="../../image/order/tel.png" />
+                        </span>
+                    </div>
+                </li>
+                <li class="item hPaddingLeft_10">
+                    <div class="border-bottom hpadding_horizontal_voth_10">
+                        <span class="hFontColor_999 hMarginRight_10">车辆型号</span>
+                        <span class="hFontColor_333" v-text="pageParam.customerCarVo.carBrand"></span>
+                    </div>
+                </li>
+                <li class="item hPaddingLeft_10">
+                    <div class="border-bottom hpadding_horizontal_voth_10">
+                        <span class="hFontColor_999 hMarginRight_10">车牌号码</span>
+                        <span class="hFontColor_333" v-text="pageParam.customerCarVo.plateNo"></span>
+                    </div>
+                </li>
+                <li class="item hPaddingLeft_10">
+                    <div class="border-bottom hpadding_horizontal_voth_10">
+                        <span class="hFontColor_999 hMarginRight_10">进场里程</span>
+                        <span class="hFontColor_333" v-text="pageParam.enterMileage || defNoText"></span>
+                    </div>
+                </li>
+                <li class="item hPaddingLeft_10">
+                    <div class="border-bottom hpadding_horizontal_voth_10">
+                        <span class="hFontColor_999 hMarginRight_10">现存油量</span>
+                        <span class="hFontColor_333" v-text="pageParam.currentOil || defNoText"></span>
+                    </div>
+                </li>
+                <li class="item hPaddingLeft_10">
+                    <div class="border-bottom hpadding_horizontal_voth_10">
+                        <span class="hFontColor_999 hMarginRight_10">进场时间</span>
+                        <span class="hFontColor_333" v-text="formatDate(pageParam.enterTime, 'yyyy-MM-dd hh:mm:ss')"></span>
+                    </div>
+                </li>
+                <li class="item hPaddingLeft_10">
+                    <div class="border-bottom hpadding_horizontal_voth_10">
+                        <span class="hFontColor_999 hMarginRight_10">接车人员</span>
+                        <span class="hFontColor_333" v-text="pageParam.receiveStaffName || defNoText"></span>
+                    </div>
+                </li>
+                <li class="item hPaddingLeft_10">
+                    <div class="border-bottom hpadding_horizontal_voth_10">
+                        <span class="hFontColor_999 hMarginRight_10">销售人员</span>
+                        <span class="hFontColor_333" v-text="pageParam.sellStaffName || defNoText"></span>
+                    </div>
+                </li>
+                <li class="item hPaddingLeft_10">
+                    <div class="border-bottom hpadding_horizontal_voth_10">
+                        <span class="hFontColor_999 hMarginRight_10">预交车时间</span>
+                        <span class="hFontColor_333" v-text="formatDate(pageParam.estimateTime, 'yyyy-MM-dd hh:mm:ss') || defNoText"></span>
+                    </div>
+                </li>
+            </ul>
+            <!-- =================================== 客户和车辆信息 结束 =================================== -->
+
+            <!-- =================================== 服务项目 开始 =================================== -->
+            <ul>
+                <li v-for="(item, index) in pageParam.orderDetailVos">
+                    <ul class="box hFontSize_16 hBgColor_white hBorderRadius_10">
+                        <li class="item hPaddingLeft_10">
+                            <div class="border-bottom hpadding_horizontal_voth_10">
+                                <span class="hFontColor_999 hMarginRight_10">服务项目</span>
+                                <span class="hFontColor_333" v-text="item.serviceName"></span>
+                            </div>
+                        </li>
+                        <li class="item hPaddingLeft_10">
+                            <div class="border-bottom hpadding_horizontal_voth_10">
+                                <span class="hFontColor_999 hMarginRight_10">服务金额</span>
+                                <span class="hFontColor_red" v-text="fixedFn(item.totalPrice, 2) + '元'"></span>
+                            </div>
+                        </li>
+                        <li class="item hPaddingLeft_10">
+                            <div class="border-bottom hpadding_horizontal_voth_10">
+                                <span class="hFontColor_999 hMarginRight_10">服务人员</span>
+                                <span class="hFontColor_333" v-text="item.serviceStaffName || defNoText"></span>
+                            </div>
+                        </li>
+                        <li @click="addService()" v-if="(pageParam.orderDetailVos.length - 1) == index && 1 === pageParam.orderStatus" class="hTextAlignCenter hpadding_horizontal_voth_10">
+                            <img src="../../image/order/add.png" class="H-vertical-align-middle hRelative hMarginRight_5" style="width: 20px; top: -2px;"/>
+                            <span class="font-color">添加服务</span>
+                        </li>
+                    </ul>
+                </li>
+            </ul>
+            <!-- =================================== 服务项目 结束 =================================== -->
+
+            <!-- =================================== 服务和支付 开始 =================================== -->
+            <ul class="box hFontSize_16 hBgColor_white hBorderRadius_10">
+                <li class="item hPaddingLeft_10">
+                    <div class="border-bottom hpadding_horizontal_voth_10">
+                        <span class="hFontColor_999 hMarginRight_10">服务金额</span>
+                        <span class="hFontColor_red" v-text="fixedFn(pageParam.totalMoney, 2) + '元'"></span>
+                    </div>
+                </li>
+                <li class="item hPaddingLeft_10">
+                    <div class="border-bottom hpadding_horizontal_voth_10">
+                        <span class="hFontColor_999 hMarginRight_10">预收金额</span>
+                        <span class="hFontColor_red" v-text="fixedFn(pageParam.perpayMoney, 2) + '元'"></span>
+                    </div>
+                </li>
+                <!-- <li class="item hPaddingLeft_10">
+                    <div class="border-bottom hpadding_horizontal_voth_10">
+                        <span class="hFontColor_999 hMarginRight_10">预收金收款方式</span>
+                        <span class="H_displayInlineBlock hFloatRight hMarginRight_10 hBgColor_white hBorderRadius_3 hFontColor_white hFontSize_12" style="padding: 2px 10px; background-color: #4FA4F3;">去支付</span>
+                    </div>
+                </li> -->
+            </ul>
+
+            <ul class="box hFontSize_16 hBgColor_white hBorderRadius_10">
+                <li class="item hPaddingLeft_10">
+                    <div class="border-bottom hpadding_horizontal_voth_10">
+                        <span class="hFontColor_999 hMarginRight_10">服务状态</span>
+                        <span class="font-color">
+                            <span v-if="0 === pageParam.orderStatus">已预约</span>
+                            <span v-if="1 === pageParam.orderStatus">未分配</span>
+                            <span v-if="2 === pageParam.orderStatus">施工中</span>
+                            <span v-if="3 === pageParam.orderStatus">已施工</span>
+                        </span>
+                    </div>
+                </li>
+                <li class="item hPaddingLeft_10">
+                    <div class="border-bottom hpadding_horizontal_voth_10">
+                        <span class="hFontColor_999 hMarginRight_10">支付状态</span>
+                        <span class="font-color">
+                            <span v-if="1 === pageParam.settleStatus">未结算</span>
+                            <span v-if="2 === pageParam.settleStatus">已结算</span>
+                            <span v-if="3 === pageParam.settleStatus">挂账</span>
+                            <span v-if="4 === pageParam.settleStatus">退款</span>
+                            <span v-if="5 === pageParam.settleStatus">作废</span>
+                        </span>
+                    </div>
+                </li>
+                <li class="item hPaddingLeft_10">
+                    <div class="border-bottom hpadding_horizontal_voth_10">
+                        <span class="hFontColor_999 hMarginRight_10">支付方式</span>
+                        <span class="font-color">
+                            <span v-if="1 === pageParam.paymentMethod">现金</span>
+                            <span v-else-if="2 === pageParam.paymentMethod">刷卡</span>
+                            <span v-else-if="3 === pageParam.paymentMethod">支付宝</span>
+                            <span v-else-if="4 === pageParam.paymentMethod">微信</span>
+                            <span v-else-if="5 === pageParam.paymentMethod">会员卡</span>
+                            <span v-else-if="6 === pageParam.paymentMethod">套餐卡</span>
+                            <span v-text="defNoText" v-else></span>
+                        </span>
+                    </div>
+                </li>
+            </ul>
+            <!-- =================================== 服务和支付 结束 =================================== -->
+
+            <!-- =================================== 开单和服务时间 开始 =================================== -->
+            <ul class="box hFontSize_16 hBgColor_white hBorderRadius_10">
+                <li class="item hPaddingLeft_10">
+                    <div class="border-bottom hpadding_horizontal_voth_10">
+                        <span class="hFontColor_999 hMarginRight_10">开单时间</span>
+                        <span class="hFontColor_333" v-text="formatDate(pageParam.createTime, 'yyyy-MM-dd hh:mm:ss')"></span>
+                    </div>
+                </li>
+                <li class="item hPaddingLeft_10">
+                    <div class="border-bottom hpadding_horizontal_voth_10">
+                        <span class="hFontColor_999 hMarginRight_10">服务时间</span>
+                        <span class="hFontColor_333" v-text="formatDate(pageParam.serviceTime, 'yyyy-MM-dd hh:mm:ss')"></span>
+                    </div>
+                </li>
+                <li class="item hPaddingLeft_10">
+                    <div class="border-bottom hpadding_horizontal_voth_10">
+                        <span class="hFontColor_999 hMarginRight_10">施工时长</span>
+                        <span class="hFontColor_333" v-text="countTimeLength()"></span>
+                    </div>
+                </li>
+            </ul>
+            <!-- =================================== 开单和服务时间 结束 =================================== -->
+
+            <!-- =================================== 车身情况和备注 开始 =================================== -->
+            <ul class="box hFontSize_16 hBgColor_white hBorderRadius_10">
+                <li class="item hPaddingLeft_10">
+                    <div class="border-bottom hpadding_horizontal_voth_10">
+                        <p class="hFontColor_999">车身情况</p>
+                        <ul class="H-overflow-hidden hMarginTop_5">
+                            <li v-if="1 === pageParam.bodyScratch" class="hFloatLeft car-situation-item font-color hFontSize_14">车身有破损擦伤</li>
+                            <li v-if="1 === pageParam.insideScratch" class="hFloatLeft car-situation-item font-color hFontSize_14">车内有破损擦伤</li>
+                            <li v-if="1 === pageParam.hasPrecious" class="hFloatLeft car-situation-item font-color hFontSize_14">车内有贵重物品</li>
+                            <li v-if="!pageParam.bodyScratch && !pageParam.insideScratch && !pageParam.hasPrecious"
+                                class="hFloatLeft car-situation-item font-color hFontSize_14">无</li>
+                        </ul>
+                    </div>
+                </li>
+                <li id="initialPhotoId" class="item hPaddingLeft_10">
+                    <div class="border-bottom hpadding_horizontal_voth_10">
+                        <p class="hFontColor_999">施工前照片</p>
+                        <ul v-if="1 === pageParam.orderStatus" class="H_displayFlex hMarginTop_10">
+                            <li @click="uploadImg('initialPhotoArr', index)" class="hPaddingRight_10 H-box-sizing-border-box hWidth_20" v-for="(item, index) in initialPhotoArr">
+                                <img class="hWidth_100 H_displayBlock construction-img" :src="item"/>
+                            </li>
+                        </ul>
+                        <ul v-else class="H_displayFlex hMarginTop_10">
+                            <li @click="imgShow(initialPhotoArr, index)" class="hPaddingRight_10 H-box-sizing-border-box hWidth_20" v-for="(item, index) in initialPhotoArr">
+                                <img class="hWidth_100 H_displayBlock construction-img" :src="item"/>
+                            </li>
+                        </ul>
+                    </div>
+                </li>
+                <li id="finalPhotoId" class="item hPaddingLeft_10 hPaddingbottom_5">
+                    <div class="hpadding_horizontal_voth_10">
+                        <p class="hFontColor_999">施工后照片</p>
+                        <ul v-if="2 === pageParam.orderStatus" class="H_displayFlex hMarginTop_10">
+                            <li @click="uploadImg('finalPhotoArr', index)" class="hPaddingRight_10 H-box-sizing-border-box hWidth_20" v-for="(item, index) in finalPhotoArr">
+                                <img class="hWidth_100 H_displayBlock construction-img" :src="item"/>
+                            </li>
+                        </ul>
+                        <ul v-else class="H_displayFlex hMarginTop_10">
+                            <li @click="imgShow(finalPhotoArr, index)" class="hPaddingRight_10 H-box-sizing-border-box hWidth_20" v-for="(item, index) in finalPhotoArr">
+                                <img class="hWidth_100 H_displayBlock construction-img" :src="item"/>
+                            </li>
+                        </ul>
+                    </div>
+                </li>
+                <li class="item hPaddingLeft_10">
+                    <div class="border-bottom hpadding_horizontal_voth_10">
+                        <span class="hFontColor_999 hMarginRight_10">取钥匙时间</span>
+                        <span class="hFontColor_333" v-text="formatDate(pageParam.getKeyTime, 'yyyy-MM-dd hh:mm:ss') || defNoText"></span>
+                    </div>
+                </li>
+            </ul>
+            <!-- =================================== 车身情况和备注 结束 =================================== -->
+
+            <!-- =================================== 备注 开始 =================================== -->
+            <ul class="box hFontSize_16 hBgColor_white hBorderRadius_10 hMarginBottom_10">
+                <li class="item hPaddingLeft_10">
+                    <div class="border-bottom hpadding_horizontal_voth_10">
+                        <p class="hFontColor_999">备注</p>
+                        <div class="hPaddingRight_10">
+                            <textarea readonly v-model="pageParam.orderRemark"  class="hWidth_100 H-border-none" rows="3"></textarea>
+                        </div>
+                    </div>
+                </li>
+            </ul>
+            <!-- =================================== 备注 结束 =================================== -->
+
+            <!-- =================================== 操作按钮 开始 =================================== -->
+            <div id="bottomId" class="bottom-box hBottom_0 hBgColor_white hpadding_horizontal_voth_5">
+                <ul class="bottom hWidth_100 hFontSize_14 hFontColor_999">
+                    <li @click="distribution()" class="hTextAlignCenter">
+                        <img class="bottom-img" v-bind:src="2 <= pageParam.orderStatus? '../../image/order/img_1.png' : '../../image/order/img_2.png'"/>
+                        <p class="bottom-text" v-bind:class="{'font-color': 2 <= pageParam.orderStatus}">分配人员</p>
+                    </li>
+                    <li @click="finishOrder()" class="hTextAlignCenter">
+                        <img class="bottom-img" v-bind:src="3 === pageParam.orderStatus ? '../../image/order/img_3.png' : '../../image/order/img_4.png'"/>
+                        <p class="bottom-text" v-bind:class="{'font-color': 3 === pageParam.orderStatus}">完成订单</p>
+                    </li>
+                    <li @click="pay" class="hTextAlignCenter">
+                        <img class="bottom-img" v-bind:src="[2, 3, 4, 5].indexOf(pageParam.settleStatus) >= 0 ? '../../image/order/img_5.png' : '../../image/order/img_6.png'"/>
+                        <p class="bottom-text" v-bind:class="{'font-color': [2, 3, 4, 5].indexOf(pageParam.settleStatus) >= 0}">确认付款</p>
+                    </li>
+                    <li @click="cancelOrder" class="hTextAlignCenter">
+                        <img class="bottom-img" v-bind:src="5 === pageParam.settleStatus ? '../../image/order/img_9.png' : '../../image/order/img_10.png'"/>
+                        <p class="bottom-text" v-bind:class="{'font-color': 5 === pageParam.settleStatus}">取消订单</p>
+                    </li>
+                </ul>
+            </div>
+            <!-- =================================== 操作按钮 结束 =================================== -->
+        </div>
+    </div>
+    <script type="text/javascript" src="../../script/api.js"></script>
+    <script type="text/javascript" src="../../script/hui/H.js"></script>
+    <script type="text/javascript" src="../../script/vue.min.js"></script>
+    <script type="text/javascript" src="../../script/jquery.min.js"></script>
+    <script type="text/javascript" src="../../script/appUtils.js"></script>
+    <script type="text/javascript">
+        apiready = function() {
+            // 状态栏颜色
+            setStatusBarStyleFn('dark');
+            // 头部沉侵
+            var header = $api.dom('header');
+            var headerH = $api.fixStatusBar(header);
+
+            window.app = new Vue({
+                el: '#VUE_BOX',
+                data: {
+                    userInfo: GET_USER_INFO(), // 登录数据
+                    pageParam: api.pageParam.data, // 订单数据
+                    defNoText: '--', // 默认无数据显示
+                    succ: false, // 查询详情的方法是否完成
+                    initialPhotoArr: [], // 施工前照片数组
+                    finalPhotoArr: [], // 施工后照片数组
+                },
+                mounted: function() {
+                    var self = this;
+                    self.listener(); // 监听
+                },
+                methods: vueDefMethods({
+                    // 计算施工时长
+                    countTimeLength: function () {
+                        var self = this, pageParam = self.pageParam, defNoText = self.defNoText;
+                        if (!pageParam.paymentTime || !pageParam.enterTime) {
+                            return defNoText;
+                        }
+                        var len = pageParam.paymentTime - pageParam.enterTime; // 施工的时间戳差
+                        var ms = 60 * 1000; // 一分钟时间戳
+                        var hs = ms * 60; // 一小时时间戳
+                        var h = Math.floor(len / hs); // 小时
+                        var m = Math.floor((len % hs) / ms); // 分钟
+                        return (!h ? '' : (h + '小时')) + (!m && h ? '' : (m + '分钟'));
+                    },
+
+                    // 监听
+                    listener: function () {
+                        var self = this;
+                        // window显示
+                        api.addEventListener({
+                            name: 'viewappear'
+                        }, function(ret, err){
+                             setStatusBarStyleFn('dark');
+                             self.getOrderById(); // 查询订单详情
+                        });
+                    },
+
+                    // 查询订单详情数据
+                    getOrderById: function () {
+                        var self = this;
+                        request({
+                            url: "app/shop_order/details/" + self.pageParam.orderId
+                        }, function (ret) {
+                            self.initialPhotoArr = (ret.initialPhoto ? ret.initialPhoto.split(",") : []);
+                            self.finalPhotoArr = (ret.finalPhoto ? ret.finalPhoto.split(",") : []);
+                            self.pageParam = ret;
+                            if (!self.succ) { // 固定底部
+                                fixedBottom("bottomId");
+                            }
+                            self.succ = true;
+                        });
+                    },
+
+                    // 分配人员
+                    distribution: function () {
+                        var self = this, pageParam = self.pageParam;
+                        if (1 === pageParam.orderStatus) { // 未分配
+                            var fn = function () {
+                                pageParam.initialPhoto = self.initialPhotoArr.join(",");
+                                api.openWin({
+                                    name: 'appOrderDistribution',
+                                    url: 'p_appOrderDistribution.html',
+                                    pageParam: {
+                                        data: pageParam
+                                    }
+                                });
+                            };
+                            if (self.judgeUpload(self.initialPhotoArr)) { // 有照片
+                                fn();
+                            } else {
+                                self.uploadImgTips(
+                                    "施工前",
+                                    function () {self.scroll("initialPhotoId");},
+                                    function () {
+                                        fn();
+                                    }
+                                );
+                            }
+                        } else if (1 < pageParam.orderStatus) {
+                            toastFn("已分配");
+                        } else {
+                            toastFn("不可分配");
+                        }
+                    },
+
+                    // 滚动到施工后的照片位置
+                    scroll: function (id) {
+                        setTimeout(function () {
+                            var element = document.getElementById(id);
+                            element.scrollIntoView();
+                            element.scrollIntoView(false);
+                            element.scrollIntoView({block: "end"});
+                            element.scrollIntoView({behavior: "instant", block: "end", inline: "nearest"});
+                        } ,500);
+                    },
+
+                    // 上传图片
+                    // key 给那个属性（数组）上传
+                    // index 正在上传的数组下标 数组需要占位
+                    uploadImg: function (key, index) {
+                        var self = this;
+                        selectUploadImgType({
+                            maxCount: 1
+                        }, function (ret) {
+                            var arr = [];
+                            var old = self[key];
+                            for (var i = 0; i < old.length; i++) {
+                                arr.push(old[i]);
+                            }
+                            arr[index] = ret;
+                            self[key] = arr;
+                        });
+                    },
+
+                    // 完成订单
+                    finishOrder: function () {
+                        var self = this, pageParam = self.pageParam;
+                        if (1 == pageParam.orderStatus) {
+                            toastFn("请分配人员");
+                        } else if (2 == pageParam.orderStatus) {
+                            if (self.judgeUpload(self.finalPhotoArr)) { // 有照片
+                                self.finishTips();
+                            } else { // 没有上传图片 询问是否上传 取消上传之后直接添加
+                                self.uploadImgTips(
+                                    "施工后",
+                                    function () {self.scroll("finalPhotoId");},
+                                    function () {self.finish();}
+                                );
+                            }
+                        } else if (3 == pageParam.orderStatus) {
+                            toastFn("订单已完成");
+                        } else {
+                            toastFn("订单不可操作");
+                        }
+                    },
+
+                    // 判断是否上传有效的图片
+                    judgeUpload: function (value) {
+                        var hasImg = false; // 是否上传照片
+                        if (value && value.length > 0) {
+                            for (var i = 0; i < value.length; i++) {
+                                if (value[i].indexOf("http") == 0) {
+                                    hasImg = true;
+                                    break;
+                                }
+                            }
+                        }
+                        return hasImg
+                    },
+
+                    // 完成订单 ---> 已上传图片，二次确认是否完成订单
+                    finishTips: function () {
+                        var self = this;
+                        api.confirm({
+                            title: '提示',
+                            msg: "是否确认完成订单",
+                            buttons: ['确定', '取消']
+                        }, function(ret, err) {
+                            if (ret.buttonIndex == 1) {
+                                self.finish(); // 完成订单
+                            }
+                        });
+                    },
+
+                    // 完成订单
+                    finish: function () {
+                        var self = this, pageParam = self.pageParam;
+                        var paramData = {
+                            orderId: pageParam.orderId,
+                            orderStatusEnum: "CONSTRUCTION_COMPLETED",
+                            finalPhoto: self.finalPhotoArr.join(",")
+                        };
+                        request({
+                            method: "post",
+                            url: "app/shop_order/upd_order_status",
+                            data: {body: paramData}
+                        }, function (ret) {
+                            toastFn("订单已完成");
+                            setTimeout(function () {
+                                self.getOrderById();
+                            }, 2000);
+                        });
+                    },
+
+                    /**
+                     * 未上传图片 提示是否上传图片
+                     *
+                     * name 照片的名称 比如施工前 施工后
+                     * 确认执行 confirmFn 的回调
+                     * 取消执行 cancelFn的回调
+                     */
+                    uploadImgTips: function (name, confirmFn, cancelFn) {
+                        api.confirm({
+                            title: '提示',
+                            msg: "未上传" + (name ? name : '') + "图片，是否上传图片",
+                            buttons: ['是', '否']
+                        }, function(ret, err) {
+                            if (ret.buttonIndex == 1) { // 确认操作
+                                if (confirmFn) {
+                                    confirmFn();
+                                }
+                            } else if (ret.buttonIndex == 2) { // 取消操作
+                                if (cancelFn) {
+                                    cancelFn();
+                                }
+                            }
+                        });
+                    },
+
+                    // 确认付款
+                    pay: function () {
+                        var self = this, pageParam = self.pageParam;
+                        if (1 === pageParam.settleStatus && 3 === pageParam.orderStatus) { // 已完成，未结算  去结算
+                            api.openWin({
+                                name: 'appOrderPay',
+                                url: 'p_appOrderPay.html',
+                                pageParam: {
+                                    data: pageParam
+                                }
+                            });
+                        } else if (2 === pageParam.settleStatus) { // 已经付款
+                            toastFn("订单已付款");
+                        } else {
+                            toastFn("订单不可付款");
+                        }
+                    },
+
+                    // 取消订单
+                    cancelOrder: function () {
+                        var self = this, pageParam = self.pageParam;
+                        if (5 === pageParam.settleStatus) { // 已经取消
+                            toastFn("订单已取消");
+                        } else if (3 === pageParam.orderStatus && 2 === pageParam.settleStatus) { // 已完成，已付款，可以取消
+                            api.openWin({
+                                name: 'appOrderCancel',
+                                url: 'p_appOrderCancel.html',
+                                pageParam: {
+                                    data: pageParam
+                                }
+                            });
+                        } else {
+                            toastFn("订单不可取消");
+                        }
+                    },
+
+                    // 添加服务
+                    addService: function () {
+                       var self = this, pageParam = self.pageParam;
+                       var arr = []; // 套餐或者服务的id
+                       var type = null; // choService-服务，choPackage-套餐
+                       for (var i = 0; i < pageParam.orderDetailVos.length; i++) {
+                           var item = pageParam.orderDetailVos[i];
+                           if (-1 == item.qcpsId) {
+                               type = "choService";
+                               arr.push(item.serviceId);
+                           } else {
+                               type = "choPackage";
+                               arr.push(item.qcpsId);
+                           }
+                       }
+                       var pageParam = {
+                           shop: {shopId: pageParam.shopId}, // 店铺id
+                           mess: {custom: {customerId: pageParam.customerId}}, // 用户id
+                           type: type, // 类型 服务或者套餐
+                           arr: arr, // 服务或者套餐的数据
+                           orderId: pageParam.orderId, // 订单id
+                       };
+                       api.openWin({
+                           name: 'appServices',
+                           url: 'p_appServices.html',
+                           pageParam: {
+                               data: pageParam
+                           }
+                       });
+                    },
+
+                }),
+            });
+
+
+        }
+    </script>
+</body>
+
+</html>

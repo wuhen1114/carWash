@@ -1,0 +1,250 @@
+<!DOCTYPE HTML>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="maximum-scale=1.0, minimum-scale=1.0, user-scalable=0, initial-scale=1.0, width=device-width" />
+    <meta name="format-detection" content="telephone=no, email=no, date=no, address=no">
+    <title>历史记录</title>
+    <link href="../../css/api.css" rel="stylesheet" type="text/css" />
+    <link href="../../css/Hui.css" rel="stylesheet" type="text/css" />
+    <style>
+        header {
+            height: 40px;
+        }
+        #main {
+            width: 100%;
+            /*padding: 0px 2%;*/
+            box-sizing: border-box;
+            margin-top: 1px;
+        }
+        section {
+            width: 100%;
+            overflow: hidden;
+            background-color: #FFF;
+            display: flex;
+            justify-content: space-between;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        section .section-left {
+            width: 28%;
+            background-color: #F0F0F0;
+        }
+        section .section-left .lis {
+            height: 70px;
+            line-height: 70px;
+            text-align: center;
+            border-bottom: 1px solid #eee;
+            /*background-color: #fff;*/
+        }
+        section .section-left .lis:last-child {
+            border-bottom: 0;
+        }
+        section .section-right {
+            width: 72%;
+            /*border-left: 1px solid #ddd;*/
+            box-sizing: border-box;
+            padding: 5px 0;
+            overflow-y: scroll;
+
+        }
+        section .section-right::-webkit-scrollbar {
+            width: 0;
+        }
+        section .section-right .list-1 {
+            border-bottom: 1px solid #eee;
+            padding-bottom: 26px;
+            position: relative;
+        }
+        section .section-right .list-1 p {
+            padding: 7px 4%;
+            box-sizing: border-box;
+        }
+        footer span {
+            background-color: #4FA4F3;
+            border-radius: 2px;
+            font-weight: bold;
+        }
+
+        .sizeColor {
+            color: #C7855A;
+        }
+        .bgColor {
+            background-color: #FFF;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="VUE_BOX">
+        <!-- 头部导航 start -->
+        <header class=" H-theme-background-color9" id="header">
+            <span tapmode="" onclick="H.closeWin();" class="H-icon H-position-relative H-display-inline-block H-float-left H-vertical-middle H-theme-font-color-black H-padding-vertical-top-8 H-padding-horizontal-left-5 H-z-index-100">
+                <i class="H-iconfont H-icon-arrow-left H-font-size-18 H-vertical-middle"></i>
+                <label class="H-display-block H-vertical-middle H-font-size-15"></label>
+            </span>
+            <div class="H-header-title H-center-all H-font-size-18 H-text-show-row-1 H-theme-font-color-black H-position-absolute H-padding-vertical-top-8 H-width-100-percent">历史记录</div>
+            <!-- <div class="hpadding_horizontal_voth_10 hpadding_horizontal_both_10 search-box" style="padding-top: 50px;background-color: #FFF">
+                <div class="hBgColor_white hBorderRadius_20 hPaddingLeft_25" style="border: 1px solid #999;position:relative">
+                    <input ref="shopName" type="text" class="hFontColor_333 hFontSize_14 hPadding_5 H-border-none" placeholder=""/ >
+                    <i @click="search($event)" class="H-iconfont H-icon-search H-font-size-14" style="width: 18px;position: absolute; right: 5%;top: 20%"></i>
+                </div>
+            </div> -->
+        </header>
+        <!-- 头部导航 end -->
+        <div id="main">
+            <section>
+                <div class="section-left">
+                    <div v-for="(item,key,index) in services.serviceOrder" @click="inId=index" class="lis" :class="{bgColor: inId==index}">{{key}}</div>
+                    <div v-for="(item,key,index) in services.cardAndHistory" v-if="item.length!=0" @click="inId=key" class="lis" :class="{bgColor: inId==key}">{{key}}</div>
+                </div>
+                <div class="section-right" id="section-right" :style="{height: height+'px'}">
+                    <template v-for="(item,key,index) in services.serviceOrder" v-if="index==inId" v-if="services.serviceOrder">
+                        <div class="list-1" v-for="(value,index) in item"  @click="details(index)">
+                            <p>时间：{{new Date(value.createTime).Format("yyyy-MM-dd hh:mm:ss")}}</p>
+                            <p>店铺：{{value.shopName}}</p>
+                            <p>服务项目：
+                                <span v-for="(valuelis,index) in value.orderDetailVos">{{valuelis.serviceName}}&nbsp;</span>
+                            </p>
+                            <div style="padding: 7px 4%">
+                                <div v-if="value.paymentMethod!==6" style="color: #FF5757; float: left;">{{value.totalMoney}}元 <span v-if="value.giveMoney && value.giveMoney!=0">赠送金额({{value.giveMoney}})</span></div>
+                                <div v-if="value.paymentMethod" style="color: #fff;background-color: #4FA4F3;padding: 4px 6px; font-size: 13px;border-radius: 4px;position: relative; top:-4px;float: right">{{paymentMethod[value.paymentMethod-1]}}</div>
+                            </div>
+                        </div>
+                    </template>
+                    <template v-for="(item,key,index) in services.cardAndHistory" v-if="key==inId" v-if="services.cardAndHistory">
+                        <div class="list-1" v-for="(value,index) in item"  @click="details1(key,index)">
+                            <p>时间：{{new Date(value.createTime).Format("yyyy-MM-dd hh:mm:ss")}}</p>
+                            <p>店铺：{{value.shopName}}</p>
+                            <p>服务项目：
+                                <span>{{value.rechargeType}}</span>
+                            </p>
+                            <div style="padding: 7px 4%">
+                                <div v-if="value.paymentMethod!==6" style="color: #FF5757; float: left;">{{value.refillMoneySum}}元 <span v-if="value.giveMoney && value.giveMoney!=0">赠送金额({{value.giveMoney}})</span></div>
+                            </div>
+                        </div>
+                    </template>
+                </div>
+            </section>
+        </div>
+
+
+
+    </div>
+    <script type="text/javascript" src="../../script/api.js"></script>
+    <script type="text/javascript" src="../../script/hui/H.js"></script>
+    <script type="text/javascript" src="../../script/vue.min.js"></script>
+    <script type="text/javascript" src="../../script/jquery.min.js"></script>
+    <script type="text/javascript" src="../../script/appUtils.js"></script>
+    <script type="text/javascript">
+        apiready = function() {
+            setStatusBarStyleFn('dark'); // 状态栏颜色
+            // 头部沉侵
+            var header = $api.dom('header');
+            var headerH = $api.fixStatusBar(header);
+            // 接收页面传递过来的参数
+            var userData=api.pageParam.data;
+            var serviceData='';
+            // console.log(JSON.stringify(userData));
+            var userId=userData.mess.custom.customerId;
+            // console.log(userId)
+            // 修改时间格式
+            function timeCycle(datetime){
+                var y=datetime.getFullYear();
+                var m=datetime.getMonth()+1;
+                var d=datetime.getDate();
+                var x= y+"-"+(m<10 ? "0" +m:m)+"-"+(d<10 ? "0" +d:d)+" "+datetime.toTimeString().substr(0,8);
+                return x;
+            }
+
+            // 获取#main距离页面顶部高度
+            // var topHeight=document.getElementById("section-right").style.height=api.winHeight-130+'px';
+
+            var service=new Vue({
+                el: "#VUE_BOX",
+                data: {
+                    services: '',
+                    height: api.winHeight - headerH - 10,
+                    inId: '',
+                    paymentMethod: ['现金', '刷卡', '支付宝', '微信', '会员卡', '套餐支付'],
+                },
+                created: function(){
+                    request({
+                        url: "app/user/order_history",
+                        method: 'post',
+                        data: {
+                            body: {
+                                customerId: userId
+                            }
+                        }
+                    },function(res){
+                        console.log(JSON.stringify(res))
+                        serviceData=res;
+                        service.services=res;
+                        var serv=Object.keys(res.cardAndHistory)[0];
+                        if(res.serviceOrder && (Object.keys(res.serviceOrder).length!==0)){
+                            service.inId=0;
+                        } else {
+                            service.inId=serv;
+                        }
+                    })
+                },
+                mounted: function() {
+                    var self = this;
+                    self.listener(); // 监听
+                },
+                methods: vueDefMethods({
+                    // 监听
+                    listener: function () {
+                        // window显示
+                        api.addEventListener({
+                            name: 'viewappear'
+                        }, function(ret, err){
+                             setStatusBarStyleFn('dark');
+                        });
+                    },
+                    // 搜索框
+                    search: function(e){
+                        var value=this.$refs.shopName.value;
+                        // req(service.inde,value);
+                    },
+                    details: function(index){
+                        var datas=Object.keys(service.services.serviceOrder);
+                        var keys=datas[service.inId];
+                        var dats=service.services.serviceOrder[keys][index];
+                        console.log(JSON.stringify(dats))
+                        api.openWin({
+                            name: 'p_appHistoryDetail',
+                            url: 'p_appHistoryDetail.html',
+                            pageParam: {
+                                data: dats
+                            }
+                        })
+                    },
+                    details1: function(key,index){
+                        var datas=Object.keys(service.services.cardAndHistory);
+                        var keys=datas[service.inId];
+                        var dats=service.services.cardAndHistory[key][index];
+                        console.log(JSON.stringify(dats))
+                        api.openWin({
+                            name: 'p_appHistoryDetail',
+                            url: 'p_appHistoryDetail.html',
+                            pageParam: {
+                                data: dats
+                            }
+                        })
+                    }
+
+
+
+                }),
+            })
+
+
+
+        }
+    </script>
+</body>
+
+</html>

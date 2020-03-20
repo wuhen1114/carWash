@@ -1,0 +1,224 @@
+<!DOCTYPE HTML>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="maximum-scale=1.0, minimum-scale=1.0, user-scalable=0, initial-scale=1.0, width=device-width" />
+    <meta name="format-detection" content="telephone=no, email=no, date=no, address=no">
+    <title></title>
+    <link href="../../css/api.css" rel="stylesheet" type="text/css" />
+    <link href="../../css/Hui.css" rel="stylesheet" type="text/css" />
+    <style>
+        ul, li, h3, p{
+            margin: 0;
+            padding: 0;
+        }
+        .search-box{ /* 搜索框 */
+            background-color: #F0F0F0;
+        }
+        .search-box .search-img{ /* 搜索图片 */
+            width: 20px;
+            height: 20px;
+            position: relative;
+            top: 5px;
+        }
+        .item{ /* 每个用户的信息 */
+            display: flex;
+            justify-content: space-between;
+            padding: 20px 10px;
+        }
+        .item>*{ /* item 下的所有直接子元素 */
+            margin: auto 0;
+        }
+        .img{/* 用户的电话和信息图标 */
+            width: 45px;
+            height: 45px;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="VUE_BOX">
+        <!-- =================================== 头部 开始 =================================== -->
+        <header class="hHeader" id="header">
+            <span @click="closeWin" class="hIconBox hPaddingLeft_10">
+                <i class="hIcon H-icon-arrow-left"></i>
+            </span>
+            <div class="hChannelTitle" v-text="paramData.title"></div>
+            <span @click="selShop" class="hIconRightBox hMarginRight_20">
+                <label class="hIconFont hFontSize_16 hRelative hTop_3" v-text="selShopData.shopName || '选择店铺'"></label>
+            </span>
+            <img src="../../image/homePage/bottom.png" class="downBoult" alt="">
+        </header>
+        <!-- =================================== 头部 结束 =================================== -->
+
+        <!-- =================================== 状态和搜索 开始 =================================== -->
+        <div id="search" class="hRelative">
+            <div class="hPadding_10 search-box">
+                <div class="hBgColor_white hBorderRadius_20 hpadding_horizontal_voth_5 hPaddingLeft_25">
+                    <img class="search-img" src="../../image/def/search.png"/>
+                    <input type="text" @blur="getList" v-model="search" class="hFontColor_333 hFontSize_14 hPadding_5 H-border-none" placeholder="搜索车牌、电话"/>
+                </div>
+            </div>
+        </div>
+        <!-- =================================== 状态和搜索 结束 =================================== -->
+
+        <!-- =================================== 统计信息 开始 =================================== -->
+        <ul class="H-padding-vertical-bottom-10 H-padding-horizontal-both-10 hFontSize_16 hFontColor_333">
+            <li v-for="item in message" class="hRelative hBorderRadius_5 hBgColor_white H-box-sizing-border-box hMarginBottom_10 item">
+                <div>{{item.customerName}}</div>
+                <div style="position: absolute; left: 30%;">
+                    <p>{{item.plateNo}}</p>
+                    <p class="hFontSize_14 hFontColor_999">{{item.customerMobile}}</p>
+                </div>
+                <div class="H_displayFlex">
+                    <img @click="call(item.customerMobile)" src="../../image/customerAnalysis/tel.png" class="img hMarginRight_10" />
+                    <img @click="sms(item.customerMobile)" src="../../image/customerAnalysis/sms.png" class="img" />
+                </div>
+            </li>
+        </ul>
+        <!-- =================================== 统计信息 结束 =================================== -->
+
+        <!-- =================================== 页面底部 开始 =================================== -->
+        <div class="hPaddingtop_30"></div>
+        <!-- =================================== 页面底部 结束 =================================== -->
+    </div>
+    <script type="text/javascript" src="../../script/api.js"></script>
+    <script type="text/javascript" src="../../script/hui/H.js"></script>
+    <script type="text/javascript" src="../../script/vue.min.js"></script>
+    <script type="text/javascript" src="../../script/jquery.min.js"></script>
+    <script type="text/javascript" src="../../script/appUtils.js"></script>
+    <script type="text/javascript">
+        apiready = function() {
+            // 状态栏颜色
+            setStatusBarStyleFn('dark');
+            // 头部沉侵
+            var header = $api.dom('header');
+            var headerH = $api.fixStatusBar(header);
+            // 固定搜索框
+            fixedHead("search");
+
+            window.app = new Vue({
+                el: '#VUE_BOX',
+                data: {
+                    userInfo: GET_USER_INFO(), // 登录数据
+                    selShopData: {}, // 选择的店铺信息
+                    shopList: [], // 店铺列表
+                    paramData: api.pageParam.data || {}, // 传过来的数据
+                    search: null, // 搜索
+                    message: [], // 页面数据
+                    showLoadMore: false, // 是否有下一页
+                    showCount: 10, // 一页查几条
+                    currentPage: 1, // 当前页
+                },
+                mounted: function() {
+                    var self = this;
+                    self.init();
+                    self.listener(); // 监听
+                    self.getShopList(); // 查询店铺列表
+                },
+                methods: vueDefMethods({
+                    // 数据初始化
+                    init: function () {
+                        var self = this;
+                        var paramData = self.paramData;
+                        if (paramData && paramData.selShopData) {
+                            self.selShopData = paramData.selShopData
+                        }
+                    },
+
+                    // 监听
+                    listener: function () {
+                        var self = this;
+                        // window显示
+                        api.addEventListener({
+                            name: 'viewappear'
+                        }, function(ret, err){
+                             setStatusBarStyleFn('dark');
+                        });
+                        // 页面底部监听
+                        api.addEventListener({
+                            name:'scrolltobottom',
+                            extra:{
+                                threshold: 0 // 设置距离底部多少距离时触发，默认值为0，数字类型
+                            }
+                        }, function(ret, err) {
+                            if (self.showLoadMore) {
+                                self.getList(self.currentPage); // 查询列表
+                            }
+                        });
+                    },
+
+                    // 查询店铺列表
+                    getShopList: function () {
+                        var self = this;
+                        request({
+                            url: "app/shop/shop_role_list"
+                        }, function (ret) {
+                            var retData = ret.shopList;
+                            self.shopList = retData;
+                            self.selShopData = retData[0];
+                            self.getList();
+                        });
+                    },
+
+                    // 选择店铺
+                    selShop: function () {
+                        var self = this;
+                        var shopList = self.shopList;
+                        if (!shopList || shopList.length == 0) {
+                            toastFn("暂无其他店铺");
+                            return;
+                        }
+                        var buttons = [];
+                        for (var i = 0; i < shopList.length; i++) {
+                            buttons.push(shopList[i].shopName);
+                        }
+                        api.actionSheet({
+                            title: '请选择店铺',
+                            buttons: buttons
+                        }, function(ret, err) {
+                            var index = ret.buttonIndex;
+                            if (index <= shopList.length) {
+                                self.selShopData = shopList[index - 1];
+                            } else {
+                                self.selShopData = {};
+                            }
+                            self.getList(); // 查询客户列表
+                        });
+                    },
+
+                    // 查询客户列表
+                    getList: function () {
+                        var self=this;
+                        request({
+                            url: 'app/shop_chart/get_custom_count',
+                            method: 'post',
+                            data: {
+                                body: {
+                                    sellerId: self.shopList[0].sellerId,
+                                    customCountType: self.paramData.type,
+                                    search: self.search,
+                                    showCount: self.showCount, // 一页查几条
+                                    currentPage: self.currentPage, // 当前页
+                                }
+                            }
+                        }, function (ret) {
+                            self.paging({ // 分页
+                                "vue": self,
+                                "dataList": "message",
+                                "retData": ret
+                            });
+                        });
+                    },
+
+
+                }),
+            });
+
+
+        }
+    </script>
+</body>
+
+</html>

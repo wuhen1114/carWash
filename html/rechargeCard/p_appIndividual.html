@@ -1,0 +1,99 @@
+<!DOCTYPE HTML>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="maximum-scale=1.0, minimum-scale=1.0, user-scalable=0, initial-scale=1.0, width=device-width" />
+    <meta name="format-detection" content="telephone=no, email=no, date=no, address=no">
+    <title>充值卡数据统计</title>
+    <link href="../../css/api.css" rel="stylesheet" type="text/css" />
+    <link href="../../css/Hui.css" rel="stylesheet" type="text/css" />
+    <style>
+        header {
+            height: 40px;
+        }
+        #main {
+            width: 100%;
+            padding: 0px 3% 20px 3%;
+            box-sizing: border-box;
+        }
+        #ser {
+            padding-left: 15px;
+            box-sizing: border-box;
+        }
+        #main>div {
+            position: relative;
+        }
+        .secList {
+            height: 120px;
+        }
+
+    </style>
+</head>
+
+<body>
+    <div id="VUE_BOX">
+        <!-- 头部导航 start -->
+        <header class=" H-theme-background-color9" id="header">
+            <span tapmode="" onclick="H.closeWin();" class="H-icon H-position-relative H-display-inline-block H-float-left H-vertical-middle H-theme-font-color-black H-padding-vertical-top-8 H-padding-horizontal-left-5 H-z-index-100">
+                <i class="H-iconfont H-icon-arrow-left H-font-size-18 H-vertical-middle"></i>
+                <label class="H-display-block H-vertical-middle H-font-size-15"></label>
+            </span>
+            <div class="H-header-title H-center-all H-font-size-18 H-text-show-row-1 H-theme-font-color-black H-position-absolute H-padding-vertical-top-8 H-width-100-percent">散客数据统计</div>
+        </header>
+        <!-- 头部导航 end -->
+        <div id="main">
+            <div v-for="item in message" class="H-margin-vertical-top-10 H-theme-background-color-white H-border-vertical-both-after" style="border-radius: 7px; padding: 12px 12px 12px 12px">
+                <span style="display:inline-block;padding: 5px 5px;background:url(../../image/charge/chepai.png) no-repeat 0 0; background-size: 100% 100%; color: #FFF;position:relative;">{{item.plateNo}}</span>
+                <span style="display:inline-block;margin-left: 10%;">{{item.customerName}}</span>
+                <span style="display:inline-block; position: absolute;top: 50%;right: 2%;transform: translateY(-50%)">{{item.customerMobile}}</span>
+            </div>
+
+        </div>
+
+
+
+    </div>
+    <script type="text/javascript" src="../../script/api.js"></script>
+    <script type="text/javascript" src="../../script/hui/H.js"></script>
+    <script type="text/javascript" src="../../script/vue.min.js"></script>
+    <script type="text/javascript" src="../../script/jquery.min.js"></script>
+    <script type="text/javascript" src="../../script/appUtils.js"></script>
+    <script type="text/javascript">
+        apiready = function() {
+            setStatusBarStyleFn('dark'); // 状态栏颜色
+            // 头部沉侵
+            var header = $api.dom('header');
+            var headerH = $api.fixStatusBar(header);
+            // 接收参数
+            var cardDate=api.pageParam.data;
+
+
+            var recard=new Vue({
+                el: '#VUE_BOX',
+                data: {
+                    message: ''
+                },
+                created(){
+                    // 散客列表查询
+                    request({
+                        url: 'app/shop_chart/getIndividualCustomerBySellerId?sellerId='+cardDate.shopList.shopList[0].sellerId
+                    },function(res){
+                        recard.message=res;
+                    })
+
+                },
+                methods: {
+
+                }
+            })
+
+
+
+
+
+        }
+    </script>
+</body>
+
+</html>

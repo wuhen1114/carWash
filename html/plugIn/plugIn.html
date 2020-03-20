@@ -1,0 +1,138 @@
+<!DOCTYPE HTML>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="maximum-scale=1.0, minimum-scale=1.0, user-scalable=0, initial-scale=1.0, width=device-width" />
+    <meta name="format-detection" content="telephone=no, email=no, date=no, address=no">
+    <title></title>
+    <link href="../../css/api.css" rel="stylesheet" type="text/css" />
+    <style>
+        p{
+            margin: 0;
+            padding: 0;
+        }
+        html,body {
+            width: 100%;
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            background-color: rgba(0,0,0,0);
+        }
+        #VUE_BOX {
+            width: 100%;
+            height: 100%;
+            border-radius: 12px;
+            background-color: #EEE;
+            overflow: hidden;
+        }
+        .frameTop {
+            padding: 10px 12px;
+            display: flex;
+            justify-content: space-between;
+            background-color: #DDD;
+        }
+        section {
+            width: 90%;
+            height: 140px;
+            overflow-y: scroll;
+            padding: 6px 5%;
+        }
+        section::-webkit-scrollbar {
+            width: 0;
+            height: 0;
+        }
+        section>div {
+            text-align: center;
+            padding: 8px 0;
+            width: 100%;
+            border: 1px solid #ccc;
+            border-radius: 20px;
+            margin: 7px 0;
+
+        }
+    </style>
+</head>
+
+<body>
+    <div id="VUE_BOX">
+        <div class="frameTop">
+            <span @click="closeFrame1">取消</span>
+            <p>{{title}}</p>
+            <span @click="closeFrame2">确定</span>
+        </div>
+        <section>
+            <template v-for="(item,index) in message">
+                <div @click="chooses(index)" :style="{backgroundColor: item.bgColor}">{{item.name}}</div>
+            </template>
+
+        </section>
+
+
+    </div>
+    <script type="text/javascript" src="../../script/api.js"></script>
+    <script type="text/javascript" src="../../script/vue.min.js"></script>
+    <script type="text/javascript" src="../../script/jquery.min.js"></script>
+    <script type="text/javascript" src="../../script/appUtils.js"></script>
+    <script type="text/javascript">
+        apiready = function() {
+            var data=api.pageParam.data;
+            var arr1=[];
+            for(var i=0;i<data.arr.length;i++){
+                arr1[i]=new Object();
+                arr1[i].name=data.arr[i];
+                arr1[i].bgColor="#FFF";
+            }
+
+            var plug=new Vue({
+                el: '#VUE_BOX',
+                data: {
+                    title: data.title,
+                    message: arr1,
+                    choose: []
+                },
+                methods: {
+                    chooses(index){
+                        if(plug.choose.length==0){
+                            plug.choose[plug.choose.length]=plug.message[index].name;
+                            plug.message[index].bgColor="#ccc";
+                        } else {
+                            for(var i=0;i<plug.choose.length;i++){
+                                if(plug.choose[i]!==plug.message[index].name){
+                                    if(i==plug.choose.length-1){
+                                        plug.choose[plug.choose.length]=plug.message[index].name;
+                                        plug.message[index].bgColor="#ccc";
+                                        break;
+                                    }
+
+                                } else {
+                                    plug.choose.splice(i,1);
+                                    plug.message[index].bgColor="#FFF";
+                                    break;
+                                }
+                            }
+                        }
+                    },
+                    closeFrame1(){
+                        api.closeFrame({
+                            name: 'plugIn'
+                        })
+                    },
+                    closeFrame2(){
+                        api.sendEvent({
+                            name: 'choseDate',
+                            extra: {
+                                data: plug.choose
+                            }
+                        })
+                        api.closeFrame({
+                            name: 'plugIn'
+                        })
+                    }
+                }
+            })
+        }
+    </script>
+</body>
+
+</html>

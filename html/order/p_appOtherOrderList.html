@@ -1,0 +1,348 @@
+<!DOCTYPE HTML>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="maximum-scale=1.0, minimum-scale=1.0, user-scalable=0, initial-scale=1.0, width=device-width" />
+    <meta name="format-detection" content="telephone=no, email=no, date=no, address=no">
+    <title></title>
+    <link href="../../css/api.css" rel="stylesheet" type="text/css" />
+    <link href="../../css/Hui.css" rel="stylesheet" type="text/css" />
+    <style>
+        input::-webkit-input-placeholder { /* placeholder样式 */
+            color: #CCCCCC;
+        }
+        ul, li, p, dl, dt, dd, h3{ /* 重置样式 */
+            margin: 0;
+            padding: 0;
+        }
+        .padding-box{ /* 页面边距 */
+            padding: 2.5vw 2.5vw 0;
+            box-sizing: border-box;
+        }
+        .select-time-item{ /* 选择时间的框 */
+            height: 4.8vh;
+            width: 39.17vw;
+            background: white;
+            border-radius: 32px;
+            display: flex;
+        }
+        .select-time-item span{
+            margin: auto;
+        }
+        .select-time-item span span{
+            color: #eee;
+        }
+        .line{
+            width: 2.78vw;
+            height: 0.45vh;
+            background: rgba(153, 153, 153, 1);
+            border-radius: 3px;
+            top: 2vh;
+            margin: 0 1.39vw;
+        }
+        .select-time-text{
+            margin-top: 0.5vh;
+            margin-left: 2vw;
+        }
+        .order-item{ /* 每一条订单的样式 */
+            margin-bottom: 2.5vw;
+            padding: 15px 10px;
+            box-sizing: border-box;
+            display: flex;
+        }
+        .margin-column-auto{
+            margin: auto 0;
+        }
+        .margin-left-auto{
+            margin: auto 0 auto auto;
+        }
+        .license-plate{ /* 车牌样式 */
+            background-image: url('../../image/order/license_plate.png');
+            background-repeat: no-repeat;
+            background-size: 100% 100%;
+            background-position: center center;
+            padding: 8px 5px;
+        }
+        .fixed-settle-box{ /* 结算状态框 */
+            background: rgba(79,164,243,1);
+            border-radius: 5px;
+            padding: 3px 10px;
+        }
+        .font-color{
+            color: rgba(79, 164, 243, 1);
+        }
+        .status-circular{ /* 施工状态-圆圈 空心 */
+            width: 5px;
+            height: 5px;
+            border: 1px solid rgba(79,164,243,1);
+            border-radius: 50%;
+        }
+        .status-line{ /* 施工状态-线 */
+            height: 1px;
+            width: 18px;
+            background: rgba(79,164,243,1);
+            position: relative;
+            top: 3px;
+        }
+        .status-bg{
+            background-color: rgba(79,164,243,1);
+        }
+    </style>
+</head>
+
+<body class="hRelative">
+    <div id="VUE_BOX">
+        <!-- =================================== 头部 开始 =================================== -->
+        <header class="hHeader" id="header">
+            <span @click="closeWin" class="hIconBox hPaddingLeft_10">
+                <i class="hIcon H-icon-arrow-left"></i>
+            </span>
+            <div class="hChannelTitle" v-text="pageParam.name"></div>
+        </header>
+        <!-- =================================== 头部 结束 =================================== -->
+
+        <!-- =================================== 搜索框 开始 =================================== -->
+        <div id="search" class="padding-box H-overflow-hidden hFontSize_14 hFontColor_333 hBgColor_f0f0f0" style="padding-bottom: 2.5vw;">
+            <div @click="selTime('startTime')" class="select-time-item hFloatLeft">
+                <span v-html="formatDate(startTime, 'yyyy-MM-dd') || ('<span>开始时间</span>')"></span>
+            </div>
+            <div class="line hFloatLeft hRelative"></div>
+            <div @click="selTime('endTime')" class="select-time-item hFloatLeft">
+                <span v-html="formatDate(endTime, 'yyyy-MM-dd') || ('<span>结束时间</span>')"></span>
+            </div>
+            <div @click="getOrderList(1)" class="hFloatLeft select-time-text hFontSize_16 hFontWeight_bold hRelative">
+                搜索
+            </div>
+        </div>
+        <!-- =================================== 搜索框 结束 =================================== -->
+
+        <!-- =================================== 订单列表 开始 =================================== -->
+        <ul class="padding-box hPaddingtop_0">
+            <li @click="orderDetails(item)" v-for="(item, index) in dataList" class="hFontSize_16">
+                <h3 v-if="0 == index || formatDate(item.createTime, 'yyyy-MM-dd') != formatDate(dataList[index - 1].createTime, 'yyyy-MM-dd')" class="hPaddingbottom_10 hFontColor_333 hFontSize_16" v-text="formatDate(item.createTime, 'yyyy-MM-dd')"></h3>
+                <div class="order-item hBgColor_white hBorderRadius_5 hBorderRadius_10 ">
+                    <div class="margin-column-auto hFontWeight_bold hFontColor_333" v-text="formatDate(item.createTime, 'hh:mm')"></div>
+                    <div class="hMarginLeft_10">
+                        <div class="license-plate hFontColor_white hFontSize_14" v-text="item.customerCarVo.plateNo"></div>
+                        <P class="hFontColor_999 hMarginTop_5" v-text="item.orderDetailVos[0].serviceName"></P>
+                    </div>
+                    <div class="margin-left-auto">
+                        <P class="fixed-settle-box hFontColor_white hFontSize_14">
+                            <span v-if="1 === item.settleStatus">未结算</span>
+                            <span v-if="2 === item.settleStatus">已结算</span>
+                            <span v-if="3 === item.settleStatus">挂账</span>
+                            <span v-if="4 === item.settleStatus">退款</span>
+                            <span v-if="5 === item.settleStatus">作废</span>
+                        </P>
+                        <dl class="hMarginTop_5">
+                            <dt class="hTextAlignCenter hFontSize_14 font-color">
+                                <span v-if="0 === item.orderStatus">已预约</span>
+                                <span v-if="1 === item.orderStatus">未分配</span>
+                                <span v-if="2 === item.orderStatus">施工中</span>
+                                <span v-if="3 === item.orderStatus">已施工</span>
+                            </dt>
+                            <dd class="H_displayFlex">
+                                <ul class="H_displayFlex" style="margin: 0 auto;">
+                                    <li class="status-circular" v-bind:class="{'status-bg': item.orderStatus >= 1}"></li>
+                                    <li class="status-line"></li>
+                                    <li class="status-circular" v-bind:class="{'status-bg': item.orderStatus >= 2}"></li>
+                                    <li class="status-line"></li>
+                                    <li class="status-circular" v-bind:class="{'status-bg': item.orderStatus >= 3}"></li>
+                                </ul>
+                            </dd>
+                        </dl>
+                    </div>
+                </div>
+            </li>
+        </ul>
+        <!-- =================================== 订单列表 结束 =================================== -->
+
+        <!-- =================================== 暂无数据 开始 =================================== -->
+        <div v-show="!dataList || dataList.length == 0" class="hPaddingtop_50 hPaddingbottom_50 hTextAlignCenter hFontColor_999 hFontSize_16">
+            - 暂无数据 -
+        </div>
+        <!-- =================================== 暂无数据 结束 =================================== -->
+
+        <!-- =================================== 页面底部 结束 =================================== -->
+        <div class="hHeight_100px"></div>
+        <!-- =================================== 页面底部 开始 =================================== -->
+    </div>
+    <script type="text/javascript" src="../../script/api.js"></script>
+    <script type="text/javascript" src="../../script/hui/H.js"></script>
+    <script type="text/javascript" src="../../script/vue.min.js"></script>
+    <script type="text/javascript" src="../../script/jquery.min.js"></script>
+    <script type="text/javascript" src="../../script/appUtils.js"></script>
+    <script type="text/javascript">
+        apiready = function() {
+            // 状态栏颜色
+            setStatusBarStyleFn('dark');
+            // 头部沉侵
+            var header = $api.dom('header');
+            var headerH = $api.fixStatusBar(header);
+            // 固定搜索框和tab
+            fixedHead("search");
+
+            window.app = new Vue({
+                el: '#VUE_BOX',
+                data: {
+                    userInfo: GET_USER_INFO(), // 登录数据
+                    dataList: [], // 数据
+                    showLoadMore: false, // 是否有下一页
+                    currentPage: 1, // 当前页
+                    showCount: 10, // 一页查几条
+                    pageParam: api.pageParam.param || {}, // name-名称
+                    startTime: null, // 搜索-开始时间
+                    endTime: null, // 搜索-结束时间
+                    times: [], // 提供选择的时间数据
+                },
+                mounted: function() {
+                    var self = this;
+                    self.listener(); // 监听
+                },
+                methods: vueDefMethods({
+                    // 创建时间数据
+                    createTimes: function () {
+                        var self = this;
+                        var count = 10;
+                        var longTime = 1000 * 60 * 60 * 24; // 一次增加的时间数据
+                        var start = new Date().getTime() - (parseInt(count / 2) * longTime); // 开始时间
+                        var arr = [{name: self.formatDate(start, 'yyyy-MM-dd'), time: start}];
+                        for (var i = 1; i < count; i++) {
+                            var temp = arr[i- 1].time + longTime;
+                            arr.push({name: self.formatDate(temp, 'yyyy-MM-dd'), time: temp});
+                        }
+                        self.times = arr;
+                    },
+
+                    // 选择时间
+                    selTime: function (type) {
+                        var self = this, now, title, suffix;
+                        var fn = function (time) {
+                            if (!time && 0 !== time) {
+                                return self.formatDate(new Date(), 'yyyy-MM-dd');
+                            } else {
+                                return self.formatDate(time, 'yyyy-MM-dd');
+                            }
+                        };
+                        if ('startTime' == type) {
+                            now = fn(self.startTime);
+                            title = "开始";
+                            suffix = " 00:00:00";
+                        } else {
+                            now = fn(self.endTime);
+                            title = "结束";
+                            suffix = " 23:59:59";
+                        }
+                        api.openPicker({
+                            type: 'date',
+                            date: now,
+                            title: '选择' + title + '时间'
+                        }, function(ret, err) {
+                            if (ret) {
+                                var sel = new Date(ret.year + "/" + ret.month + "/" + ret.day + suffix); // 选择的时间
+                                if (!self.verify(type, sel)) {
+                                    toastFn("时间选择错误");
+                                    return;
+                                }
+                                self[type] = sel;
+                            }
+                        });
+                    },
+
+                    // 验证时间
+                    verify: function (type, time) {
+                        var self = this;
+                        // 比较大小 结束时间需要大于开始时间 t1-开始时间， t2结束时间
+                        var fn = function (t1, t2) {
+                            if (!t1 || !t2) {
+                                return true;
+                            }
+                            return t1 < t2;
+                        };
+                        if ('startTime' == type) {
+                            return fn(time, self.endTime);
+                        } else {
+                            return fn(self.startTime, time);
+                        }
+                    },
+
+                    // 监听
+                    listener: function () {
+                        var self = this;
+                        // window显示
+                        api.addEventListener({
+                            name: 'viewappear'
+                        }, function(ret, err){
+                             setStatusBarStyleFn('dark');
+                             self.getOrderList(1); // 查询订单列表
+                        });
+                        // 页面底部监听
+                        api.addEventListener({
+                            name:'scrolltobottom',
+                            extra:{
+                                threshold: 0 // 设置距离底部多少距离时触发，默认值为0，数字类型
+                            }
+                        }, function(ret, err) {
+                            if (self.showLoadMore) {
+                                self.getOrderList(self.currentPage); // 查询订单列表
+                            }
+                        });
+                    },
+
+                    // 查询订单状态
+                    getOrderList: function (currentPage) {
+                        var self = this;
+                        var showCount = self.showCount;
+                        var selShopData = self.selShopData;
+                        var pageParam = self.pageParam;
+                        var startTime = self.startTime;
+                        var endTime = self.endTime;
+                        var paramData = {
+                            showCount: showCount,
+                            currentPage: currentPage,
+                            shopId: pageParam.shopId, // 店铺id
+                            orderStatus: pageParam.orderStatus, // 订单状态
+                            startTime: startTime || null,
+                            endTime: endTime || null
+                        };
+                        request({
+                            url: "app/shop_order/list",
+                            method: "post",
+                            data: {body: paramData}
+                        }, function (ret) {
+                            var dataList = self.dataList;
+                            var retData = ret;
+                            if (1 == currentPage) {dataList = [];}
+                            dataList = dataList.concat(retData);
+                            self.dataList = dataList;
+                            if (showCount <= retData.length) { // 有下一页
+                                self.currentPage = parseInt(currentPage + "") + 1;
+                                self.showLoadMore = true;
+                            } else {
+                                self.showLoadMore = false;
+                            }
+                        });
+                    },
+
+                    // 查看订单详情
+                    orderDetails: function (data) {
+                        api.openWin({
+                            name: 'appOrderDetails',
+                            url: 'p_appOrderDetails.html',
+                            pageParam: {
+                                data: data
+                            }
+                        });
+                    },
+
+
+                }),
+            });
+
+
+        }
+    </script>
+</body>
+
+</html>

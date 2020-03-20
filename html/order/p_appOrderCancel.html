@@ -1,0 +1,148 @@
+<!DOCTYPE HTML>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="maximum-scale=1.0, minimum-scale=1.0, user-scalable=0, initial-scale=1.0, width=device-width" />
+    <meta name="format-detection" content="telephone=no, email=no, date=no, address=no">
+    <title></title>
+    <link href="../../css/api.css" rel="stylesheet" type="text/css" />
+    <link href="../../css/Hui.css" rel="stylesheet" type="text/css" />
+    <style>
+        input::-webkit-input-placeholder { /* placeholder样式 */
+            color: #CCCCCC;
+        }
+        ul, li, p, h4{
+            margin: 0;
+            padding: 0;
+        }
+        .display-flex{
+            display: flex;
+            justify-content: space-between;
+        }
+        .font-color-red{
+            color: #CC0000;
+        }
+    </style>
+</head>
+
+<body class="hRelative">
+    <div id="VUE_BOX">
+        <!-- =================================== 头部 开始 =================================== -->
+        <header class="hHeader" id="header">
+            <span @click="closeWin" class="hIconBox hPaddingLeft_10">
+                <i class="hIcon H-icon-arrow-left"></i>
+            </span>
+            <div class="hChannelTitle">取消订单</div>
+        </header>
+        <!-- =================================== 头部 结束 =================================== -->
+
+        <!-- =================================== 取消订单样式 开始 =================================== -->
+        <ul class="hpadding_horizontal_both_10 hPaddingtop_10 hFontSize_16">
+            <li class="hMarginBottom_10 hBgColor_white hBorderRadius_5 H-box-sizing-border-box hpadding_horizontal_both_10 hpadding_horizontal_voth_15">
+                <p class="hFontColor_999">退款原因</p>
+                <input v-model="pageParam.refundReason" type="text" class="hWidth_100 H-border-none hpadding_horizontal_voth_5 hFontColor_333" placeholder="请输入退款原因"/>
+            </li>
+            <li class="hMarginBottom_10 hBgColor_white hBorderRadius_5 H-box-sizing-border-box hpadding_horizontal_both_10 hpadding_horizontal_voth_15 display-flex">
+                <p class="hFontColor_999">退款金额</p>
+                <p class="font-color-red" v-text="'+' + fixedFn(pageParam.totalMoney, 2) + '元'"></p>
+            </li>
+            <li class="hMarginBottom_10 hBgColor_white hBorderRadius_5 H-box-sizing-border-box hpadding_horizontal_both_10 hpadding_horizontal_voth_15">
+                <p class="hFontColor_999">
+                    备注<!-- <span class="hFontColor_ccc hMarginLeft_10">请输入备注信息</span> -->
+                </p>
+                <textarea v-model="pageParam.orderRemark" class="hWidth_100 H-border-none hFontColor_333" rows="3"></textarea>
+            </li>
+            <li>
+                <div @click="save" class="hFontColor_white hFontSize_18 hTextAlignCenter hpadding_horizontal_voth_10 hBorderRadius_5"
+                  style="background-color: #4FA4F3;">确认取消</div>
+            </li>
+            <li>
+                <h4 class="font-color-red hFontSize_14 hMarginTop_20">提示：</h4>
+                <p class="font-color-red hFontSize_12 hMarginTop_10">1.取消订单的退款金额将原路返回；</p>
+                <p class="font-color-red hFontSize_12">2.若为免单的支付方式，则确认退款后直接作废订单；</p>
+                <!-- <p class="font-color-red hFontSize_12">3若为团购的支付方式，需要您前往团购平台进行操作；</p> -->
+                <p class="font-color-red hFontSize_12">3.若为现金或刷卡的支付方式，请当面返还用户现金；</p>
+                <p class="font-color-red hFontSize_12">4.若为微信或支付宝的支付方式，将于两小时内原路返还用户对应的账户中；</p>
+                <p class="font-color-red hFontSize_12">5.若订单包含客户套餐或赠送项目，施工未开始则原路返还；</p>
+                <p class="font-color-red hFontSize_12">6.若订单包含赠送项目施工开始后不返还。</p>
+            </li>
+        </ul>
+
+
+        <!-- =================================== 取消订单样式 结束 =================================== -->
+    </div>
+    <script type="text/javascript" src="../../script/api.js"></script>
+    <script type="text/javascript" src="../../script/hui/H.js"></script>
+    <script type="text/javascript" src="../../script/vue.min.js"></script>
+    <script type="text/javascript" src="../../script/jquery.min.js"></script>
+    <script type="text/javascript" src="../../script/appUtils.js"></script>
+    <script type="text/javascript">
+        apiready = function() {
+            // 状态栏颜色
+            setStatusBarStyleFn('dark');
+            // 头部沉侵
+            var header = $api.dom('header');
+            var headerH = $api.fixStatusBar(header);
+
+            window.app = new Vue({
+                el: '#VUE_BOX',
+                data: {
+                    userInfo: GET_USER_INFO(), // 登录数据
+                    pageParam: api.pageParam.data || {}, // 订单数据
+                },
+                mounted: function() {
+                    var self = this;
+                    self.listener(); // 监听
+                },
+                methods: vueDefMethods({
+                    // 监听
+                    listener: function () {
+                        var self = this;
+                        // window显示
+                        api.addEventListener({
+                            name: 'viewappear'
+                        }, function(ret, err){
+                             setStatusBarStyleFn('dark');
+                        });
+                    },
+
+                    // 保存
+                    save: function () {
+                        var self = this;
+                        api.confirm({
+                            title: '确认提示',
+                            msg: '您是否取消该订单',
+                            buttons: ['确定', '取消']
+                        }, function(ret, err) {
+                            if (1 == ret.buttonIndex) {
+                                var pageParam = self.pageParam;
+                                var paramData = {
+                                    orderId: pageParam.orderId,
+                                    settleStatusEnum: 'OBSOLETE',
+                                    orderRemark: pageParam.orderRemark,
+                                    refundReason: pageParam.refundReason
+                                };
+                                request({
+                                    url: "app/shop_order/upd_order_settle_status",
+                                    method: "post",
+                                    data: {body: paramData},
+                                }, function (ret) {
+                                    toastFn("取消成功");
+                                    setTimeout(function () {
+                                        self.closeWin();
+                                    }, 2000);
+                                });
+                            }
+                        });
+                    },
+
+                }),
+            });
+
+
+        }
+    </script>
+</body>
+
+</html>

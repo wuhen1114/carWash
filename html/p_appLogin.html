@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+    <title>登录</title>
+    <link href="../css/Hui.css" rel="stylesheet" type="text/css" />
+    <style>
+      html, body, #VUE_BOX{
+          width: 100%;
+          height: 100%;
+      }
+      body{
+          background-image: url('../image/login/bg.png');
+          background-size: cover;
+          background-repeat: no-repeat;
+          background-position: center center;
+      }
+      input::-webkit-input-placeholder{
+          color: #CCCCCC;
+      }
+      h3, p{
+          margin: 0;
+          padding: 0;
+      }
+      .box{
+          padding:0 18px;
+      }
+      .padding_def{
+          padding: 25px 18px 18px 18px;
+          box-shadow: 0 0 50px #999;
+      }
+    </style>
+</head>
+<body>
+  <div id="VUE_BOX" style="display:flex;">
+      <div class="box" style="margin: auto; margin-top: 32vh;">
+          <div class="hBgColor_white hBorderRadius_10 padding_def">
+              <h3 class="hFontSize_24 hFontColor_333">登录</h3>
+              <div class="hRelative hFontSize_14">
+                  <img class="hAbsolute" src="../image/login/id.png" style="height:30px;top:50%;margin-top:-18px;"/>
+                  <input onblur="this.style.borderBottom='2px solid #E8EDF4'" onfocus="this.style.borderBottom='2px solid #0D84D5'"
+                      maxLength="15" v-model="user_account" type="tel" placeholder="请输入手机号码"
+                      class="hWidth_100 H-box-sizing-border-box H-padding-15 H-border-none" style="border-bottom: 2px solid #E8EDF4; padding-left:40px;"/>
+              </div>
+
+              <div class="hRelative hMarginTop_20 hFontSize_14">
+                  <img class="hAbsolute" src="../image/login/password.png" style="height:30px;top:50%;margin-top:-18px;"/>
+                  <input onblur="this.style.borderBottom='2px solid #E8EDF4'" onfocus="this.style.borderBottom='2px solid #0D84D5'"
+                      maxLength="16" v-model="user_password" type="password" placeholder="请输入密码"
+                      class="hWidth_100 H-box-sizing-border-box H-padding-15 H-border-none" style="border-bottom: 2px solid #E8EDF4; padding-left:40px;"/>
+              </div>
+
+              <div class="hMarginTop_30">
+                  <div @click="loginFun" class="hFontSize_18 hTextAlignCenter hBorderRadius_5 hFontColor_white hpadding_horizontal_voth_10" style="background-color: #4FA4F3;">
+                      登&nbsp;录
+                  </div>
+              </div>
+              <div class="H-overflow-hidden hMarginTop_15">
+                  <p @click="getPwd" class="hFloatRight hFontSize_14" style="color:#0D84D5;">忘记密码?</p>
+              </div>
+          </div>
+      </div>
+  </div>
+  <script type="text/javascript" src="../script/api.js"></script>
+  <script type="text/javascript" src="../script/hui/H.js"></script>
+  <script type="text/javascript" src="../script/vue.min.js"></script>
+  <script type="text/javascript" src="../script/jquery.min.js"></script>
+  <script type="text/javascript" src="../script/appUtils.js"></script>
+
+	<script>
+  apiready = function () {
+      // var header = $api.dom('header');
+      // $api.fixStatusBar(header);
+      var app = new Vue({
+          el: '#VUE_BOX',
+          data: {
+              user_account: "15266668888",
+              user_password: "123456",
+              p_showPwd: false,
+          },
+          mounted: function () {
+              var self = this;
+          },
+          methods:{//方法声明周期
+            // 清空账号信息
+            clearUserAccount:function(){
+                var self = this;
+                self.user_account = "";
+            },
+
+            // 切换显示密码
+            showTagglePwd:function(){
+                var self = this;
+                self.p_showPwd = !self.p_showPwd;
+            },
+
+            // 登录方法 start
+            loginFun: function(){
+                var self = this;
+                // 获取数据 start
+                var userAccount = self.user_account; // 电话
+                var userPassword = self.user_password; // 密码
+                // 获取数据 end
+                // 验证数据 start
+                if (!userAccount) {
+                    toastFn("请输入手机号码"); return;
+                }
+                if (!VERIFYTEL(userAccount)) {
+                    toastFn("手机号码格式错误"); return;
+                }
+                if (!userPassword) {
+                    toastFn("请输入密码"); return;
+                }
+                if (userPassword.length < 6 || userPassword.length > 16) {
+                    toastFn("密码为6-16位"); return;
+                }
+                // 验证数据 end
+                // 开始登录 start
+                request({
+                    url: "app/shop/login?loginName=" + userAccount + "&loginPassword=" + userPassword,
+                    returnAll: true
+                }, function (result) {
+                    toastFn("登录成功");
+                    result.body.data.authId = result.headers["Auth-Id"]; // 认证appId
+                    result.body.data.authToken = result.headers["Auth-Token"]; // 认证token
+                    $api.setStorage(APP_USER_INFO, JSON.stringify(result.body.data));  // 将用户数据放到本地
+                    $api.setStorage(APP_USER_LAST_LOGIN_TIME, new Date().getTime());  // 登录时间
+                    $api.setStorage(APP_USER_LOGIN, JSON.stringify({"account": userAccount, "password": userPassword}));
+                    // 跨域刷新index的子页面
+                    setTimeout (function () {
+                        var jsfun = 'refresh();';
+                        api.execScript({
+                            name: 'root',
+                            script: jsfun
+                        });
+                    }, 300);
+                    setTimeout (function () {
+                        api.closeToWin({name: 'root'});
+                    }, 2000);
+                });
+          },
+
+
+          // 找回密码
+          getPwd:function() {
+              api.toast({msg: '请联系管理员重置密码',duration: 3000,location: 'middle'});
+              return;
+              api.openWin({
+                  name: 'appGetPwd',
+                  url: 'p_appGetPwd.html'
+              });
+          },
+
+
+
+          }
+      });
+
+      var lastTime = null; // 记录上次点击返回的时间，为null第一次点击，时间不超过2000毫秒退出应用
+      api.addEventListener({
+          name:"keyback"
+      }, function(ret,err){
+          var now = new Date().getTime(); // 当前时间戳
+          if (null != lastTime && now - lastTime <= 2000) {
+              api.closeWidget({ // 关闭当前应用
+                  id: api.appId,
+                  retData: {name: 'closeWidget'},
+                  silent: true
+              });
+          } else {
+              toastFn("继续返回退出应用");
+          }
+          lastTime = now;
+      });
+  }
+
+
+	</script>
+</body>
+</html>

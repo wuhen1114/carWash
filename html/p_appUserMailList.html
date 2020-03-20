@@ -1,0 +1,222 @@
+<!DOCTYPE HTML>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="maximum-scale=1.0, minimum-scale=1.0, user-scalable=0, initial-scale=1.0, width=device-width" />
+    <meta name="format-detection" content="telephone=no, email=no, date=no, address=no">
+    <title></title>
+    <link href="../css/api.css" rel="stylesheet" type="text/css" />
+    <link href="../css/Hui.css" rel="stylesheet" type="text/css" />
+    <style>
+        html, body{
+            width: 100%!important;
+            min-height: 100%!important;
+            background-color: white!important;
+        }
+        ul, li, p{
+           margin: 0;
+           padding: 0;
+        }
+        .search-box{
+            background-color: #F0F0F0;
+        }
+        .search-box .search-img{
+            width: 20px;
+            height: 20px;
+            position: relative;
+            top: 5px;
+        }
+        .border-bottom{
+            border-bottom: 1px solid #F5F5F5;
+        }
+        .padding-top-bottom{
+            padding: 15px 0;
+        }
+        .introduce{
+            padding: 2px 10px;
+            background-color: #4FA4F3;
+            color: white;
+            border-radius: 3px;
+        }
+        input::-webkit-input-placeholder {
+            color: #CCCCCC;
+        }
+        .zhiwei {
+            position: absolute;
+            right: 2px;
+        }
+        .user-photo-box{
+            width: 100%;
+        }
+        .user-photo-box .photo{
+            padding-top: 100%;
+            background-repeat: no-repeat;
+            background-size: cover;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="VUE_BOX">
+        <!-- =================================== 头部 开始 =================================== -->
+        <header class="hHeader" id="header">
+            <span v-if="!!pageParam" @click="closeWin" class="hIconBox hPaddingLeft_10">
+                <i class="hIcon H-icon-arrow-left"></i>
+            </span>
+            <div class="hChannelTitle" v-text="operationData.shopName"></div>
+        </header>
+        <!-- =================================== 头部 结束 =================================== -->
+
+
+        <!-- =================================== 搜索框 开始 =================================== -->
+        <div class="hpadding_horizontal_voth_15 hpadding_horizontal_both_15 search-box">
+            <div class="hBgColor_white hBorderRadius_20 hpadding_horizontal_voth_5 hPaddingLeft_25" style="position:relative">
+                <!-- <img class="search-img" src="../image/def/search.png"/> -->
+                <input v-model="staffName" @blur="getList" type="text" class="hFontColor_333 hFontSize_14 hPadding_5 H-border-none" placeholder="搜索"/>
+                <i class="H-iconfont H-icon-search H-font-size-14" style="width: 18px;position: absolute; right: 7%;top: 50%;transform: translateY(-50%)"></i>
+            </div>
+        </div>
+        <!-- =================================== 搜索框 结束 =================================== -->
+
+        <!-- =================================== 通讯录列表 开始 =================================== -->
+        <ul class="hFontSize_14">
+            <li @click="detailsFn(item)" v-for="item in dataList" class="H-overflow-hidden">
+                <div class="hFloatLeft hpadding_horizontal_both_15 padding-top-bottom H-box-sizing-border-box" style="width: 23%; margin-top: -7px;">
+                    <div class="user-photo-box">
+                        <div class="photo hBorderRadius_50" :style="'background-image: url(' + (item.staffPhoto ? item.staffPhoto : '../image/def/def_user.png') + ');'"></div>
+                    </div>
+                </div>
+                <div class="hFloatLeft H-box-sizing-border-box padding-top-bottom H-overflow-hidden border-bottom" style="width: 77%;">
+                    <div class="hFloatLeft" style="width: 50%;">
+                        <p class="hTextWordShowRow_1 hWidth_100 hFontColor_999">
+                            <span class="hFontColor_333" v-text="item.staffName"></span>
+                        </p>
+                        <p style="color: #4FA4F3;" v-text="item.staffMobile ? item.staffMobile : '---'"></p>
+                    </div>
+                    <div class="hFloatRight hMarginRight_15 zhiwei">
+                        <span class="H_displayInlineBlock hFontSize_12 hMarginRight_5 introduce" v-text="item.roleName"></span>
+                        <img style="width: 25px;" class="hRelative hTop_8" src="../image/def/right.png"/>
+                    </div>
+                </div>
+            </li>
+        </ul>
+        <!-- =================================== 通讯录列表 结束 =================================== -->
+
+        <!-- =================================== 暂无数据 开始 =================================== -->
+        <div v-show="!dataList || dataList.length == 0" class="hPaddingtop_50 hPaddingbottom_50 hTextAlignCenter hFontColor_999 hFontSize_16">
+            - 暂无数据 -
+        </div>
+        <!-- =================================== 暂无数据 结束 =================================== -->
+
+        <!-- =================================== 页面底部 结束 =================================== -->
+        <div class="hPaddingtop_30"></div>
+        <!-- =================================== 页面底部 开始 =================================== -->
+    </div>
+    <script type="text/javascript" src="../script/api.js"></script>
+    <script type="text/javascript" src="../script/hui/H.js"></script>
+    <script type="text/javascript" src="../script/vue.min.js"></script>
+    <script type="text/javascript" src="../script/jquery.min.js"></script>
+    <script type="text/javascript" src="../script/appUtils.js"></script>
+    <script type="text/javascript">
+        apiready = function() {
+            // 状态栏颜色
+            setStatusBarStyleFn('dark');
+            // 头部沉侵
+            var header = $api.dom('header');
+            var headerH = $api.fixStatusBar(header);
+
+            window.app = new Vue({
+                el: '#VUE_BOX',
+                data: {
+                    userInfo: GET_USER_INFO(), // 登录数据
+                    pageParam: api.pageParam.shop, // 上级页面传递的数据 没有传递不显示返回按钮
+                    operationData: { // 正在操作的数据
+                        shopId: null, // 店铺id
+                        sellerId: null, // 商家id
+                        shopName: null // 名称
+                    },
+                    staffName: null, // 查询条件填写姓名或者手机号,模糊查询
+                    dataList: [], // 用户数据
+                },
+                mounted: function() {
+                    var self = this;
+                    self.listener(); // 监听
+                    if (!self.pageParam) {
+                        self.refresh(); // 下拉刷新
+                    }
+                    if (!self.userInfo) { // 没有登录数据不执行
+                        return;
+                    }
+                    self.initData(); // 处理数据
+                },
+                methods: vueDefMethods({
+                    // 处理数据
+                    initData: function () {
+                        var self = this;
+                        var pageParam = self.pageParam;
+                        var userInfo = self.userInfo;
+                        var operationData = self.operationData;
+                        if (pageParam) {
+                            operationData.shopId = pageParam.shopId;
+                            operationData.sellerId = pageParam.sellerId;
+                            operationData.shopName = pageParam.shopName;
+                        } else {
+                            operationData.shopId = userInfo.shopId;
+                            operationData.sellerId = userInfo.sellerId;
+                            operationData.shopName = '通讯录';
+                        }
+                        self.getList(); // 获取一个店铺的所有员工的通讯录
+                    },
+
+                    // 监听
+                    listener: function () {
+                        // window显示
+                        api.addEventListener({
+                            name: 'viewappear'
+                        }, function(ret, err){
+                             setStatusBarStyleFn('dark');
+                        });
+                    },
+
+                    // 下拉刷新
+                    refresh: function () {
+                        var self = this;
+                        dropdownRefresh(function () {
+                            self.getList();
+                        });
+                    },
+
+                    // 获取一个店铺的所有员工的通讯录
+                    getList: function () {
+                        var self = this;
+                        var operationData = self.operationData;
+                        request({
+                            url: "app/shop/shop_staff_list",
+                            method: "post",
+                            data: {body: {staffName: self.staffName, shopId: operationData.shopId}}
+                        }, function (ret) {
+                            self.dataList = ret;
+                        });
+                    },
+
+                    // 详情
+                    detailsFn: function (data) {
+                        api.openWin({
+                            name: 'appStaffInfo',
+                            url: 'staffManage/p_appStaffInfo.html',
+                            pageParam: {
+                                data: data
+                            }
+                        });
+                    },
+
+                }),
+            });
+
+
+        }
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,583 @@
+<!DOCTYPE HTML>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="maximum-scale=1.0, minimum-scale=1.0, user-scalable=0, initial-scale=1.0, width=device-width" />
+    <meta name="format-detection" content="telephone=no, email=no, date=no, address=no">
+    <title>选择服务</title>
+    <link href="../../css/api.css" rel="stylesheet" type="text/css" />
+    <link href="../../css/Hui.css" rel="stylesheet" type="text/css" />
+    <style>
+        header {
+            height: 40px;
+        }
+        #main {
+            width: 100%;
+            /*padding: 0px 2%;*/
+            box-sizing: border-box;
+            margin-top: 65px;
+        }
+        section {
+            width: 100%;
+            height: calc(100%-130px);
+            background-color: #FFF;
+            display: flex;
+            justify-content: space-between;
+            padding: 3px 2% 58px 2%;
+            box-sizing: border-box;
+        }
+        section .section-left {
+            width: 25%;
+        }
+        section .section-left .lis {
+            height: 70px;
+            line-height: 70px;
+            text-align: center;
+            border-bottom: 1px solid #eee;
+        }
+        section .section-left .lis:last-child {
+            border-bottom: 0;
+        }
+
+
+
+        section .section-right {
+            width: 75%;
+            overflow-y: scroll;
+            border-left: 1px solid #ddd;
+            box-sizing: border-box;
+            padding: 5px 0;
+
+        }
+        section .section-right::-webkit-scrollbar {
+            width: 0;
+        }
+        section .section-right .list-1 p {
+            padding: 7px 4%;
+            border-bottom: 1px solid #eee;
+            box-sizing: border-box;
+        }
+        section .section-right .list-2 {
+            display: flex;
+            justify-content: space-between;
+            padding: 14px 4% 14px 25%;
+            border-bottom: 1px solid #eee;
+            box-sizing: border-box;
+            position: relative;
+        }
+        section .section-right .list-2 .img {
+            width: 25px;
+            height: 25px;
+            line-height: 25px;
+            position: absolute;
+            top: 50%;
+            left: 8%;
+            transform: translateY(-50%);
+            -o-transform: translateY(-50%);
+            -moz-transform: translateY(-50%);
+            -webkit-transform: translateY(-50%);
+        }
+        section .section-right .list-2 .img img {
+            width: 100%;
+        }
+        section .section-right .list-2 .message span {
+            color: #C7855A;
+        }
+        section .section-right .list-2 .choose {
+            width: 20px;
+            height: 20px;
+            line-height: 20px;
+            position: absolute;
+            top: 50%;
+            right: 8%;
+            transform: translateY(-50%);
+            -o-transform: translateY(-50%);
+            -moz-transform: translateY(-50%);
+            -webkit-transform: translateY(-50%);
+        }
+        section .section-right .list-2 .choose input {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+        }
+
+
+
+
+
+
+        footer span {
+            background-color: #4FA4F3;
+            border-radius: 2px;
+            font-weight: bold;
+        }
+
+        .sizeColor {
+            color: #C7855A;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="VUE_BOX">
+        <!-- 头部导航 start -->
+        <header class=" H-theme-background-color9" id="header">
+            <span tapmode="" onclick="H.closeWin();" class="H-icon H-position-relative H-display-inline-block H-float-left H-vertical-middle H-theme-font-color-black H-padding-vertical-top-8 H-padding-horizontal-left-5 H-z-index-100">
+                <i class="H-iconfont H-icon-arrow-left H-font-size-18 H-vertical-middle"></i>
+                <label class="H-display-block H-vertical-middle H-font-size-15"></label>
+            </span>
+            <div class="H-header-title H-center-all H-font-size-18 H-text-show-row-1 H-theme-font-color-black H-position-absolute H-padding-vertical-top-8 H-width-100-percent">选择服务</div>
+            <div class="hpadding_horizontal_voth_10 hpadding_horizontal_both_10 search-box" style="padding-top: 50px;background-color: #FFF">
+                <div class="hBgColor_white hBorderRadius_20 hPaddingLeft_25" style="border: 1px solid #999;position:relative">
+                    <input ref="shopName" type="text" class="hFontColor_333 hFontSize_14 hPadding_5 H-border-none" placeholder="请输入要搜索的商品"/ >
+                    <i @click="search($event)" class="H-iconfont H-icon-search H-font-size-14" style="width: 18px;position: absolute; right: 5%;top: 20%"></i>
+                </div>
+            </div>
+        </header>
+        <!-- 头部导航 end -->
+        <div id="main">
+            <section>
+                <div class="section-left">
+                    <div @click="onclick1()" :class="{sizeColor: 2==inde}" class="lis">服务项目</div>
+                    <div @click="onclick2()" :class="{sizeColor: 1==inde}" class="lis">商品项目</div>
+                    <div @click="onclick3()" :class="{sizeColor: 3==inde}" class="lis">其它项目</div>
+                    <div @click="onclick4()" :class="{sizeColor: 4==inde}" class="lis">可用套餐</div>
+                </div>
+                <div class="section-right" :style="{height: height+'px'}">
+                    <div class="list-1" v-for="(list,ind) in shopMessage">
+                        <p v-if="list.dictName">{{list.dictName}}</p>
+                        <div v-if="list.dictName" class="list-2" v-for="(item,index) in list.serviceVoList" v-if="item.isValid==1">
+                            <div class="img">
+                                <img src="../../image/def/def_user.png" alt="">
+                            </div>
+                            <div class="message">
+                                <div>{{item.serviceName}}</div>
+                                <div><span>{{item.marketPrice}}</span>元</div>
+                            </div>
+                            <div class="choose">
+                                <input v-model="choService" :value="item.serviceId" type="checkbox">
+                                <div v-if="list.dictId==9" style="width: 90px;margin: 8px 0;position: relative; right: 70px; top: -10px">
+                                    <span @click="timeMinus(index)" style="display: inline-block; font-size: 18px; background-color:#C7855A;padding: 0 6px;border-radius: 3px">-</span>
+                                    <span style="margin: 0 5px">{{item.number}}</span>
+                                    <span @click="timeAdd(index)" style="display: inline-block; font-size: 18px; background-color:#C7855A;padding: 0 4px;border-radius: 3px">+</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <p v-if="list.packageName">{{list.packageName}}</p>
+                        <div v-if="list.packageName" class="list-2" v-for="(item,index) in list.packageServiceVos" v-if="item.isValid==1">
+                            <div class="img">
+                                <img src="../../image/def/def_user.png" alt="">
+                            </div>
+                            <div class="message">
+                                <div>{{item.serviceName}}</div>
+                                <div><span>{{item.totalTimes}}</span>次</div>
+                            </div>
+                            <div class="choose">
+                                <input v-model="choPackage" :value="item.qcpsId" type="checkbox">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            <!-- 下一步按钮 start -->
+            <footer @click="btnNext()" class="H-text-align-center H-position-relative" style="position: fixed;bottom: 0;width: 100%">
+                <span class="H-theme-font-color-white H-font-size-18 H-display-block H-padding-vertical-both-10" style="left:10px;right:10px;">下一步</span>
+            </footer>
+            <!-- 下一步按钮 end -->
+        </div>
+
+
+
+    </div>
+    <script type="text/javascript" src="../../script/api.js"></script>
+    <script type="text/javascript" src="../../script/hui/H.js"></script>
+    <script type="text/javascript" src="../../script/vue.min.js"></script>
+    <script type="text/javascript" src="../../script/jquery.min.js"></script>
+    <script type="text/javascript" src="../../script/appUtils.js"></script>
+    <script type="text/javascript">
+        apiready = function() {
+            setStatusBarStyleFn('dark'); // 状态栏颜色
+            // 头部沉侵
+            var header = $api.dom('header');
+            var headerH = $api.fixStatusBar(header);
+            // 接收页面传递过来的参数
+            var userData=api.pageParam.data;
+            var shopId=userData.shop.shopId;
+            var chooseService={};
+            userData.choose=[];
+            userData.serviceItem=[];
+            userData.searchItem=[];
+            var arr=[];
+            var m=0;
+            var n=0;
+            // var q=0;
+            var comm='';
+            var qita='';
+            var val='';
+            function req(ind, shopName){
+                userData.choose=userData.choose.concat(service.choService);
+                request({
+                    url: "app/shop_service/service_list",
+                    method: 'post',
+                    data: {body:{shopId: shopId, serviceType: ind, searchName: shopName}}
+                },function(res){
+                    if(ind==1){
+                        if(!shopName){
+                            for(var i=0;i<res.length;i++){
+                                for(var j=0;j<res[i].serviceVoList.length;j++)
+                                res[i].serviceVoList[j].number=1;
+                            }
+                            userData.serviceItem[1]=res;
+                        } else {
+                            for(var i=0;i<res.length;i++){
+                                for(var j=0;j<res[i].serviceVoList.length;j++)
+                                res[i].serviceVoList[j].number=1;
+                            }
+                            userData.searchItem[1]=res;
+                        }
+                    }
+                    if(ind==2){
+                        if(!shopName){
+                            for(var i=0;i<res.length;i++){
+                                for(var j=0;j<res[i].serviceVoList.length;j++)
+                                res[i].serviceVoList[j].number=1;
+                            }
+                            userData.serviceItem[0]=res;
+                        } else {
+                            for(var i=0;i<res.length;i++){
+                                for(var j=0;j<res[i].serviceVoList.length;j++)
+                                res[i].serviceVoList[j].number=1;
+                            }
+                            userData.searchItem[0]=res;
+                        }
+
+                    }
+                    if(ind==3){
+                        if(!shopName){
+                            for(var i=0;i<res.length;i++){
+                                for(var j=0;j<res[i].serviceVoList.length;j++)
+                                res[i].serviceVoList[j].number=1;
+                            }
+                            userData.serviceItem[2]=res;
+                        } else {
+                            for(var i=0;i<res.length;i++){
+                                for(var j=0;j<res[i].serviceVoList.length;j++)
+                                res[i].serviceVoList[j].number=1;
+                            }
+                            userData.searchItem[2]=res;
+                        }
+                    }
+                    service.shopMessage=res;
+                })
+            }
+
+            // 数组去重
+            function arrUnique(arr){
+                var obj = {};
+                var ret = [];
+                for (var i = 0; i < arr.length; i++) {
+                    obj[arr[i]] = "";
+                }
+                for (var key in obj) {
+                    ret.push(key);
+                }
+                return ret;
+            }
+
+            var service=new Vue({
+                el: "#VUE_BOX",
+                data: {
+                    shopMessage: '',
+                    inde: 2,
+                    choService: [],
+                    choPackage: [],
+                    height: api.winHeight - headerH - 130,
+                },
+                created: function(){
+
+                    request({
+                        url: "app/shop_service/service_list",
+                        method: 'post',
+                        data: {body:{shopId: shopId, serviceType: 2, searchName: ''}}
+                    },function(res){
+                        service.shopMessage=res;
+                        for(var i=0;i<res.length;i++){
+                            for(var j=0;j<res[i].serviceVoList.length;j++)
+                            res[i].serviceVoList[j].number=1;
+                        }
+                        userData.serviceItem[0]=res;
+                    })
+                    request({
+                        url: "app/shop_service/service_list",
+                        method: 'post',
+                        data: {body:{shopId: shopId, serviceType: 1, searchName: ''}}
+                    },function(res){
+                        for(var i=0;i<res.length;i++){
+                            for(var j=0;j<res[i].serviceVoList.length;j++)
+                            res[i].serviceVoList[j].number=1;
+                        }
+                        userData.serviceItem[1]=res;
+                    })
+                    request({
+                        url: "app/shop_service/service_list",
+                        method: 'post',
+                        data: {body:{shopId: shopId, serviceType: 3, searchName: ''}}
+                    },function(res){
+                        for(var i=0;i<res.length;i++){
+                            for(var j=0;j<res[i].serviceVoList.length;j++)
+                            res[i].serviceVoList[j].number=1;
+                        }
+                        userData.serviceItem[2]=res;
+                    })
+
+                },
+                mounted: function() {
+                    var self = this;
+                    self.listener(); // 监听
+                    self.initData(); // 初始化数据
+                },
+                methods: vueDefMethods({
+                    // 监听
+                    listener: function () {
+                        // window显示
+                        api.addEventListener({
+                            name: 'viewappear'
+                        }, function(ret, err){
+                             setStatusBarStyleFn('dark');
+                        });
+                    },
+                    onclick1: function(e){
+                        if(service.choPackage.length==0){
+                            service.inde=2;
+                            var value=this.$refs.shopName.value;
+                            if(value){
+                                if(value!==val){
+                                    req(service.inde,value);
+                                } else {
+                                    service.shopMessage=userData.searchItem[0];
+                                }
+                            } else {
+                                if(userData.serviceItem[0]){
+                                    service.shopMessage=userData.serviceItem[0];
+                                } else {
+                                    req(2)
+                                }
+
+                            }
+                            userData.serviceId=2;
+                            val=value;
+                        } else {
+                            api.toast({
+                                msg: '您已选择套餐，无法再选择服务项目',
+                                duration: 2000,
+                                location: 'middle'
+                            })
+                        }
+                    },
+                    onclick2: function(e){
+                        if(service.choPackage.length==0){
+                            service.inde=1;
+                            var value=this.$refs.shopName.value;
+                            if(value){
+                                if(value!==val){
+                                    req(service.inde,value);
+                                } else {
+                                    service.shopMessage=userData.searchItem[1];
+                                }
+
+                            } else {
+                                if(userData.serviceItem[1]){
+                                    service.shopMessage=userData.serviceItem[1];
+                                } else {
+                                    req(1);
+                                }
+                            }
+                            userData.serviceId=1;
+                            val=value;
+                        } else {
+                            api.toast({
+                                msg: '您已选择套餐，无法再选择服务项目',
+                                duration: 2000,
+                                location: 'middle'
+                            })
+                        }
+                    },
+                    onclick3: function(e){
+                        if(service.choPackage.length==0){
+                            service.inde=3;
+                            var value=this.$refs.shopName.value;
+                            if(value){
+                                if(value!==val){
+                                    req(service.inde,value);
+                                } else {
+                                    service.shopMessage=userData.searchItem[3];
+                                }
+                            } else {
+                                if(userData.serviceItem[2]){
+                                    service.shopMessage=userData.serviceItem[2];
+                                } else {
+                                    req(3);
+                                }
+                            }
+                            userData.serviceId=3;
+                            val=value;
+                        } else {
+                            api.toast({
+                                msg: '您已选择套餐，无法再选择服务项目',
+                                duration: 2000,
+                                location: 'middle'
+                            })
+                        }
+
+                    },
+                    onclick4: function(e){
+                        if(service.choService.length==0){
+                            service.inde=4;
+                            request({
+                                url: 'app/user/packages?id='+userData.mess.custom.customerId+'&shopId='+userData.shop.shopId
+                            },function(res){
+                                service.shopMessage=res;
+                                userData.packageItem=res;
+                            })
+                        } else {
+                            api.toast({
+                                msg: '您已选择服务，无法再选择套餐',
+                                duration: 2000,
+                                location: 'middle'
+                            })
+                        }
+
+                    },
+                    // 搜索框
+                    search: function(e){
+                        var value=this.$refs.shopName.value;
+                        req(service.inde,value);
+                    },
+                    timeMinus:function(index){
+                        for(var i=0;i<userData.serviceItem.length;i++){
+                            for(var j=0;j<userData.serviceItem[i].length;j++){
+                                if(userData.serviceItem[i][j].dictId==9){
+                                    if(userData.serviceItem[i][j].serviceVoList[index].number>1){
+                                        userData.serviceItem[i][j].serviceVoList[index].number-=1;
+                                    };
+
+                                }
+                            }
+                        }
+                        if(!userData.searchItem.length==0){
+                            if(userData.searchItem[1][0].serviceVoList[index].number>1){
+                                userData.searchItem[1][0].serviceVoList[index].number-=1;
+                            }
+                        }
+                        if(service.number>1){
+                            service.number=service.number-1;
+                        }
+
+                    },
+                    timeAdd:function(index){
+                        for(var i=0;i<userData.serviceItem.length;i++){
+                            for(var j=0;j<userData.serviceItem[i].length;j++){
+                                if(userData.serviceItem[i][j].dictId==9){
+                                    userData.serviceItem[i][j].serviceVoList[index].number+=1;
+                                }
+                            }
+                        }
+                        if(!userData.searchItem.length==0){
+                            userData.searchItem[1][0].serviceVoList[index].number+=1;
+                        }
+                        service.number=service.number+1;
+                    },
+                    // **************************************** 与开单不同的地方 开始 ****************************************
+                    // 下一步
+                    btnNext: function () {
+                        var self = this;
+                        var choService = service.choService; // 服务
+                        var choPackage = service.choPackage; // 套餐
+                        if(0 == choService.length && 0 == choPackage.length) {
+                            toastFn("请选择服务");
+                        }
+                        choService = arrUnique(choService);
+                        choPackage = arrUnique(choPackage);
+                        console.log(JSON.stringify(choService));
+                        console.log(JSON.stringify(choPackage));
+                        // 获取选中服务并放入同一个数组中
+                        userData.choose=service.choService;
+                        userData.choosePack=service.choPackage;
+                        var chooseList = [], arrSer = [], s = 0, totalPrice = 0;
+                        for(var i=0;i<userData.serviceItem.length;i++){
+                            for(var n=0;n<userData.serviceItem[i].length;n++){
+                                for(var j=0;j<userData.serviceItem[i][n].serviceVoList.length;j++){
+                                    for(var k=0;k<userData.choose.length;k++){
+                                        if(userData.choose[k]==userData.serviceItem[i][n].serviceVoList[j].serviceId){
+                                            userData.serviceItem[i][n].serviceVoList[j].dictId=userData.serviceItem[i][n].dictId;
+                                            chooseList[chooseList.length]=userData.serviceItem[i][n].serviceVoList[j];
+                                            totalPrice+=(userData.serviceItem[i][n].serviceVoList[j].marketPrice)*(userData.serviceItem[i][n].serviceVoList[j].number);
+                                            arrSer[s]=new Object();
+                                            arrSer[s].sellP='--';
+                                            s++;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                        if(userData.packageItem){
+                            for(var i=0;i<userData.packageItem.length;i++){
+                                for(var j=0;j<userData.packageItem[i].packageServiceVos.length;j++){
+                                    for(var k=0;k<userData.choosePack.length;k++){
+                                        if(userData.packageItem[i].packageServiceVos[j].qcpsId==userData.choosePack[k]){
+                                            chooseList[chooseList.length]=userData.packageItem[i].packageServiceVos[j];
+                                            arrSer[s]=new Object();
+                                            arrSer[s].sellP='--';
+                                            s++;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                        var arr = [];
+                        for (var i = 0; i < chooseList.length ; i++) {
+                            arr[i] = new Object();
+                            arr[i].serviceName=chooseList[i].serviceName;
+                            arr[i].serviceType=userData.packageItem?1:(chooseList[i].serviceType);
+                            arr[i].goodsQty=userData.packageItem?1:(chooseList[i].number);
+                            arr[i].unitPrice=userData.packageItem?0:(chooseList[i].marketPrice);
+                            arr[i].totalPrice=userData.packageItem?0:(chooseList[i].marketPrice*chooseList[i].number);
+                            arr[i].serviceId=chooseList[i].serviceId;
+                            arr[i].qcpsId=chooseList[i].qcpsId;
+                        }
+
+                        var data = api.pageParam.data;
+                        var reqData = {
+                            orderId: data.orderId,
+                            orderDetailConditions: arr,
+                        };
+                        request({
+                            method: "post",
+                            url: "app/shop_order/upd_order_details",
+                            data: {body: reqData}
+                        }, function (ret) {
+                            toastFn("添加成功");
+                            setTimeout(function () {
+                                api.closeWin();
+                            }, 2000);
+                        });
+                    },
+                    // 初始化数据
+                    initData: function () {
+                        var self = this;
+                        var data = api.pageParam.data;
+                        self[data.type] = data.arr;
+                    },
+                    // **************************************** 与开单不同的地方 结束 ****************************************
+                }),
+            })
+
+
+
+        }
+    </script>
+</body>
+
+</html>

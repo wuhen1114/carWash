@@ -1,0 +1,328 @@
+<!DOCTYPE HTML>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="maximum-scale=1.0, minimum-scale=1.0, user-scalable=0, initial-scale=1.0, width=device-width" />
+    <meta name="format-detection" content="telephone=no, email=no, date=no, address=no">
+    <title>统计详情</title>
+    <link href="../../css/api.css" rel="stylesheet" type="text/css" />
+    <link href="../../css/Hui.css" rel="stylesheet" type="text/css" />
+    <style>
+        header {
+            height: 40px;
+        }
+        #main {
+            width: 100%;
+            padding: 0px 3% 20px 3%;
+            box-sizing: border-box;
+        }
+        #ser {
+            padding-left: 15px;
+            box-sizing: border-box;
+        }
+        #main>div:first-child {
+            color: #FFF;
+            position: relative;
+        }
+        #main>div {
+            position: relative;
+        }
+        .secList {
+            height: 120px;
+        }
+        .money {
+            position: absolute;
+            top: 50%;
+            left: 25%;
+            transform: translate(-50%, -50%);
+            -o-transform: translate(-50%, -50%);
+            -moz-transform: translate(-50%, -50%);
+            -webkit-transform: translate(-50%, -50%);
+        }
+        .money>p>span {
+
+        }
+        .money .cardTime {
+            display: inline-block;
+        }
+        .amount {
+            min-width: 100px;
+            background-color: #FFF;
+            color: #333;
+            border-radius: 15px;
+            text-align: center;
+            padding: 1px 6px;
+            font-size: 13px;
+            position: absolute;
+            top: 50%;
+            left: 75%;
+            transform: translate(-50%, -50%);
+            -o-transform: translate(-50%, -50%);
+            -moz-transform: translate(-50%, -50%);
+            -webkit-transform: translate(-50%, -50%);
+        }
+
+    </style>
+</head>
+
+<body>
+    <div id="VUE_BOX">
+        <!-- 头部导航 start -->
+        <header class=" H-theme-background-color9" id="header">
+            <span tapmode="" onclick="H.closeWin();" class="H-icon H-position-relative H-display-inline-block H-float-left H-vertical-middle H-theme-font-color-black H-padding-vertical-top-8 H-padding-horizontal-left-5 H-z-index-100">
+                <i class="H-iconfont H-icon-arrow-left H-font-size-18 H-vertical-middle"></i>
+                <label class="H-display-block H-vertical-middle H-font-size-15"></label>
+            </span>
+            <div class="H-header-title H-center-all H-font-size-18 H-text-show-row-1 H-theme-font-color-black H-position-absolute H-padding-vertical-top-8 H-width-100-percent">{{message.incom.name}}</div>
+        </header>
+        <!-- 头部导航 end -->
+        <div id="main" @onscroll="loadMore">
+            <div class="secList H-margin-vertical-top-15" style="border-radius: 7px;background: url(../../image/manage/carbg.png) no-repeat 0 0;background-size: 100% 100%;">
+                <div class="money">
+                    <p>{{message.incom.name}}</span></p>
+                    <p class="cardTime">{{message.incom.money}}元</p>
+                </div>
+                <div class="amount">共计：{{message.incom.number}}</div>
+
+            </div>
+            <!-- 到店车辆统计 -->
+            <div v-if="inData"  v-for="item in inData" class="H-margin-vertical-top-10 H-theme-background-color-white H-border-vertical-both-after" style="border-radius: 7px; padding: 18px 12px 12px 12px">
+                <div style="display:flex;justify-content: space-between">
+                    <div style="color: #999999;text-align: center;font-size: 14px; position: relative; top: 3px;">
+                        <p>{{item.paymentTime.substring(0,2)}}月{{item.paymentTime.substring(3,5)}}日</p>
+                        <p>{{item.paymentTime.substring(6,11)}}</p>
+                    </div>
+                    <div style="margin-left: 6%;">
+                        <p>{{item.plateNo}}</p>
+                        <p style="color: #999999;font-size: 12px">{{item.serviceName}}</p>
+                    </div>
+                    <div style="color: #FF0000; min-width: 30%;text-align: right; position: relative; top: -5px;">
+                        <p>{{item.totalMoney?item.totalMoney:0}}元</p>
+                        <p style="background-color: #4FA4F3;color: #FFF;display: inline-block;padding: 1px 5px;border-radius: 5px;font-size: 12px">{{item.qoPaymentMethod}}</p>
+                    </div>
+                </div>
+            </div>
+            <!-- 充值办卡 -->
+            <div v-if="carData"  v-for="item in carData" class="H-margin-vertical-top-10 H-theme-background-color-white H-border-vertical-both-after" style="border-radius: 7px; padding: 18px 12px 12px 12px">
+                <div style="display:flex;justify-content: space-between">
+                    <div style="color: #999999;text-align: center;font-size: 14px; position: relative; top: 3px;">
+                        <p>{{item.createTime.substring(0,2)}}月{{item.createTime.substring(3,5)}}日</p>
+                        <p>{{item.createTime.substring(6,11)}}</p>
+                    </div>
+                    <div style="margin-left: 6%;">
+                        <p>{{item.customerName}}</p>
+                        <p style="color: #999999;font-size: 12px">{{item.customerMobile}}</p>
+                    </div>
+                    <div style="color: #FF0000; min-width: 30%;text-align: right; position: relative; top: -5px;">
+                        <p>{{item.refillMoney?item.refillMoney:0}}元</p>
+                        <p style="background-color: #4FA4F3;color: #FFF;display: inline-block;padding: 1px 5px;border-radius: 5px;font-size: 12px">{{item.rechargeType}}</p>
+                    </div>
+                </div>
+            </div>
+            <!-- 新增项目 -->
+            <div v-if="serviceData"  v-for="item in serviceData" class="H-margin-vertical-top-10 H-theme-background-color-white H-border-vertical-both-after" style="border-radius: 7px; padding: 18px 12px 12px 12px">
+                <div style="display:flex;justify-content: space-between">
+                    <div style="color: #999999;text-align: center;font-size: 14px; position: relative; top: 3px;">
+                        <p>{{item.createTime.substring(0,2)}}月{{item.createTime.substring(3,5)}}日</p>
+                        <p>{{item.createTime.substring(6,11)}}</p>
+                    </div>
+                    <div style="margin-left: 6%;">
+                        <p>{{item.plateNo}}</p>
+                        <p style="color: #999999;font-size: 12px">{{item.serviceName}}</p>
+                    </div>
+                    <div style="color: #FF0000; min-width: 30%;text-align: right; position: relative; top: -5px;">
+                        <p>{{item.totalPrice?item.totalPrice:0}}元</p>
+                        <p style="background-color: #4FA4F3;color: #FFF;display: inline-block;padding: 1px 5px;border-radius: 5px;font-size: 12px">{{item.qoPaymentMethod}}</p>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+
+
+    </div>
+    <script type="text/javascript" src="../../script/api.js"></script>
+    <script type="text/javascript" src="../../script/hui/H.js"></script>
+    <script type="text/javascript" src="../../script/vue.min.js"></script>
+    <script type="text/javascript" src="../../script/jquery.min.js"></script>
+    <script type="text/javascript" src="../../script/appUtils.js"></script>
+    <script type="text/javascript">
+        apiready = function() {
+            setStatusBarStyleFn('dark'); // 状态栏颜色
+            // 头部沉侵
+            var header = $api.dom('header');
+            var headerH = $api.fixStatusBar(header);
+            // 接收参数
+            var userData=api.pageParam.data;
+            // console.log(JSON.stringify(userData))
+            var currentPage=1; // 当前页
+            var showCount=10; // 一页查几条
+            var recard=new Vue({
+                el: '#VUE_BOX',
+                data: {
+                    message: userData,
+                    inData: '',
+                    carData: '',
+                    serviceData: '',
+
+                },
+                created(){
+
+
+                },
+                mounted: function(){
+                    var self=this;
+                    // 到店车辆统计
+                    if(userData.dataId==1){
+                        self.indata();
+                    }
+                    // 充值办卡统计
+                    if(userData.dataId==2){
+                        self.cardata();
+                    }
+                    // 新增项目排行
+                    if(userData.dataId==3){
+                        self.servicedata();
+                    }
+                    self.loadMore();
+                },
+                methods: {
+                    loadMore: function(){
+                        var self=this;
+                        // 页面底部监听
+                        api.addEventListener({
+                            name:'scrolltobottom',
+                            extra:{
+                                threshold:0            //设置距离底部多少距离时触发，默认值为0，数字类型
+                            }
+                        }, function(ret, err){
+                            // console.log('已滚动到底部');
+                            // 到店车辆统计
+                            if(userData.dataId==1){
+                                if(recard.inData.length%showCount==0){
+                                    self.indata();
+                                }
+                            }
+                            // 充值办卡统计
+                            if(userData.dataId==2){
+                                if(recard.carData.length%showCount==0){
+                                    self.cardata();
+                                }
+                            }
+                            // 新增项目排行
+                            if(userData.dataId==3){
+                                if(recard.serviceData.length%showCount==0){
+                                    self.servicedata();
+                                }
+                            }
+                        });
+                    },
+                    // 到店车辆统计
+                    indata: function(){
+                        if(userData.incomeSource==0){
+                            var settleStatus=2;
+                            var paymentMethod='';
+                        }
+                        if(userData.incomeSource==1){
+                            var settleStatus=2;
+                            var paymentMethod=1;
+                        }
+                        if(userData.incomeSource==2){
+                            var settleStatus=2;
+                            var paymentMethod=5;
+                        }
+                        if(userData.incomeSource==3){
+                            var settleStatus=2;
+                            var paymentMethod=1;
+                        }
+                        if(userData.incomeSource==4){
+                            var settleStatus=2;
+                            var paymentMethod=6;
+                        }
+                        if(userData.incomeSource==5){
+                            var settleStatus=4;
+                            var paymentMethod='';
+                        }
+
+                        request({
+                            url: 'app/shop_order/arrival_shop_history_count',
+                            method: 'post',
+                            data: {
+                                body: {
+                                    currentPage: currentPage, // 当前页
+                                    showCount: showCount, // 一页查几条
+                                    shopId: userData.shop.shopId,
+                                    date: userData.time,
+                                    settle_status: settleStatus,
+                                    paymentMethod: paymentMethod,
+                                }
+                            }
+                        },function(ret){
+                            // console.log(JSON.stringify(ret))
+                            for(var i=0;i<ret.list.length;i++){
+                                ret.list[i].paymentTime=new Date(ret.list[i].paymentTime).Format("MM-dd hh:mm");
+                            }
+                            recard.inData=[...recard.inData,...ret.list];
+                            currentPage++;
+                        })
+                    },
+                    // 充值办卡统计
+                    cardata: function(){
+                        request({
+                            url: 'app/shop_order/customer_history_count',
+                            method: 'post',
+                            data: {
+                                body: {
+                                    currentPage: currentPage, // 当前页
+                                    showCount: showCount, // 一页查几条
+                                    shopId: userData.shop.shopId,
+                                    date: userData.time,
+                                    incomeSource: userData.incomeSource,
+                                }
+                            }
+                        },function(ret){
+                            // console.log(JSON.stringify(ret))
+                            for(var i=0;i<ret.list.length;i++){
+                                ret.list[i].createTime=new Date(ret.list[i].createTime).Format("MM-dd hh:mm");
+                            }
+                            recard.carData=[...recard.carData,...ret.list];
+                            currentPage++;
+                        })
+                    },
+                    // 新增项目排行
+                    servicedata: function(){
+                        request({
+                            url: 'app/shop_chart/service_ranking',
+                            method: 'post',
+                            data: {
+                                body: {
+                                    currentPage: currentPage, // 当前页
+                                    showCount: showCount, // 一页查几条
+                                    shopId: userData.shop.shopId,
+                                    date: userData.time,
+                                    serviceId: userData.commodity.serviceId,
+                                }
+                            }
+                        },function(ret){
+                            // console.log(JSON.stringify(ret))
+                            for(var i=0;i<ret.serviceRankingList.length;i++){
+                                ret.serviceRankingList[i].createTime=new Date(ret.serviceRankingList[i].createTime).Format("MM-dd hh:mm");
+                            }
+                            recard.serviceData=[...recard.serviceData,...ret.serviceRankingList];
+                            currentPage++;
+                        })
+                    },
+                }
+            })
+
+
+
+
+
+        }
+    </script>
+</body>
+
+</html>

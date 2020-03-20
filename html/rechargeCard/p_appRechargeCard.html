@@ -1,0 +1,235 @@
+<!DOCTYPE HTML>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="maximum-scale=1.0, minimum-scale=1.0, user-scalable=0, initial-scale=1.0, width=device-width" />
+    <meta name="format-detection" content="telephone=no, email=no, date=no, address=no">
+    <title>办卡充值</title>
+    <link href="../../css/api.css" rel="stylesheet" type="text/css" />
+    <link href="../../css/Hui.css" rel="stylesheet" type="text/css" />
+    <style>
+        header {
+            height: 40px;
+        }
+        #main {
+            width: 100%;
+            padding: 0px 3%;
+            box-sizing: border-box;
+        }
+        #ser {
+            padding-left: 15px;
+            box-sizing: border-box;
+        }
+        footer span {
+            background-color: #4FA4F3;
+            border-radius: 2px;
+            font-weight: bold;
+        }
+        .listCard {
+            width: 30%;
+            display: inline-block;
+            background:rgba(255,255,255,1);
+            box-shadow:0px 0px 14px 6px rgba(0, 0, 0, 0.09);
+            border-radius:6px;
+            margin: 6px 1.2%;
+            text-align:center;
+            padding: 3px 0 5px 0;
+            color: #4FA4F3;
+        }
+        .listCard img {
+            width: 40%;
+            position: relative;
+            top: 5px;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="VUE_BOX" v-if="message">
+        <!-- 头部导航 start -->
+        <header class=" H-theme-background-color9" id="header">
+            <span tapmode="" onclick="H.closeWin();" class="H-icon H-position-relative H-display-inline-block H-float-left H-vertical-middle H-theme-font-color-black H-padding-vertical-top-8 H-padding-horizontal-left-5 H-z-index-100">
+                <i class="H-iconfont H-icon-arrow-left H-font-size-18 H-vertical-middle"></i>
+                <label class="H-display-block H-vertical-middle H-font-size-15"></label>
+            </span>
+            <div class="H-header-title H-center-all H-font-size-18 H-text-show-row-1 H-theme-font-color-black H-position-absolute H-padding-vertical-top-8 H-width-100-percent">办卡充值</div>
+            <span @click="addUser" class="H-icon H-position-relative H-display-inline-block H-float-right H-vertical-middle H-theme-font-color-black H-padding-vertical-top-12 H-padding-horizontal-right-10 H-z-index-100">
+                <label class="H-display-block H-vertical-middle H-font-size-14">新增用户</label>
+            </span>
+        </header>
+        <!-- 头部导航 end -->
+        <div id="main">
+            <!-- 搜索框 start -->
+            <!-- <div class="hpadding_horizontal_voth_10 hpadding_horizontal_both_10 search-box">
+                <div class="hBgColor_white hBorderRadius_20 hPaddingLeft_25" style="position: relative">
+                    <input v-model="number" style="padding-top: 8px" ref="telphone" type="text" class="hFontColor_333 hFontSize_14 hPadding_5 H-border-none" placeholder="搜索车辆、电话"/>
+                    <i @click="search()" class="H-iconfont H-icon-search H-font-size-14" style="width: 18px;position: absolute; right: 5%;top: 20%"></i>
+                </div>
+            </div> -->
+            <!-- 搜索框 end -->
+            <div class="H-theme-background-color-white H-margin-vertical-top-15 H-border-vertical-both-after" style="border-radius: 7px">
+                <img style="width: 100%" src="../../image/charge/banner.png" alt="">
+            </div>
+
+            <div class="" style="border-radius: 7px;margin-top: 8px">
+                <div @click="valueCard" class="listCard">
+                    <img src="../../image/charge/storedCard.png" alt="">
+                    <p>储值卡</p>
+                    <p style="font-weight: bold">{{message.storedValueCard}}</p>
+                </div>
+                <div @click="numberCard" class="listCard">
+                    <img src="../../image/charge/timeCard.png" alt="">
+                    <p>计次卡</p>
+                    <p style="font-weight: bold">{{message.countingCard}}</p>
+                </div>
+                <div @click="individual" class="listCard">
+                    <img src="../../image/charge/client.png" alt="">
+                    <p>散客</p>
+                    <p style="font-weight: bold">{{message.individual}}</p>
+                </div>
+                <div @click="setMenu" class="listCard" style="padding: 15px 0 19px 0">
+                    <img src="../../image/charge/timeCombo.png" alt="">
+                    <p>记次套餐</p>
+                </div>
+                <div @click="clubCard" class="listCard" style="padding: 15px 0 19px 0">
+                    <img src="../../image/charge/clubCard.png" alt="">
+                    <p>会员卡</p>
+                </div>
+                <!-- <div @click="rechargeSet" class="listCard" style="padding: 15px 0 19px 0">
+                    <img src="../../image/charge/set.png" alt="">
+                    <p>充值设置</p>
+                </div> -->
+            </div>
+        </div>
+
+
+
+    </div>
+    <script type="text/javascript" src="../../script/api.js"></script>
+    <script type="text/javascript" src="../../script/hui/H.js"></script>
+    <script type="text/javascript" src="../../script/vue.min.js"></script>
+    <script type="text/javascript" src="../../script/jquery.min.js"></script>
+    <script type="text/javascript" src="../../script/appUtils.js"></script>
+    <script type="text/javascript">
+        apiready = function() {
+            setStatusBarStyleFn('dark'); // 状态栏颜色
+            // 头部沉侵
+            var header = $api.dom('header');
+            var headerH = $api.fixStatusBar(header);
+
+            var cardDate={};
+
+            var recard=new Vue({
+                el: '#VUE_BOX',
+                data: {
+                    number: '',
+                    message: ''
+                },
+                created: function(){
+                    // 查询店铺信息
+                    request({
+                        url: 'app/shop/shop_role_list'
+                    },function(res){
+                        cardDate.shopList=res;
+                        console.log(JSON.stringify(res))
+
+                        // 查询页面数据统计
+                        request({
+                            url: 'app/shop_chart/statistics?shopId='+''+'&sellerId='+res.shopList[0].sellerId
+                        },function(ret){
+                            console.log(JSON.stringify(ret))
+                            cardDate.cardMessage=ret;
+                            recard.message=ret;
+                        })
+                    })
+                    // 查询会员卡字典信息
+                    request({
+                        url: 'app/dict/dict_list?dictDescValue='+4
+                    },function(res){
+                        cardDate.cardColor=res;
+                    })
+
+
+
+                },
+                methods: {
+                    addUser: function () {
+                        api.openWin({
+                            name: 'p_appAddUser',
+                            url: '../homePage/addUser/p_appAddUser.html',
+                            pageParam: {
+
+                            }
+                        })
+                    },
+                    valueCard: function () {
+                        cardDate.typeId=1;
+                        api.openWin({
+                            name: 'p_appValueCard',
+                            url: 'valueCard/p_appValueCard.html',
+                            pageParam: {
+                                data:cardDate
+                            }
+                        })
+                    },
+                    numberCard: function () {
+                        cardDate.typeId=2;
+                        api.openWin({
+                            name: 'p_appValueCard',
+                            url: 'valueCard/p_appValueCard.html',
+                            pageParam: {
+                                data: cardDate
+                            }
+                        })
+                    },
+                    individual: function () {
+                        api.openWin({
+                            name: 'p_appIndividual',
+                            url: 'p_appIndividual.html',
+                            pageParam: {
+                                data: cardDate
+                            }
+                        })
+                    },
+                    setMenu: function () {
+                        api.openWin({
+                            name: 'p_appSetMenu',
+                            url: 'setMenu/p_appSetMenu.html',
+                            pageParam: {
+                                data: cardDate
+                            }
+                        })
+                    },
+                    clubCard: function () {
+                        api.openWin({
+                            name: 'p_appClubCard',
+                            url: 'clubCard/p_appClubCard.html',
+                            pageParam: {
+                                data: cardDate
+                            }
+                        })
+                    },
+                    rechargeSet: function () {
+                        api.openWin({
+                            name: 'p_appRechargeSet',
+                            url: 'rechargeSet/p_appRechargeSet.html',
+                            pageParam: {
+                                data: cardDate
+                            }
+                        })
+                    },
+
+
+                }
+            })
+
+
+
+
+
+        }
+    </script>
+</body>
+
+</html>

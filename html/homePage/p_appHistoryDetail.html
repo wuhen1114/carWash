@@ -1,0 +1,132 @@
+<!DOCTYPE HTML>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="maximum-scale=1.0, minimum-scale=1.0, user-scalable=0, initial-scale=1.0, width=device-width" />
+    <meta name="format-detection" content="telephone=no, email=no, date=no, address=no">
+    <title>历史服务详情</title>
+    <link href="../../css/api.css" rel="stylesheet" type="text/css" />
+    <link href="../../css/Hui.css" rel="stylesheet" type="text/css" />
+    <style>
+        header {
+            height: 40px;
+        }
+        #main {
+            width: 100%;
+            padding: 0px 2%;
+            box-sizing: border-box;
+        }
+        footer span {
+            background-color: #4FA4F3;
+            border-radius: 2px;
+            font-weight: bold;
+        }
+        div {
+            position: relative;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="VUE_BOX">
+        <!-- 头部导航 start -->
+        <header class=" H-theme-background-color9" id="header">
+            <span tapmode="" onclick="H.closeWin();" class="H-icon H-position-relative H-display-inline-block H-float-left H-vertical-middle H-theme-font-color-black H-padding-vertical-top-8 H-padding-horizontal-left-5 H-z-index-100">
+                <i class="H-iconfont H-icon-arrow-left H-font-size-18 H-vertical-middle"></i>
+                <label class="H-display-block H-vertical-middle H-font-size-15"></label>
+            </span>
+            <div class="H-header-title H-center-all H-font-size-18 H-text-show-row-1 H-theme-font-color-black H-position-absolute H-padding-vertical-top-8 H-width-100-percent">历史服务详情</div>
+        </header>
+        <!-- 头部导航 end -->
+        <div id="main">
+            <!-- 基本信息 -->
+            <div class="H-margin-vertical-top-10 H-theme-background-color-white H-border-vertical-both-after">
+                <div class="H-text-list H-flexbox-horizontal  H-theme-background-color-white H-border-vertical-bottom-margin-left-10-after H-vertical-middle H-touch-active">
+                    <div class="H-flex-item H-padding-horizontal-both-10 H-font-size-16 H-padding-vertical-both-12">时间<span style="margin-left: 12px;width: 55%;outline: none">{{new Date(message.createTime).Format("yyyy-MM-dd hh:mm:ss")}}</span></div>
+                </div>
+                <div class="H-text-list H-flexbox-horizontal  H-theme-background-color-white H-border-vertical-bottom-margin-left-10-after H-vertical-middle H-touch-active">
+                    <div class="H-flex-item H-padding-horizontal-both-10 H-font-size-16 H-padding-vertical-both-12">店铺<span style="margin-left: 12px;width: 55%;outline: none">{{message.shopName}}</span></div>
+                </div>
+            </div>
+            <div class="H-margin-vertical-top-10 H-theme-background-color-white H-border-vertical-both-after">
+                <div class="H-text-list H-flexbox-horizontal  H-theme-background-color-white H-border-vertical-bottom-margin-left-10-after H-vertical-middle H-touch-active">
+                    <div class="H-flex-item H-padding-horizontal-both-10 H-font-size-16 H-padding-vertical-both-12" style="display: flex; justify-content: space-between; color: #57A8F4">
+                        <span>服务项目</span>
+                        <span>价格</span>
+                        <span>施工人员</span>
+                    </div>
+                </div>
+                <div v-if="message.orderDetailVos" v-for="item in message.orderDetailVos" class="H-text-list H-flexbox-horizontal  H-theme-background-color-white H-border-vertical-bottom-margin-left-10-after H-vertical-middle H-touch-active">
+                    <div class="H-flex-item H-padding-horizontal-both-10 H-font-size-16 H-padding-vertical-both-12">
+                        <span>{{item.serviceName}}</span>
+                        <span style="color: #FF3232; position: absolute;left: 50%;transform: translateX(-50%); ">{{item.unitPrice}}</span>
+                        <span style="color: #FF3232; position: absolute;right: 4%; ">{{item.serviceStaffName}}</span>
+                    </div>
+                </div>
+                <div v-if="message.rechargeType" class="H-text-list H-flexbox-horizontal  H-theme-background-color-white H-border-vertical-bottom-margin-left-10-after H-vertical-middle H-touch-active">
+                    <div class="H-flex-item H-padding-horizontal-both-10 H-font-size-16 H-padding-vertical-both-12">
+                        <span>{{message.rechargeType}}</span>
+                        <span v-if="message.refillMoney" style="color: #FF3232; position: absolute;left: 50%;transform: translateX(-50%); ">{{message.refillMoney}}</span>
+                        <span v-if="message.refillMoneySum" style="color: #FF3232; position: absolute;left: 50%;transform: translateX(-50%); ">{{message.refillMoneySum}}</span>
+                        <span style="color: #FF3232; position: absolute;right: 4%; ">{{message.createUser}}</span>
+                    </div>
+                </div>
+            </div>
+            <div v-if="message.orderDetailVos" class="H-margin-vertical-top-10 H-theme-background-color-white H-border-vertical-both-after">
+                <div class="H-text-list H-flexbox-horizontal  H-theme-background-color-white H-border-vertical-bottom-margin-left-10-after H-vertical-middle H-touch-active">
+                    <div class="H-flex-item H-padding-horizontal-both-10 H-font-size-16 H-padding-vertical-both-12">合计总价<span style="margin-left: 12px;color: #FF3232">{{message.totalMoney}}元 <span v-if="message.paymentMethod==5">(会员价)</span></span></div>
+                    <span v-if="message.paymentMethod" class="H-icon H-display-block H-font-size-12" style="background-color:#4FA4F3;color: #FFF;margin-right: 8px;border-radius:5px;padding: 5px 10px;">{{paymentMethod[message.paymentMethod-1]}}</span>
+                </div>
+            </div>
+            <div v-if="message.rechargeType" class="H-margin-vertical-top-10 H-theme-background-color-white H-border-vertical-both-after">
+                <div class="H-text-list H-flexbox-horizontal  H-theme-background-color-white H-border-vertical-bottom-margin-left-10-after H-vertical-middle H-touch-active">
+                    <!-- <div v-if="message.refillMoney" class="H-flex-item H-padding-horizontal-both-10 H-font-size-16 H-padding-vertical-both-12">合计总价<span style="margin-right: 12px;color: #FF3232;float: right;">{{message.refillMoney}}元</span></div> -->
+                    <div v-if="message.refillMoneySum" class="H-flex-item H-padding-horizontal-both-10 H-font-size-16 H-padding-vertical-both-12">合计总价<span style="margin-right: 12px;color: #FF3232;float: right;">{{message.refillMoneySum}}元</span></div>
+                </div>
+            </div>
+        </div>
+
+
+
+    </div>
+    <script type="text/javascript" src="../../script/api.js"></script>
+    <script type="text/javascript" src="../../script/hui/H.js"></script>
+    <script type="text/javascript" src="../../script/vue.min.js"></script>
+    <script type="text/javascript" src="../../../script/jquery.min.js"></script>
+    <script type="text/javascript" src="../../script/appUtils.js"></script>
+    <script type="text/javascript">
+        apiready = function() {
+            setStatusBarStyleFn('dark'); // 状态栏颜色
+            // 头部沉侵
+            var header = $api.dom('header');
+            var headerH = $api.fixStatusBar(header);
+            var serData=api.pageParam.data;
+            console.log(JSON.stringify(serData))
+
+
+            var addUser=new Vue({
+                el: '#VUE_BOX',
+                data: {
+                    message: serData,
+                    paymentMethod: ['现金', '刷卡', '支付宝', '微信', '会员卡', '套餐支付'],
+
+                },
+                created: function(){
+
+                },
+                methods: {
+
+
+
+                }
+            })
+
+
+
+
+        }
+    </script>
+</body>
+
+</html>

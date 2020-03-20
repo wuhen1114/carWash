@@ -1,0 +1,408 @@
+<!DOCTYPE HTML>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="maximum-scale=1.0, minimum-scale=1.0, user-scalable=0, initial-scale=1.0, width=device-width" />
+    <meta name="format-detection" content="telephone=no, email=no, date=no, address=no">
+    <title>个人提成</title>
+    <link href="../../css/api.css" rel="stylesheet" type="text/css" />
+    <link href="../../css/Hui.css" rel="stylesheet" type="text/css" />
+    <style>
+        header {
+            height: 40px;
+        }
+        #main {
+            width: 100%;
+            padding: 0px 3% 10px 3%;
+            box-sizing: border-box;
+        }
+        #ser {
+            padding-left: 15px;
+            box-sizing: border-box;
+        }
+        .title {
+            display: flex;
+            justify-content: space-around;
+            padding: 18px 20%;
+            color: #999999;
+            font-size: 18px;
+        }
+
+        .chooseDate {
+            display: flex;
+            background-color: #FFF;
+            border-radius: 35px;
+            overflow: hidden;
+            padding: 10px 18px;
+        }
+        .ul {
+            width: 100%;
+            display: flex;
+            overflow-x: scroll;
+            flex-shrink: 0;
+            font-size: 14px;
+            color: #999999;
+
+        }
+        .ul li {
+            width: 20%;
+            flex-shrink: 0;
+        }
+        .ul li p {
+            width: 100%;
+            text-align: center;
+        }
+        #aside {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.3);
+        }
+        .hint {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: #fff;
+            border-radius: 10px;
+            width: 70%;
+            padding: 0 0 5px 0;
+        }
+        .hint .tit {
+            margin: 7px 0 3px 0;
+        }
+        .hint .title {
+            width: 100%;
+            text-align: center;
+            font-weight: bold;
+            font-size: 18px;
+            color: #000;
+            padding: 10px 0 0 0;
+            border-top-left-radius: 10px;
+            border-top-right-radius: 10px;
+        }
+        .hint .section {
+            padding: 2px 30px 8px 30px;
+        }
+        .hint .section p {
+            text-align: left;
+            background-color: none;
+            border-radius: 0;
+            position: relative;
+        }
+        .hint .section p .keyPoint {
+            position: absolute;
+            top: 50%;
+            left: -12px;
+            transform: translateY(-50%);
+            font-size: 30px;
+        }
+        .hint .section .sectionMain {
+            color: #999;
+            font-size: 12px;
+        }
+        .hint button {
+            display: block;
+            padding: 3px 14px;
+            margin: 0 auto;
+            border-radius: 10px;
+            background-color: #4FA4F3;
+            color: #FFF;
+        }
+
+        /*动态添加样式*/
+        .titleStyle {
+            color: #4FA4F3;
+            font-weight: bold;
+        }
+        .sizeColor {
+            color: #4FA4F3;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="VUE_BOX">
+        <!-- 头部导航 start -->
+        <header class=" H-theme-background-color9" id="header">
+            <span tapmode="" onclick="H.closeWin();" class="H-icon H-position-relative H-display-inline-block H-float-left H-vertical-middle H-theme-font-color-black H-padding-vertical-top-8 H-padding-horizontal-left-5 H-z-index-100">
+                <i class="H-iconfont H-icon-arrow-left H-font-size-18 H-vertical-middle"></i>
+                <label class="H-display-block H-vertical-middle H-font-size-15"></label>
+            </span>
+            <div class="H-header-title H-center-all H-font-size-18 H-text-show-row-1 H-theme-font-color-black H-position-absolute H-padding-vertical-top-8 H-width-100-percent">个人提成</div>
+            <span  class="H-icon H-position-relative H-display-inline-block H-float-right H-vertical-middle H-theme-font-color-black H-padding-vertical-top-12 H-padding-horizontal-right-20 H-z-index-100">
+                <label @click="hint" class="H-display-block H-vertical-middle H-font-size-12" style="padding: 0 5.5px; color: #777; border: 1px solid #777; border-radius: 50%; text-align: center;">?</label>
+            </span>
+        </header>
+        <!-- 头部导航 end -->
+        <div id="main">
+            <!-- 日期 start -->
+            <div class="chooseDate search-box H-margin-vertical-top-12">
+                <ul class="ul">
+                    <template v-for="(item,index) in timeList">
+                        <li @click="sizeColor(index)" :class="{sizeColor: item.ind==inId}">
+                            <p>{{item.time1}}</p>
+                            <p>{{item.time2}}</p>
+                        </li>
+                    </template>
+                </ul>
+            </div>
+            <!-- 本月提成总额 -->
+            <div class="H-text-list H-flexbox-horizontal H-theme-background-color-white H-border-vertical-bottom-margin-left-10-after H-vertical-middle H-margin-vertical-top-12 H-border-radius-15">
+                <div class="H-flex-item H-padding-horizontal-both-10 H-font-size-16 H-padding-vertical-both-12">本月提成总额：<span style="color: #FF0000">{{allMoney ? allMoney : 0}}元</span></div>
+                <span class="H-icon H-padding-horizontal-right-10 H-display-block">{{monthDay}}</span>
+            </div>
+            <!-- 数据统计 -->
+            <div class="apply-list-item H-flexbox-horizontal H-box-sizing-border-box H-padding-vertical-both-10 H-padding-horizontal-both-8 H-theme-background-color-white H-margin-vertical-top-12 H-border-radius-15 H-position-relative">
+                <div id="container" style="height: 200px; width: 100%"></div>
+            </div>
+            <!-- 昨日提成 -->
+            <div class="H-box-sizing-border-box H-touch-active H-theme-background-color-white H-margin-vertical-top-12 H-border-radius-9 H-position-relative">
+                <div style="background-color: #DDD; border-top-left-radius: 9px; border-top-right-radius: 9px;" class="H-text-list H-flexbox-horizontal H-border-vertical-bottom-margin-left-10-after H-vertical-middle">
+                    <div class="H-flex-item H-padding-horizontal-both-10 H-font-size-16 H-padding-vertical-both-8" style="text-align: center;font-weight: bold;">昨日提成</div>
+                </div>
+                <div class="H-theme-background-color-white">
+                    <div v-for="item in royaltyData" style="display:flex;justify-content: space-between;padding: 10px 12px 8px 12px; border-bottom: 1px solid #EEE;">
+                        <div style="width: 70%;">
+                            <p>{{item.serviceName}}</p>
+                            <p style="color: #999999;font-size: 12px">{{new Date(item.createTime).Format("MM")+'月'+new Date(item.createTime).Format("dd")+'日'+' '+new Date(item.createTime).Format("hh")+':'+new Date(item.createTime).Format("mm")}}<span v-if="item.remark">{{'，'+item.remark.replace('车牌号：','')}}</span></p>
+                        </div>
+                        <div style="min-width: 30%;text-align: right; position: relative; top: -5px;">
+                            <p>提成: <span style="color: #FF0000">{{item.percentage}}元</span></p>
+                            <p style="background-color: #4FA4F3;color: #FFF;display: inline-block;padding: 1px 5px;border-radius: 5px;font-size: 12px">{{item.percentageName}}</p>
+                        </div>
+                    </div>
+                    <div v-if="royaltyData==''" style="width: 100%; text-align: center; margin: 12px 0;">--暂无数据--</div>
+                </div>
+
+                <div @click="details"  style="background-color: #DDD; border-bottom-left-radius: 9px; border-bottom-right-radius: 9px;" class="H-text-list H-flexbox-horizontal H-border-vertical-bottom-margin-left-10-after H-vertical-middle">
+                    <div class="H-flex-item H-padding-horizontal-both-10 H-font-size-16 H-padding-vertical-both-8" style="text-align: center;">查看当月更多提成详情</div>
+                </div>
+            </div>
+        </div>
+        <!-- 提示框 -->
+        <div id="aside" :style="{display: istrue}">
+            <div class="hint">
+                <p class="title">帮助说明</p>
+                <div class="section">
+                    <p class="tit"><span class="keyPoint">•</span><span>销售提成</span></p>
+                    <p class="sectionMain">销售提成是每个服务项目设置的固定销售金额提成</p>
+                    <p class="tit"><span class="keyPoint">•</span><span>施工提成</span></p>
+                    <p class="sectionMain">施工提成是每个服务项目设置的固定施工金额提成，其中按照施工人数进行均分，例如:某项服务的施工提成为5元，两人共同施工，那么单人获得2.5元的施工提成</p>
+                </div>
+                <button @click="istrue='none'" style="outline: none;">我知道了</button>
+            </div>
+        </div>
+
+
+
+    </div>
+    <script type="text/javascript" src="../../script/api.js"></script>
+    <script type="text/javascript" src="../../script/hui/H.js"></script>
+    <script type="text/javascript" src="../../script/vue.min.js"></script>
+    <script type="text/javascript" src="../../script/jquery.min.js"></script>
+    <script type="text/javascript" src="../../script/appUtils.js"></script>
+    <script type="text/javascript" src="../../script/echarts.min.js"></script>
+    <script type="text/javascript">
+        // 员工提成统计图
+        function makeMap(data) {
+            var dataTitle=[];
+            for(var i=0;i<data.length;i++){
+                dataTitle[i]=data[i].name;
+            }
+            var dom = document.getElementById("container");
+            var myChart = echarts.init(dom);
+            var app = {};
+            option = null;
+            option = {
+                tooltip : {
+                    trigger: 'item',
+                    formatter: "{a} <br/>{b} : {c} ({d}%)"
+                },
+                legend: {
+                    orient: 'vertical',
+                    left: 'right',
+                    data: dataTitle
+                },
+                series : [
+                    {
+                        name: '访问来源',
+                        type: 'pie',
+                        color: ['#37A2DA', '#32C5E9', '#67E0E3', '#9FE6B8', '#FFDB5C','#ff9f7f', '#fb7293', '#E062AE', '#E690D1', '#e7bcf3', '#9d96f5', '#8378EA', '#96BFFF'],
+                        radius : '55%',
+                        center: ['40%', '60%'],
+                        data: data,
+                        itemStyle: {
+                            emphasis: {
+                                shadowBlur: 10,
+                                shadowOffsetX: 0,
+                                shadowColor: 'rgba(0, 0, 0, 0.5)'
+                            }
+                        }
+                    }
+                ]
+            };
+            ;
+            if (option && typeof option === "object") {
+                myChart.setOption(option, true);
+            }
+        };
+
+
+        apiready = function() {
+            setStatusBarStyleFn('dark'); // 状态栏颜色
+            // 头部沉侵
+            var header = $api.dom('header');
+            var headerH = $api.fixStatusBar(header);
+
+            var datas={};
+            var shopMessage='';
+            var dateList=[];
+
+
+            // 获取当前及之前月份
+            var monthTime=[31,28,31,30,31,30,31,31,30,31,30,31]
+            var dataMonth=[];
+            var times=new Date().getTime();
+            for(var i=0;i<12;i++){
+                dataMonth[i]={};
+                dataMonth[i].time=times;
+                dataMonth[i].time2=new Date(times).Format("yyyy");
+                dataMonth[i].time1=new Date(times).Format("MM");
+                dataMonth[i].ind=i;
+                if(dataMonth[i].time1=='02'){
+                    var years=new Date(times).Format("yyyy");
+                    if((years%4==0 && years%100!==0) || years%400==0){
+                        times-=1000*60*60*24*29;
+                    } else {
+                        times-=1000*60*60*24*28;
+                    }
+                } else {
+                    var month=parseInt(dataMonth[i].time1);
+                    var days=monthTime[month-2];
+                    times-=days*1000*60*60*24;
+                }
+                dataMonth[i].time1=dataMonth[i].time1+'月';
+            }
+            // 获取当前月份天数
+            var monthId=parseInt(new Date().Format('MM'));
+            var monthDay=monthId+'.1~'+monthId+'.'+monthTime[monthId-1];
+            datas.monthDay=monthDay;
+            // 获取某月提成数据
+            function dateMess(time){
+                request({
+                    url: 'app/staff/staff_percentage_count',
+                    method: 'post',
+                    data: {
+                        body: {
+                            date: time
+                        }
+                    }
+                },function(ret){
+                    var data=[];
+                    var i=0;
+                    for (var key in ret){
+                        data[i]={};
+                        data[i].name=key;
+                        data[i].value=ret[key];
+                        i++;
+                    }
+                    console.log(JSON.stringify(data))
+                    makeMap(data)
+                })
+
+            }
+
+            var vuebox=new Vue({
+                el: '#VUE_BOX',
+                data: {
+                    timeList: dataMonth,
+                    inId: 0,
+                    monthDay: monthDay,
+                    royaltyData: '',
+                    allMoney: '',
+                    istrue: 'none',
+                },
+                created: function(){
+                    var isBos=GET_USER_INFO().shopId;
+                    // 请求员工提成统计
+                    var time=new Date().Format("yyyy-MM");
+                    dateMess(time);
+
+                    // 请求员工提成详情
+                    this.royalty(time);
+
+
+                },
+                methods: {
+                    // 选择展示的日期
+                    sizeColor: function(index){
+                        var self=this;
+                        vuebox.inId=index;
+                        var datatime=dataMonth[index].time;
+                        var monthId=parseInt(new Date(datatime).Format('MM'));
+                        vuebox.monthDay=monthId+'.1~'+monthId+'.'+monthTime[monthId-1];
+                        datas.monthDay=monthId+'.1~'+monthId+'.'+monthTime[monthId-1];
+                        datatime=new Date(datatime).Format("yyyy-MM");
+                        datas.time=datatime;
+                        dateMess(datatime);
+                        self.royalty(datatime);
+                    },
+                    // 请求员工提成详情
+                    royalty: function(time){
+                        request({
+                            url: 'app/staff/staff_percentage_details',
+                            method: 'post',
+                            data: {
+                                body: {
+                                    date: time
+                                }
+                            }
+                        },function(ret){
+                            console.log(JSON.stringify(ret));
+                            datas.message=ret;
+                            var nextTime=new Date().getTime()-1000*60*60*24;
+                            nextTime=new Date(nextTime).Format("yyyy-MM-dd");
+                            var allMoney=0;
+                            for(var key in ret){
+                                for (var i=0;i<ret[key].length;i++){
+                                    allMoney+=ret[key][i].percentage;
+                                }
+                                if(key==nextTime){
+                                    vuebox.royaltyData=ret[key];
+                                    break;
+                                }
+                            }
+                            vuebox.allMoney=allMoney;
+                            datas.allMoney=allMoney;
+                        })
+                    },
+                    // 提示框
+                    hint: function(){
+                        vuebox.istrue='block';
+                    },
+                    details: function(){
+                        console.log(JSON.stringify(datas))
+                        api.openWin({
+                            name: 'p_appPersonalComDetail',
+                            url: 'p_appPersonalComDetail.html',
+                            pageParam: {
+                                data: datas
+                            }
+                        })
+                    }
+                }
+            })
+
+
+
+
+
+        }
+    </script>
+</body>
+
+</html>

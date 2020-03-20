@@ -1,0 +1,278 @@
+<!DOCTYPE HTML>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="maximum-scale=1.0, minimum-scale=1.0, user-scalable=0, initial-scale=1.0, width=device-width" />
+    <meta name="format-detection" content="telephone=no, email=no, date=no, address=no">
+    <title></title>
+    <link href="../css/api.css" rel="stylesheet" type="text/css" />
+    <link href="../css/Hui.css" rel="stylesheet" type="text/css" />
+    <style>
+        html,body {
+            height: 100%;
+        }
+        #VUE_BOX {
+            height: 100%;
+            position: relative;
+        }
+        p{
+            margin: 0;
+            padding: 0;
+        }
+        .frame-bg{
+            background-color: rgba(255, 255, 255, 0.6);
+        }
+        .content-box{
+            left: -5px;
+            top: 5px;
+            padding-top: 8%;
+            padding-bottom: 8%;
+        }
+        .fillet{
+            /*border-bottom-left-radius: 20px;
+            border-bottom-right-radius: 20px;*/
+        }
+        .box-shadow{
+            box-shadow: 2px 2px 5px #888888;
+        }
+        .margin-left{
+            margin-left: 2.5px;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="VUE_BOX">
+        <!-- =================================== 背景 开始 =================================== -->
+        <div class="hWidth_100">
+            <img src="../image/index/banner.png" class="hWidth_100 fillet"/>
+        </div>
+        <!-- =================================== 背景 结束 =================================== -->
+
+        <!-- =================================== 功能 结束 =================================== -->
+        <div style="position: absolute; top: 12%; width: 90%;margin: 0 5%">
+            <div class="hWidth_100 hRelative frame-bg hBorderRadius_10 margin-left">
+                <div class="hBgColor_white hFontSize_16 hFontColor_333 hBorderRadius_10 hRelative content-box H-overflow-hidden box-shadow">
+                    <div @click="openOrder" class="hWidth_25 hFloatLeft content-item">
+                        <div class="hpadding_horizontal_both_20 H-box-sizing-border-box">
+                            <img src="../image/index/img_1_1.png" class="hWidth_100"/>
+                        </div>
+                        <p class="hTextAlignCenter" style="margin-top: 5%">服务开单</p>
+                    </div>
+                    <div @click="orderList" class="hWidth_25 hFloatLeft content-item">
+                        <div class="hpadding_horizontal_both_20 H-box-sizing-border-box">
+                            <img src="../image/index/img_1_2.png" class="hWidth_100"/>
+                        </div>
+                        <p class="hTextAlignCenter" style="margin-top: 5%">订单管理</p>
+                    </div>
+                    <div @click="rechargeCard" class="hWidth_25 hFloatLeft content-item">
+                        <div class="hpadding_horizontal_both_20 H-box-sizing-border-box">
+                            <img src="../image/index/img_1_3.png" class="hWidth_100"/>
+                        </div>
+                        <p class="hTextAlignCenter" style="margin-top: 5%">办卡充值</p>
+                    </div>
+                    <div @click="commission" class="hWidth_25 hFloatLeft content-item">
+                        <div class="hpadding_horizontal_both_20 H-box-sizing-border-box">
+                            <img src="../image/index/img_1_4.png" class="hWidth_100"/>
+                        </div>
+                        <p class="hTextAlignCenter" style="margin-top: 5%">个人提成</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div style="position: absolute; top: 40%; width: 90%;margin: 0 5%">
+            <div class="hWidth_100 hRelative frame-bg hBorderRadius_10 margin-left">
+                <div class="hBgColor_white hFontSize_16 hFontColor_333 hBorderRadius_10 hRelative content-box H-overflow-hidden box-shadow">
+                    <div @click="taking" class="hWidth_25 hFloatLeft content-item">
+                        <div class="hpadding_horizontal_both_20 H-box-sizing-border-box">
+                            <img src="../image/index/img_2_1.png" class="hWidth_100"/>
+                        </div>
+                        <p class="hTextAlignCenter" style="margin-top: 5%">营业统计</p>
+                    </div>
+                    <div @click="staffList" class="hWidth_25 hFloatLeft content-item">
+                        <div class="hpadding_horizontal_both_20 H-box-sizing-border-box">
+                            <img src="../image/index/img_2_2.png" class="hWidth_100"/>
+                        </div>
+                        <p class="hTextAlignCenter" style="margin-top: 5%">员工管理</p>
+                    </div>
+                    <div @click="customerAnalysis" class="hWidth_25 hFloatLeft content-item">
+                        <div class="hpadding_horizontal_both_20 H-box-sizing-border-box">
+                            <img src="../image/index/img_2_3.png" class="hWidth_100"/>
+                        </div>
+                        <p class="hTextAlignCenter" style="margin-top: 5%">客户分析</p>
+                    </div>
+                    <div @click="manage" class="hWidth_25 hFloatLeft content-item">
+                        <div class="hpadding_horizontal_both_20 H-box-sizing-border-box">
+                            <img src="../image/index/img_2_4.png" class="hWidth_100"/>
+                        </div>
+                        <p class="hTextAlignCenter" style="margin-top: 5%">经营管理</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- =================================== 功能 开始 =================================== -->
+
+
+        <!-- =================================== 服务商城 开始 =================================== -->
+        <div @click="alerts" style="position: absolute; top: 68%; width: 92%;margin: 0 4%">
+            <img src="../image/index/shop.png" class="hWidth_100"/>
+            <p style="position: absolute;top: 10%; left: 50%;transform: translateX(-50%);text-align: center;background-color:#EEE;padding: 5px 10px;border-radius: 4px;" :style="{display: isShow}">商城正在建设中</p>
+        </div>
+        <!-- =================================== 服务商城 结束 =================================== -->
+
+
+        <!-- =================================== 页面底部 结束 =================================== -->
+        <div class="hPaddingtop_30"></div>
+        <!-- =================================== 页面底部 开始 =================================== -->
+    </div>
+    <script type="text/javascript" src="../script/api.js"></script>
+    <script type="text/javascript" src="../script/hui/H.js"></script>
+    <script type="text/javascript" src="../script/vue.min.js"></script>
+    <script type="text/javascript" src="../script/jquery.min.js"></script>
+    <script type="text/javascript" src="../script/appUtils.js"></script>
+    <script type="text/javascript">
+        apiready = function() {
+            setStatusBarStyleFn('light'); // 状态栏颜色
+
+            window.app = new Vue({
+                el: '#VUE_BOX',
+                data: {
+                    userInfo: GET_USER_INFO(), // 获取登录数据
+                    isShow: 'none',
+                },
+                mounted: function () {
+                    var self = this;
+                    self.listener(); // 监听
+                    self.refresh(); // 下拉刷新
+                    if (!self.userInfo) { // 没有登录数据不执行
+                        return;
+                    }
+                },
+                methods: vueDefMethods({
+                    // 监听
+                    listener: function () {
+                        // window显示
+                        api.addEventListener({
+                            name: 'viewappear'
+                        }, function(ret, err){
+                             setStatusBarStyleFn('light');
+                        });
+                    },
+
+                    // 下拉刷新
+                    refresh: function () {
+                        // dropdownRefresh();
+                    },
+
+                    // 服务开单
+                    openOrder: function () {
+                        api.openWin({
+                            name: 'p_serviceOrder',
+                            url: 'homePage/p_serviceOrder.html'
+                        })
+                    },
+
+                    // 订单管理
+                    orderList: function () {
+                        var self = this;
+                        api.openWin({
+                            name: 'appOrderList',
+                            url: 'order/p_appOrderList.html'
+                        });
+                    },
+                    // 办卡充值
+                    rechargeCard: function(){
+                        var self = this;
+                        api.openWin({
+                            name: 'p_appRechargeCard',
+                            url: 'rechargeCard/p_appRechargeCard.html'
+                        })
+                    },
+                    // 个人提成
+                    commission: function(){
+                        api.openWin({
+                            name: 'p_appPersonalCommission',
+                            url: 'personalCommission/p_appPersonalCommission.html'
+                        })
+                    },
+                    // 营收统计
+                    taking: function(){
+                        var self = this;
+                        var isBos=GET_USER_INFO().shopId;
+                        if(!isBos){
+                            api.openWin({
+                                name: 'p_appTaking',
+                                url: 'taking/p_appTaking.html'
+                            })
+                        } else {
+                            api.toast({
+                                msg: '暂无权限',
+                                duration: 2000,
+                                location: 'middle'
+                            })
+                        }
+
+                    },
+                    // 员工管理
+                    staffList: function () {
+                        var self = this;
+                        var userInfo = self.userInfo;
+                        if (!userInfo.shopId) { // 管理员
+                            api.openWin({
+                                name: 'appStaffList',
+                                url: 'staffManage/p_appStaffList.html'
+                            });
+                        } else {
+                            toastFn("暂无权限");
+                        }
+                    },
+
+                    // 客户分析
+                    customerAnalysis: function () {
+                        var self = this;
+                        var userInfo = self.userInfo;
+                        if (!userInfo.shopId) { // 管理员
+                            api.openWin({
+                                name: 'appCustomerAnalysis',
+                                url: 'customerAnalysis/p_appCustomerAnalysis.html'
+                            });
+                        } else {
+                            toastFn("暂无权限");
+                        }
+                    },
+                    manage: function(){
+                        var self = this;
+                        var isBos=GET_USER_INFO().shopId;
+                        if(!isBos){
+                            api.openWin({
+                                name: 'p_appManage',
+                                url: 'manage/p_appManage.html'
+                            })
+                        } else {
+                            api.toast({
+                                msg: '暂无权限',
+                                duration: 2000,
+                                location: 'middle'
+                            })
+                        }
+
+                    },
+                    alerts: function(){
+                        var self=this;
+                        self.isShow="block";
+                        setTimeout(function(){
+                            self.isShow='none';
+                        },2000)
+                    },
+
+                }),
+            });
+
+
+        }
+    </script>
+</body>
+
+</html>

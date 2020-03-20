@@ -1,0 +1,256 @@
+<!DOCTYPE HTML>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="maximum-scale=1.0, minimum-scale=1.0, user-scalable=0, initial-scale=1.0, width=device-width" />
+    <meta name="format-detection" content="telephone=no, email=no, date=no, address=no">
+    <title></title>
+    <link href="../../css/api.css" rel="stylesheet" type="text/css" />
+    <link href="../../css/Hui.css" rel="stylesheet" type="text/css" />
+    <style>
+        ul, li, h3, p{
+            margin: 0;
+            padding: 0;
+        }
+        .search-box{ /* 搜索框 */
+            background-color: #F0F0F0;
+        }
+        .search-box .search-img{ /* 搜索图片 */
+            width: 20px;
+            height: 20px;
+            position: relative;
+            top: 5px;
+        }
+        .shop-box{ /* 店铺盒子 */
+            display: flex;
+            padding: 15px 10px;
+            border-top: 1px solid rgba(240,240,240,1);
+            border-bottom: 1px solid rgba(240,240,240,1);
+        }
+        .shop-img{ /* 店铺照片 */
+            width: 35px;
+            height: 35px;
+        }
+        .shop-title{ /* 店铺名称 */
+            margin: auto 0 auto 10px;
+        }
+        .shop-right{ /* 店铺右侧人数提示 */
+            margin: auto 0 auto auto;
+        }
+        .user-box{ /* 店铺盒子 */
+            display: flex;
+        }
+        .user-img,.user-context{ /* 用户 */
+            box-sizing: border-box;
+        }
+        .user-img{ /* 用户头像 */
+            width: 22%;
+            padding: 0 10px;
+            margin: auto 0;
+        }
+        .user-img img{ /* 用户头像 图片 */
+            border-radius: 50%;
+            height: 65px;
+            width: 65px;
+            object-fit: cover;
+        }
+        .user-context{ /* 用户主要信息 */
+            width: 78%;
+            display: flex;
+            margin: auto 0 auto auto;
+            padding: 22px 0;
+            border-bottom: 1px solid rgba(240,240,240,1);
+        }
+        .introduce{ /* 角色 */
+            padding: 2px 10px;
+            background-color: #4FA4F3;
+            color: white;
+            border-radius: 3px;
+            margin: auto 10px auto auto;
+        }
+        .user-tel{ /* 用户电话 */
+            color: rgba(79, 164, 243, 1);
+        }
+        .isShow {
+            display: none;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="VUE_BOX">
+        <!-- =================================== 头部 开始 =================================== -->
+        <header class="hHeader" id="header">
+            <span @click="closeWin" class="hIconBox hPaddingLeft_10">
+                <i class="hIcon H-icon-arrow-left"></i>
+            </span>
+            <div class="hChannelTitle">员工管理</div>
+            <span @click="add" class="hIconRightBox hMarginRight_10">
+                <label class="hIconFont hFontSize_16 hRelative hTop_3">新增员工</label>
+            </span>
+        </header>
+        <!-- =================================== 头部 结束 =================================== -->
+
+        <!-- =================================== 状态和搜索 开始 =================================== -->
+        <div id="search" class="hRelative">
+            <div class="hPadding_10 search-box" style="position: relative">
+                <div class="hBgColor_white hBorderRadius_20 hpadding_horizontal_voth_5 hPaddingLeft_25" style="position: relative">
+                    <!-- <img class="search-img" src="../../image/def/search.png"/> -->
+                    <input v-model="search"  @blur="getList"  type="text" class="hFontColor_333 hFontSize_14 hPadding_5 H-border-none" placeholder="搜索"/>
+                    <i class="H-iconfont H-icon-search H-font-size-14" style="width: 18px;position: absolute; right: 7%;top: 50%;transform: translateY(-50%)"></i>
+                </div>
+            </div>
+        </div>
+        <!-- =================================== 状态和搜索 结束 =================================== -->
+
+
+        <!-- =================================== 员工数据 开始 =================================== -->
+        <ul v-if="result" class="hBgColor_white hFontSize_16 hFontColor_333">
+            <li class="" v-for="(users, shopName) in result">
+                <!-- 店铺 -->
+                <div class="shop-box">
+                    <img src="../../image/staff/shop.png" class="H-vertical-align-middle H_displayBlock shop-img" />
+                    <p class="shop-title hFontWeight_bold" v-text="shopName"></p>
+                    <p class="shop-right" v-text="users.length + '人'"></p>
+                </div>
+                <!-- 员工 -->
+                <div>
+                    <div @click="details(user)" class="user-box" v-for="user in users">
+                        <div class="user-img">
+                            <img :src="user.staffPhoto || 'img'" onerror="src='../../image/def/def_user.png'" class="H-vertical-align-middle H_displayBlock"/>
+                        </div>
+                        <div class="user-context">
+                            <div class="">
+                                <p v-text="user.staffName || '---'"></p>
+                                <p class="user-tel" v-text="user.staffMobile || '---'"></p>
+                            </div>
+                            <div class="introduce hFontSize_14" v-text="user.roleName || '---'"></div>
+                        </div>
+                    </div>
+                </div>
+
+
+
+            </li>
+        </ul>
+        <div v-if="isShow || result==null" class="hPaddingtop_50 hPaddingbottom_50 hTextAlignCenter hFontColor_999 hFontSize_16">
+            - 暂无数据 -
+        </div>
+        <!-- =================================== 员工数据 结束 =================================== -->
+
+        <!-- =================================== 页面底部 开始 =================================== -->
+        <div class="hPaddingtop_30"></div>
+        <!-- =================================== 页面底部 结束 =================================== -->
+    </div>
+    <script type="text/javascript" src="../../script/api.js"></script>
+    <script type="text/javascript" src="../../script/hui/H.js"></script>
+    <script type="text/javascript" src="../../script/vue.min.js"></script>
+    <script type="text/javascript" src="../../script/jquery.min.js"></script>
+    <script type="text/javascript" src="../../script/appUtils.js"></script>
+    <script type="text/javascript">
+        apiready = function() {
+            // 状态栏颜色
+            setStatusBarStyleFn('dark');
+            // 头部沉侵
+            var header = $api.dom('header');
+            var headerH = $api.fixStatusBar(header);
+            // 固定搜索框
+            fixedHead("search");
+
+
+            window.app = new Vue({
+                el: '#VUE_BOX',
+                data: {
+                    userInfo: GET_USER_INFO(), // 登录数据
+                    pageParam: api.pageParam.data || {}, // 选择的员工数据
+                    result: null, // 数据 json对象 键是店铺名 值是员工数据
+                    search: "", // 搜索条件
+                    isShow: false,
+                },
+                mounted: function() {
+                    var self = this;
+                    self.listener(); // 监听
+                },
+                methods: vueDefMethods({
+                    // 监听
+                    listener: function () {
+                        var self = this;
+                        // window显示
+                        api.addEventListener({
+                            name: 'viewappear'
+                        }, function(ret, err){
+                             setStatusBarStyleFn('dark');
+                             self.getList(); // 查询员工数据
+                        });
+                    },
+
+                    // 查询员工数据
+                    getList: function () {
+                        var self = this;
+                        request({
+                            url: "app/staff/all_staff_list",
+                            method: "post",
+                            data: {body: {"search": self.search}}
+                        }, function (ret) {
+                            var result = {};
+                            for (var i = 0; i < ret.length; i++) {
+                                var item = ret[i];
+                                if (!result[item.shopName]) {
+                                    result[item.shopName] = [];
+                                }
+                                result[item.shopName].push(item);
+                            }
+                            self.result = result;
+                            if(JSON.stringify(self.result)==='{}'){
+                                self.isShow=true;
+                            }
+                        });
+                    },
+
+                    // 详情
+                    details: function (user) {
+                        var self = this;
+                        api.openWin({
+                            name: 'appStaffInfo',
+                            url: 'p_appStaffInfo.html',
+                            pageParam: {
+                                data: user
+                            }
+                        });
+                    },
+
+                    // 新增
+                    add: function () {
+                        var self = this;
+                        api.openWin({
+                            name: 'appUpdStaff',
+                            url: 'p_appUpdStaff.html',
+                            pageParam: {
+                                data: null
+                            }
+                        });
+                    },
+                    // 隐藏员工
+                    isShow: function (index) {
+
+                    }
+
+                }),
+            });
+
+            // 隐藏店铺员工
+            $(document).on("click",".shop-box",function(){
+                if($(this).next().is(".isShow")){
+                    $(this).next().removeClass("isShow")
+                } else {
+                    $(this).next().addClass("isShow")
+                }
+            })
+
+
+        }
+    </script>
+</body>
+
+</html>

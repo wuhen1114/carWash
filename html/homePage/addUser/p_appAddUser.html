@@ -1,0 +1,386 @@
+<!DOCTYPE HTML>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="maximum-scale=1.0, minimum-scale=1.0, user-scalable=0, initial-scale=1.0, width=device-width" />
+    <meta name="format-detection" content="telephone=no, email=no, date=no, address=no">
+    <title>新增用户</title>
+    <link href="../../../css/api.css" rel="stylesheet" type="text/css" />
+    <link href="../../../css/Hui.css" rel="stylesheet" type="text/css" />
+    <style>
+        header {
+            height: 40px;
+        }
+        #main {
+            width: 100%;
+            padding: 0px 2%;
+            box-sizing: border-box;
+        }
+        footer span {
+            background-color: #4FA4F3;
+            border-radius: 2px;
+            font-weight: bold;
+        }
+        div {
+            position: relative;
+        }
+
+        /*各省简称列表*/
+        #popup {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            padding: 12px 18px;
+            box-sizing: border-box;
+            background-color: #f1f1f1;
+        }
+        #popup ul {
+            width: 100%;
+        }
+        #popup ul li {
+            display: inline-block;
+            width: 10%;
+            text-align: center;
+            padding: 2px 0;
+            background-color: #FFF;
+            border-radius: 8px;
+            margin: 6px 1.12%;
+        }
+        .ishide {
+            display: none;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="VUE_BOX">
+        <!-- 头部导航 start -->
+        <header class=" H-theme-background-color9" id="header">
+            <span tapmode="" onclick="H.closeWin();" class="H-icon H-position-relative H-display-inline-block H-float-left H-vertical-middle H-theme-font-color-black H-padding-vertical-top-8 H-padding-horizontal-left-5 H-z-index-100">
+                <i class="H-iconfont H-icon-arrow-left H-font-size-18 H-vertical-middle"></i>
+                <label class="H-display-block H-vertical-middle H-font-size-15"></label>
+            </span>
+            <div class="H-header-title H-center-all H-font-size-18 H-text-show-row-1 H-theme-font-color-black H-position-absolute H-padding-vertical-top-8 H-width-100-percent">新增用户</div>
+        </header>
+        <!-- 头部导航 end -->
+        <div id="main">
+            <!-- 基本信息 -->
+            <div class="H-margin-vertical-top-10 H-theme-background-color-white H-border-vertical-both-after" style="border-radius: 7px">
+                <div class="H-text-list H-flexbox-horizontal  H-theme-background-color-white H-border-vertical-bottom-margin-left-10-after H-vertical-middle H-touch-active">
+                    <div class="H-flex-item H-padding-horizontal-both-10 H-font-size-16 H-padding-vertical-both-12">客户姓名<input v-model="user.customerName" style="margin-left: 12px;width: 55%;outline: none" type="text" placeholder="请输入客户姓名（必填）"></div>
+                </div>
+                <div class="H-text-list H-flexbox-horizontal  H-theme-background-color-white H-border-vertical-bottom-margin-left-10-after H-vertical-middle H-touch-active">
+                    <div class="H-flex-item H-padding-horizontal-both-10 H-font-size-16 H-padding-vertical-both-12">手机号码<input v-model="user.customerMobile" style="margin-left: 12px;width: 55%;outline: none"  type="text" placeholder="请输入手机号码（必填）"></div>
+                </div>
+                <div @click="genderChoose()" class="H-text-list H-flexbox-horizontal  H-theme-background-color-white H-border-vertical-bottom-margin-left-10-after H-vertical-middle H-touch-active">
+                    <div class="H-flex-item H-padding-horizontal-both-10 H-font-size-16 H-padding-vertical-both-12">客户性别<span style="margin-left: 12px;width: 55%;outline: none"  type="text">{{userGender}}</span></div>
+                    <i style="position: absolute; right: 5%;top: 30%" class="H-iconfont H-icon-arrow-right H-theme-font-color-999 H-font-size-14 H-vertical-middle"></i>
+                </div>
+                <div class="H-text-list H-flexbox-horizontal  H-theme-background-color-white H-border-vertical-bottom-margin-left-10-after H-vertical-middle H-touch-active">
+                    <div class="H-flex-item H-padding-horizontal-both-10 H-font-size-16 H-padding-vertical-both-12">客户生日<span @click="dateBirth()" style="margin-left: 12px;width: 55%;outline: none"  type="text">{{birth}}</span></div>
+                    <i style="position: absolute; right: 5%;top: 30%" class="H-iconfont H-icon-arrow-right H-theme-font-color-999 H-font-size-14 H-vertical-middle"></i>
+                </div>
+            </div>
+            <!-- 车辆型号 -->
+            <div class="H-margin-vertical-top-10 H-theme-background-color-white H-border-vertical-both-after" style="border-radius: 7px">
+                <div @click="carBrand" class="H-text-list H-flexbox-horizontal  H-theme-background-color-white H-border-vertical-bottom-margin-left-10-after H-vertical-middle H-touch-active">
+                    <div class="H-flex-item H-padding-horizontal-both-10 H-font-size-16 H-padding-vertical-both-12">车辆型号<span style="margin-left: 12px;" >{{user.carModel.carBrand}}</span></div>
+                    <i style="position: absolute; right: 5%;top: 30%" class="H-iconfont H-icon-arrow-right H-theme-font-color-999 H-font-size-14 H-vertical-middle"></i>
+                </div>
+            </div>
+            <!-- 车牌号码 -->
+            <div class="H-margin-vertical-top-10 H-theme-background-color-white H-border-vertical-both-after" style="border-radius: 7px">
+                <div class="H-text-list H-flexbox-horizontal  H-theme-background-color-white H-border-vertical-bottom-margin-left-10-after H-vertical-middle H-touch-active">
+                    <div class="H-flex-item H-padding-horizontal-both-10 H-font-size-16 H-padding-vertical-both-12">车牌号码
+                        <span @click="openForShort" style="background-color: #EEE;padding: 0 5px;">
+                            <span style="width: 18px;">{{forShort}}</span>
+                            <span style="display: inline-block;width: 6px;height: 6px; border-right: 1px solid #000;border-bottom: 1px solid #000;transform: rotate(45deg);margin-left: 0px;position: relative; top: -3px;"></span>
+                        </span>
+                        <input v-model="user.carModel.plateNo" style="margin-left: 12px;width: 55%;outline: none" type="text" placeholder="请输入车牌号码（必填）">
+                    </div>
+                </div>
+            </div>
+            <!-- 车辆配置 -->
+            <div class="H-margin-vertical-top-10 H-theme-background-color-white H-border-vertical-both-after" style="border-radius: 7px">
+                <div class="H-text-list H-flexbox-horizontal  H-theme-background-color-white H-border-vertical-bottom-margin-left-10-after H-vertical-middle H-touch-active">
+                    <div class="H-flex-item H-padding-horizontal-both-10 H-font-size-16 H-padding-vertical-both-12">车辆颜色<input v-model="user.carModel.carColor" style="margin-left: 12px;width: 55%;outline: none" type="text" placeholder="请输入车辆颜色（必填）"></div>
+                </div>
+                <div class="H-text-list H-flexbox-horizontal  H-theme-background-color-white H-border-vertical-bottom-margin-left-10-after H-vertical-middle H-touch-active">
+                    <div class="H-flex-item H-padding-horizontal-both-10 H-font-size-16 H-padding-vertical-both-12">发动机号<input v-model="user.carModel.engineNo" style="margin-left: 12px;width: 55%;outline: none" type="text" placeholder="请输入发动机号"></div>
+                </div>
+                <div class="H-text-list H-flexbox-horizontal  H-theme-background-color-white H-border-vertical-bottom-margin-left-10-after H-vertical-middle H-touch-active">
+                    <div class="H-flex-item H-padding-horizontal-both-10 H-font-size-16 H-padding-vertical-both-12">发动机排量<input v-model="user.carModel.engineVolume" style="margin-left: 12px;width: 55%;outline: none" type="text" placeholder="请输入发动机排量"></div>
+                </div>
+            </div>
+            <!-- 车辆使用信息 -->
+            <div class="H-margin-vertical-top-10 H-theme-background-color-white H-border-vertical-both-after" style="border-radius: 7px">
+                <div class="H-text-list H-flexbox-horizontal  H-theme-background-color-white H-border-vertical-bottom-margin-left-10-after H-vertical-middle H-touch-active">
+                    <div class="H-flex-item H-padding-horizontal-both-10 H-font-size-16 H-padding-vertical-both-12">生产日期<span @click="dateOpen()" style="margin-left: 12px;width: 55%;outline: none" type="text">{{prodYear}}</span></div>
+                    <i style="position: absolute; right: 5%;top: 30%" class="H-iconfont H-icon-arrow-right H-theme-font-color-999 H-font-size-14 H-vertical-middle"></i>
+                </div>
+                <div class="H-text-list H-flexbox-horizontal  H-theme-background-color-white H-border-vertical-bottom-margin-left-10-after H-vertical-middle H-touch-active">
+                    <div class="H-flex-item H-padding-horizontal-both-10 H-font-size-16 H-padding-vertical-both-12">当前里程<input v-model="user.carModel.carMileage" style="margin-left: 12px;width: 55%;outline: none" type="text" placeholder="请输入当前里程"></div>
+                </div>
+                <div class="H-text-list H-flexbox-horizontal  H-theme-background-color-white H-border-vertical-bottom-margin-left-10-after H-vertical-middle H-touch-active">
+                    <div class="H-flex-item H-padding-horizontal-both-10 H-font-size-16 H-padding-vertical-both-12">平均耗油<input v-model="user.carModel.avgConsumption" style="margin-left: 12px;width: 55%;outline: none" type="text" placeholder="请输入平均耗油"></div>
+                </div>
+                <div class="H-text-list H-flexbox-horizontal  H-theme-background-color-white H-border-vertical-bottom-margin-left-10-after H-vertical-middle H-touch-active">
+                    <div class="H-flex-item H-padding-horizontal-both-10 H-font-size-16 H-padding-vertical-both-12">保险到期日<span @click="dateEnd()" style="margin-left: 12px;width: 55%;outline: none" type="text">{{insurance}}</span></div>
+                    <i style="position: absolute; right: 5%;top: 30%" class="H-iconfont H-icon-arrow-right H-theme-font-color-999 H-font-size-14 H-vertical-middle"></i>
+                </div>
+                <div class="H-text-list H-flexbox-horizontal  H-theme-background-color-white H-border-vertical-bottom-margin-left-10-after H-vertical-middle H-touch-active">
+                    <div class="H-flex-item H-padding-horizontal-both-10 H-font-size-16 H-padding-vertical-both-12">上路时间<span @click="dateUp()" style="margin-left: 12px;width: 55%;outline: none" type="text">{{startOff}}</span></div>
+                    <i style="position: absolute; right: 5%;top: 30%" class="H-iconfont H-icon-arrow-right H-theme-font-color-999 H-font-size-14 H-vertical-middle"></i>
+                </div>
+            </div>
+            <!-- 下一步按钮 start -->
+            <footer @click="nextBtn()" class="H-text-align-center H-margin-vertical-top-15 H-position-relative" style="border-radius: 7px">
+                <span class="H-theme-font-color-white H-font-size-18 H-margin-vertical-bottom-15 H-display-block H-position-absolute H-padding-vertical-both-10" style="left:10px;right:10px;">保存</span>
+            </footer>
+            <!-- 下一步按钮 end -->
+            <!-- 各地简称列表 -->
+            <div id="popup" :class="{ishide: istrue}">
+                <ul>
+                    <li v-for="(item,index) in forShortList" @click="chooseForShort(item)">{{item}}</li>
+                </ul>
+            </div>
+            <!-- 各地简称列表 end -->
+
+        </div>
+
+
+
+    </div>
+    <script type="text/javascript" src="../../../script/api.js"></script>
+    <script type="text/javascript" src="../../../script/hui/H.js"></script>
+    <script type="text/javascript" src="../../../script/vue.min.js"></script>
+    <script type="text/javascript" src="../../../script/jquery.min.js"></script>
+    <script type="text/javascript" src="../../../script/appUtils.js"></script>
+    <script type="text/javascript">
+        apiready = function() {
+            setStatusBarStyleFn('dark'); // 状态栏颜色
+            // 头部沉侵
+            var header = $api.dom('header');
+            var headerH = $api.fixStatusBar(header);
+            // 提示信息
+            function toast(title){
+                api.toast({
+                    msg: title,
+                    duration: 2000,
+                    location: 'middle'
+                })
+            }
+            // 判断手机号
+            var pattern = /0?(13|14|15|17|18|19)[0-9]{9}/;
+            // 判断车牌号
+            var carpattern = /^[京津沪渝冀豫云辽黑湘皖鲁新苏浙赣鄂桂甘晋蒙陕吉闽贵粤青藏川宁琼使领A-Z][A-Z][A-Z0-9]{4}[A-Z0-9挂学警港澳]$/;
+            var data=api.pageParam.data;
+            var cardata=api.pageParam.data;
+            var userData='';
+            if(!pattern.test(data)){
+                data='';
+            }
+            if(!carpattern.test(cardata)){
+                cardata='';
+            }
+            // 监听选择车辆型号数据
+            api.addEventListener({
+                name: 'carBrand'
+            },function(ret,err){
+                addUser.user.carModel.carBrand=ret.value.carBrand.name+'-'+ret.value.carModel.name;
+            })
+
+
+            var addUser=new Vue({
+                el: '#VUE_BOX',
+                data: {
+                    birth: '请输入客户生日',
+                    startOff: "请输入上路时间",
+                    prodYear: '请输入生产日期',
+                    insurance: '请输入保险到期日',
+                    userGender: '请选择客户性别（必填）',
+                    forShort: '', // 选中的简称
+                    forShortList: ['陕','京','津','沪','渝','冀','豫','云','辽','黑','湘','皖','鲁','新','苏','浙','赣','鄂','桂','甘','晋','蒙','吉','闽','贵','粤','青','藏','川','宁','琼','台'],
+                    istrue: true, // 是否隐藏各省简称列表
+                    user: {
+                        customerName: '',
+                        customerGender: '请输入客户性别（必填）',
+                        customerMobile: data ? data : '',
+                        carModel: {
+                            carBrand: '请选择车辆型号',
+                            plateNo: cardata,
+                            carColor: '',
+                            engineNo: '',
+                            platePre: '',
+                            engineVolume: '',
+                            prodYear: '请输入生产日期',
+                            carMileage: '',
+                            avgConsumption: '',
+                            insurance: '请输入保险到期日'
+                        }
+
+                    },
+
+                },
+                methods: {
+                    // 选择性别
+                    genderChoose() {
+                        data=['男','女','保密'];
+                        api.actionSheet({
+                            title: "选择性别",
+                            cancelTitle: '取消',
+                            buttons: data
+                        }, function(ret, err) {
+                            var index = ret.buttonIndex;
+                            if(index!==(data.length+1)){
+                                addUser.userGender=data[index-1];
+                            } else {
+                                addUser.userGender=addUser.userGender;
+                            }
+                        });
+                    },
+                    // 选择生日
+                    dateBirth(){
+                        api.openPicker({
+                            type: 'date_time',
+                            date: '',
+                            title: '选择时间'
+                        }, function(ret, err) {
+                            if (ret) {
+                                addUser.birth=ret.year+"-"+(ret.month<10?'0'+ret.month:ret.month)+"-"+(ret.day<10?'0'+ret.day:ret.day);
+                            } else {
+
+                            }
+                        });
+                    },
+                    // 选择车辆型号
+                    carBrand: function(){
+                        api.openWin({
+                            name: 'p_appVehicleBrand',
+                            url: 'p_appVehicleBrand.html',
+                            pageParam: {
+
+                            }
+                        })
+                    },
+                    // 打开各省简称列表
+                    openForShort: function(){
+                        var self=this;
+                        self.istrue=false;
+                    },
+                    // 选择车牌简称
+                    chooseForShort: function(item){
+                        var self=this;
+                        self.forShort=item;
+                        self.istrue=true;
+                    },
+                    // 选择生产日期
+                    dateOpen(){
+                        api.openPicker({
+                            type: 'date_time',
+                            date: '',
+                            title: '选择时间'
+                        }, function(ret, err) {
+                            if (ret) {
+                                addUser.prodYear=ret.year+"-"+(ret.month<10?'0'+ret.month:ret.month)+"-"+(ret.day<10?'0'+ret.day:ret.day);
+                                addUser.user.carModel.prodYear=ret.year+"-"+(ret.month<10?'0'+ret.month:ret.month)+"-"+(ret.day<10?'0'+ret.day:ret.day);
+                            } else {
+
+                            }
+                        });
+                    },
+                    // 选择保险到期日
+                    dateEnd(){
+                        event.stopPropagation();
+                        api.openPicker({
+                            type: 'date_time',
+                            date: '',
+                            title: '选择时间'
+                        }, function(ret, err) {
+                            if (ret) {
+                                addUser.insurance=ret.year+"-"+(ret.month<10?'0'+ret.month:ret.month)+"-"+(ret.day<10?'0'+ret.day:ret.day);
+                                addUser.user.carModel.insurance=ret.year+"-"+(ret.month<10?'0'+ret.month:ret.month)+"-"+(ret.day<10?'0'+ret.day:ret.day);
+                            } else {
+
+                            }
+                        });
+                    },
+                    // 选择上路时间
+                    dateUp(){
+                        event.stopPropagation();
+                        api.openPicker({
+                            type: 'date_time',
+                            date: '',
+                            title: '选择时间'
+                        }, function(ret, err) {
+                            if (ret) {
+                                addUser.startOff=ret.year+"-"+(ret.month<10?'0'+ret.month:ret.month)+"-"+(ret.day<10?'0'+ret.day:ret.day);
+                            } else {
+
+                            }
+                        });
+                    },
+                    // 保存
+                    nextBtn: function(){
+                        console.log(JSON.stringify(addUser.user));
+                        if(addUser.userGender=='男'){
+                            addUser.user.customerGender=1;
+                        }
+                        if(addUser.userGender=='女') {
+                            addUser.user.customerGender=2;
+                        }
+                        console.log(addUser.user.customerGender)
+                        if(addUser.user.customerName!==''){
+                            if(pattern.test(addUser.user.customerMobile)){
+                                if(addUser.user.customerGender!=='请输入客户性别（必填）'){
+                                    if(addUser.user.carModel.carBrand){
+                                        addUser.user.carModel.plateNo = addUser.forShort+addUser.user.carModel.plateNo;
+                                        if(carpattern.test(addUser.user.carModel.plateNo)){
+                                            if(addUser.user.carModel.carColor){
+                                                request({
+                                                    url: 'app/user/add_user_car',
+                                                    method: 'post',
+                                                    data: {body: addUser.user}
+                                                },function(res){
+                                                    api.sendEvent({
+                                                        name: 'closeAddUser',
+                                                        extra: {
+                                                            phone: addUser.user.customerMobile
+                                                        }
+                                                    })
+                                                    api.closeWin()
+                                                })
+                                            } else {
+                                                toast("请输入车辆颜色")
+                                            }
+                                        } else {
+                                            toast("请输入正确车牌号码")
+                                        }
+                                    } else {
+                                        toast("请输入车辆型号")
+                                    }
+                                } else {
+                                    toast("请选择性别")
+                                }
+                            } else {
+                                toast("手机号格式不正确，请重新输入")
+                            }
+                        } else {
+                            toast("请输入客户姓名");
+                        }
+
+                    }
+
+                }
+            })
+
+
+
+
+        }
+    </script>
+</body>
+
+</html>

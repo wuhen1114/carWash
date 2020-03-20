@@ -1,0 +1,722 @@
+<!DOCTYPE HTML>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="maximum-scale=1.0, minimum-scale=1.0, user-scalable=0, initial-scale=1.0, width=device-width" />
+    <meta name="format-detection" content="telephone=no, email=no, date=no, address=no">
+    <title></title>
+    <link href="../../css/api.css" rel="stylesheet" type="text/css" />
+    <link href="../../css/Hui.css" rel="stylesheet" type="text/css" />
+    <style>
+        header {
+            height: 40px;
+        }
+        #main {
+            width: 100%;
+            padding: 0px 2%;
+            box-sizing: border-box;
+        }
+        #ser {
+            padding-left: 15px;
+            box-sizing: border-box;
+        }
+        footer span {
+            background-color: #4FA4F3;
+            border-radius: 2px;
+            font-weight: bold;
+        }
+
+        #popupType {
+            position: absolute;
+            top: 100%;
+            left: -1px;
+            width: 100%;
+            z-index: 100;
+            background-color: #fff;
+            border: 1px solid #BBB;
+            border-radius: 5px 0 5px 5px;
+        }
+        #popupType li {
+            width: 100%;
+            text-align: center;
+            padding: 5px 0;
+            border-bottom: 1px solid #BBB;
+        }
+        #popupType li:last-child {
+            border-bottom: 0;
+        }
+        .ishide {
+            display: none;
+        }
+
+        /*各省简称列表*/
+        #popup {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            padding: 12px 18px;
+            box-sizing: border-box;
+            background-color: #f1f1f1;
+        }
+        #popup ul {
+            width: 100%;
+        }
+        #popup ul li {
+            display: inline-block;
+            width: 10%;
+            text-align: center;
+            padding: 2px 0;
+            background-color: #FFF;
+            border-radius: 8px;
+            margin: 6px 1.12%;
+        }
+        .provinceHide {
+            display: none;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="VUE_BOX">
+        <!-- 头部导航 start -->
+        <header class=" H-theme-background-color9" id="header">
+            <span tapmode="" onclick="H.closeWin();" class="H-icon H-position-relative H-display-inline-block H-float-left H-vertical-middle H-theme-font-color-black H-padding-vertical-top-8 H-padding-horizontal-left-5 H-z-index-100">
+                <i class="H-iconfont H-icon-arrow-left H-font-size-18 H-vertical-middle"></i>
+                <label class="H-display-block H-vertical-middle H-font-size-15"></label>
+            </span>
+            <div class="H-header-title H-center-all H-font-size-18 H-text-show-row-1 H-theme-font-color-black H-position-absolute H-padding-vertical-top-8 H-width-100-percent">服务开单</div>
+            <span @click="chooseShop()" class="H-icon H-position-relative H-display-inline-block H-float-right H-vertical-middle H-theme-font-color-black H-padding-vertical-top-12 H-padding-horizontal-right-20 H-z-index-100">
+                <label class="H-display-block H-vertical-middle H-font-size-14">{{storeName}}</label>
+            </span>
+            <img src="../../image/homePage/bottom.png" class="downBoult" alt="">
+        </header>
+        <!-- 头部导航 end -->
+        <div id="main">
+            <!-- 搜索框 start -->
+            <div class="hpadding_horizontal_voth_10 hpadding_horizontal_both_10 search-box">
+                <div class="hBgColor_white" style="position: relative; border: 1px solid #BBB;border-radius: 5px;">
+                    <span @click="openSearchType" style="font-size: 14px;color: #777;border-right: 1px solid #BBB;padding: 8px 8px 6px 8px;position: relative;">
+                        <span>{{searchType}}</span>
+                        <span style="display: inline-block;width: 6px;height: 6px; border-right: 1px solid #777;border-bottom: 1px solid #777;transform: rotate(45deg);margin-left: 0px;position: relative; top: -3px;"></span>
+                        <ul id="popupType" :class="{ishide: searchTrue}">
+                            <li v-for="(item,index) in typeList" @click.stop="choosePopupType(item)">{{item}}</li>
+                        </ul>
+                    </span>
+                    <input v-if="searchType=='手机号码'" v-model="number" style="padding-top: 8px" ref="telphone" type="text" class="hFontColor_333 hFontSize_14 hPadding_5 H-border-none" placeholder="搜索手机号码"/>
+                    <span v-if="searchType=='车牌号码'" @click="openForShort" style="background-color: #EEE;padding: 0 5px;">
+                        <span style="width: 18px;">{{forShort}}</span>
+                        <span style="display: inline-block;width: 4px;height: 4px; border-right: 1px solid #000;border-bottom: 1px solid #000;transform: rotate(45deg);margin-left: 0px;position: relative; top: -3px;"></span>
+                    </span>
+                    <input v-if="searchType=='车牌号码'" v-model="number" style="padding-top: 8px;width: 90px;" ref="telphone" type="text" class="hFontColor_333 hFontSize_14 hPadding_5 H-border-none" placeholder="搜索车牌号码"/>
+                    <i @click="search()" class="H-iconfont H-icon-search H-font-size-14" style="width: 18px;position: absolute; right: 5%;top: 20%"></i>
+                </div>
+            </div>
+            <!-- 搜索框 end -->
+            <div class=" H-theme-background-color-white H-border-vertical-both-after" style="border-radius: 7px">
+                <div class="H-text-list H-flexbox-horizontal  H-theme-background-color-white H-border-vertical-bottom-margin-left-10-after H-vertical-middle H-touch-active">
+                    <div class="H-flex-item H-padding-horizontal-both-10 H-font-size-16 H-padding-vertical-both-12">客户姓名<span style="margin-left: 12px">{{userMessage.name}}</span></div>
+                </div>
+                <div class="H-text-list H-flexbox-horizontal  H-theme-background-color-white H-border-vertical-bottom-margin-left-10-after H-vertical-middle H-touch-active">
+                    <div class="H-flex-item H-padding-horizontal-both-10 H-font-size-16 H-padding-vertical-both-12">手机号码<span style="margin-left: 12px">{{userMessage.phone}}</span></div>
+                </div>
+            </div>
+            <div class="H-margin-vertical-top-10 H-theme-background-color-white H-border-vertical-both-after" style="border-radius: 7px">
+                <div @click="carBrand" class="H-text-list H-flexbox-horizontal  H-theme-background-color-white H-border-vertical-bottom-margin-left-10-after H-vertical-middle H-touch-active">
+                    <div class="H-flex-item H-padding-horizontal-both-10 H-font-size-16 H-padding-vertical-both-12">车辆型号<span style="margin-left: 12px">{{userMessage.carBrand}}</span></div>
+                    <span class="H-icon H-padding-horizontal-right-10 H-display-block"><i class="H-iconfont H-icon-arrow-right H-theme-font-color-999 H-font-size-14 H-vertical-middle"></i></span>
+                </div>
+                <div class="H-text-list H-flexbox-horizontal  H-theme-background-color-white H-border-vertical-bottom-margin-left-10-after H-vertical-middle H-touch-active">
+                    <div class="H-flex-item H-padding-horizontal-both-10 H-font-size-16 H-padding-vertical-both-12">车牌号码<span style="margin-left: 12px">{{userMessage.plateNo}}</span></div>
+                </div>
+            </div>
+            <div class="H-margin-vertical-top-10 H-theme-background-color-white H-border-vertical-both-after" style="border-radius: 7px">
+                <div class="H-text-list H-flexbox-horizontal  H-theme-background-color-white H-border-vertical-bottom-margin-left-10-after H-vertical-middle H-touch-active">
+                    <div class="H-flex-item H-padding-horizontal-both-10 H-font-size-16 H-padding-vertical-both-12">进场里程<input v-model="userMessage.enterMileage" type="number" style="margin-left: 12px;outline: none;width: 30%;border: 1px solid #eee;margin-right: 7px">km</div>
+                </div>
+                <div @click="oilMas()" class="H-text-list H-flexbox-horizontal  H-theme-background-color-white H-border-vertical-bottom-margin-left-10-after H-vertical-middle H-touch-active">
+                    <div class="H-flex-item H-padding-horizontal-both-10 H-font-size-16 H-padding-vertical-both-12">现存油量<span style="margin-left: 12px">{{userMessage.oilMass}}</span></div>
+                    <span class="H-icon H-padding-horizontal-right-10 H-display-block"><i class="H-iconfont H-icon-arrow-right H-theme-font-color-999 H-font-size-14 H-vertical-middle"></i></span>
+                </div>
+                <div @click="startDatechoose()" class="H-text-list H-flexbox-horizontal  H-theme-background-color-white H-border-vertical-bottom-margin-left-10-after H-vertical-middle H-touch-active">
+                    <div class="H-flex-item H-padding-horizontal-both-10 H-font-size-16 H-padding-vertical-both-12">进场时间<span style="margin-left: 12px">{{startDate}}</span></div>
+                    <span class="H-icon H-padding-horizontal-right-10 H-display-block"><i class="H-iconfont H-icon-arrow-right H-theme-font-color-999 H-font-size-14 H-vertical-middle"></i></span>
+                </div>
+                <div @click="endDatechoose()" class="H-text-list H-flexbox-horizontal  H-theme-background-color-white H-border-vertical-bottom-margin-left-10-after H-vertical-middle H-touch-active">
+                    <div class="H-flex-item H-padding-horizontal-both-10 H-font-size-16 H-padding-vertical-both-12">预交车时间<span style="margin-left: 12px">{{endDate}}</span></div>
+                    <span class="H-icon H-padding-horizontal-right-10 H-display-block"><i class="H-iconfont H-icon-arrow-right H-theme-font-color-999 H-font-size-14 H-vertical-middle"></i></span>
+                </div>
+                <div @click="carryPeople()" class="H-text-list H-flexbox-horizontal  H-theme-background-color-white H-border-vertical-bottom-margin-left-10-after H-vertical-middle H-touch-active">
+                    <div class="H-flex-item H-padding-horizontal-both-10 H-font-size-16 H-padding-vertical-both-12">接车人员<span style="margin-left: 12px"></span>{{carryPeop}}</div>
+                    <span class="H-icon H-padding-horizontal-right-10 H-display-block"><i class="H-iconfont H-icon-arrow-right H-theme-font-color-999 H-font-size-14 H-vertical-middle"></i></span>
+                </div>
+            </div>
+            <div class="H-margin-vertical-top-10 H-theme-background-color-white H-border-vertical-both-after" style="border-radius: 7px">
+                <div @click="openClubCard()" class="H-text-list H-flexbox-horizontal  H-theme-background-color-white H-border-vertical-bottom-margin-left-10-after H-vertical-middle H-touch-active">
+                    <div class="H-flex-item H-padding-horizontal-both-10 H-font-size-16 H-padding-vertical-both-12">会员卡种<span style="margin-left: 12px">{{cards.cardName}}</span></div>
+                    <span class="H-icon H-padding-horizontal-both-10 H-display-block H-font-size-12" style="background-color:#4FA4F3;color: #FFF;margin-right: 8px">{{cards.clubCard}}</span>
+                </div>
+                <div class="H-text-list H-flexbox-horizontal  H-theme-background-color-white H-border-vertical-bottom-margin-left-10-after H-vertical-middle H-touch-active">
+                    <div class="H-flex-item H-padding-horizontal-both-10 H-font-size-16 H-padding-vertical-both-12">卡内余额<span style="margin-left: 12px">{{cards.cardBalance}}</span></div>
+                </div>
+                <div @click="setMeal()" class="H-text-list H-flexbox-horizontal  H-theme-background-color-white H-border-vertical-bottom-margin-left-10-after H-vertical-middle H-touch-active">
+                    <div class="H-flex-item H-padding-horizontal-both-10 H-font-size-16 H-padding-vertical-both-12">可用套餐<span style="margin-left: 12px">{{pack.packageName}}</div>
+                    <span class="H-icon H-padding-horizontal-both-10 H-display-block H-font-size-12" style="background-color:#4FA4F3;color: #FFF;margin-right: 8px">{{pack.packCard}}</span>
+                </div>
+                <!-- <div class="H-text-list H-flexbox-horizontal  H-theme-background-color-white H-border-vertical-bottom-margin-left-10-after H-vertical-middle H-touch-active">
+                    <div class="H-flex-item H-padding-horizontal-both-10 H-font-size-16 H-padding-vertical-both-12">赠送项目<span style="margin-left: 12px"></span></div>
+                    <span class="H-icon H-padding-horizontal-right-10 H-display-block"><i class="H-iconfont H-icon-arrow-right H-theme-font-color-999 H-font-size-14 H-vertical-middle"></i></span>
+                </div> -->
+                <div @click="history()" class="H-text-list H-flexbox-horizontal  H-theme-background-color-white H-border-vertical-bottom-margin-left-10-after H-vertical-middle H-touch-active">
+                    <div class="H-flex-item H-padding-horizontal-both-10 H-font-size-16 H-padding-vertical-both-12">历史记录<span style="margin-left: 12px"></span></div>
+                    <span class="H-icon H-padding-horizontal-right-10 H-display-block"><i class="H-iconfont H-icon-arrow-right H-theme-font-color-999 H-font-size-14 H-vertical-middle"></i></span>
+                </div>
+            </div>
+            <!-- 下一步按钮 start -->
+            <footer class="H-text-align-center H-margin-vertical-top-15 H-position-relative" style="border-radius: 7px">
+                <span @click="nextStep()" class="H-theme-font-color-white H-font-size-18 H-margin-vertical-bottom-15 H-display-block H-position-absolute H-padding-vertical-both-10" style="left:10px;right:10px;">下一步</span>
+            </footer>
+            <!-- 下一步按钮 end -->
+            <!-- 各地简称列表 -->
+            <div id="popup" :class="{provinceHide: provinceTrue}">
+                <ul>
+                    <li v-for="(item,index) in forShortList" @click="chooseForShort(item)">{{item}}</li>
+                </ul>
+            </div>
+            <!-- 各地简称列表 end -->
+        </div>
+
+
+
+    </div>
+    <script type="text/javascript" src="../../script/api.js"></script>
+    <script type="text/javascript" src="../../script/hui/H.js"></script>
+    <script type="text/javascript" src="../../script/vue.min.js"></script>
+    <script type="text/javascript" src="../../script/jquery.min.js"></script>
+    <script type="text/javascript" src="../../script/appUtils.js"></script>
+    <script type="text/javascript" src="../../script/plugIn.js"></script>
+    <script type="text/javascript">
+        apiready = function() {
+            setStatusBarStyleFn('dark'); // 状态栏颜色
+            // 头部沉侵
+            var header = $api.dom('header');
+            var headerH = $api.fixStatusBar(header);
+
+            var userInfo=api.pageParam.userInfo;
+            // console.log(JSON.stringify(userInfo));
+            var shopMessage=''
+            var userData={};
+            var carrypeop='';  //接车人员
+            // 判断手机号
+            var pattern = /0?(13|14|15|17|18|19)[0-9]{9}/;
+            // 判断车牌号
+            var carpattern = /^[京津沪渝冀豫云辽黑湘皖鲁新苏浙赣鄂桂甘晋蒙陕吉闽贵粤青藏川宁琼使领A-Z][A-Z][A-Z0-9]{4}[A-Z0-9挂学警港澳]$/;
+            // 修改时间格式
+            function timeCycle(datetime){
+                y=datetime.getFullYear(),
+                m=datetime.getMonth()+1,
+                d=datetime.getDate(),
+                x= y+"-"+(m<10 ? "0" +m:m)+"-"+(d<10 ? "0" +d:d)+" "+datetime.toTimeString().substr(0,8);
+                return x;
+            }
+            // 登录人员信息
+            var userInfo=GET_USER_INFO();
+            // console.log(JSON.stringify(GET_USER_INFO()))
+            userData.carryPeople=GET_USER_INFO();
+            // if(userInfo.shopId!==null){
+                carrypeop=userInfo.staffName;
+            // }
+
+            // 搜过手机号或车牌号查询信息
+            function requestData(value){
+                // 如果为车牌号前面拼接省份简称
+                if(vuebox.searchType=="车牌号码"){
+                    value=vuebox.forShort+value;
+                }
+                // 判断是否为手机号
+                if(pattern.test(value)){
+                    var type=1;
+
+                }
+                // 判断是否为车牌号
+                if(carpattern.test(value)){
+                    var type=2;
+                    userData.carpattern=value;
+                }
+                // 判断用户输入格式是否正确
+                if(!pattern.test(value)&&!carpattern.test(value)){
+                    api.toast({
+                        msg: '输入信息格式不正确，请重新输入',
+                        duration: 2000,
+                        location: 'middle'
+                    })
+                } else {
+                    var shopId;
+                    for(i=0;i<shopMessage.length;i++){
+                        if(shopMessage[i].shopName==vuebox.storeName){
+                            shopId=shopMessage[i].shopId;
+                        }
+                    }
+                    request({
+                        url: "app/user/get_info?type="+type+"&value="+value+"&shopId="+shopId
+                    },function(ret){
+                        console.log(JSON.stringify(ret))
+                        vuebox.carryPeop=carrypeop;
+                        if(ret.cars.length!==0){
+                            userData.mess=ret;
+                            userData.chooseCar=ret.cars[0];
+                            vuebox.userMessage.name=ret.custom.customerName;
+                            vuebox.userMessage.phone=ret.custom.customerMobile;
+                            vuebox.userMessage.carBrand=ret.cars[0].carBrand;
+                            vuebox.userMessage.plateNo=ret.cars[0].plateNo;
+                            userData.phone=ret.custom.customerMobile;
+                            // 转换时间格式
+                            var time=new Date();
+                            vuebox.startDate=timeCycle(time);
+                            userData.startDate=timeCycle(time);
+                            // var timeend=new Date(ret.custom.updateTime);
+                            // vuebox.endDate=timeCycle(timeend);
+
+                            // 判断用户是否有会员卡
+                            if(ret.card!==null){
+                                vuebox.cards.clubCard="立即充值";
+                                vuebox.cards.cardName=ret.card.cardName;
+                                vuebox.cards.cardBalance=ret.card.cardBalance;
+                            } else {
+                                vuebox.cards.clubCard="立即办卡";
+                                vuebox.cards.cardName='';
+                                vuebox.cards.cardBalance='';
+                            }
+                            // 判断是否有套餐
+                            if(ret.packages){
+                                if(ret.packages.length!==0){
+                                    vuebox.pack.packCard="立即充值";
+                                    vuebox.pack.packageName=ret.packages[0].packageName;
+                                } else {
+                                    vuebox.pack.packCard="立即购买";
+                                    vuebox.pack.packageName='';
+                                }
+                            }
+
+                        } else {
+                            api.confirm({
+                                title: '请注册信息',
+                                msg: '该用户未注册信息，是否前去注册',
+                                buttons: ['取消','去注册']
+                            },function(ret,err){
+                                if(ret.buttonIndex==2){
+                                    api.openWin({
+                                        name: 'p_appAddUser',
+                                        url: 'addUser/p_appAddUser.html',
+                                        pageParam: {
+                                            data: vuebox.number
+                                        }
+                                    })
+                                }
+                            })
+                        }
+                    });
+                }
+
+            }
+            // 开单成功后，清空页面数据
+            api.addEventListener({
+                name: 'openCard'
+            },function(ret,err){
+                window.location.reload();
+            })
+            // 新增用户成功后，请求新增用户信息并渲染
+            api.addEventListener({
+                name: 'closeAddUser'
+            }, function(ret,err){
+                requestData(ret.value.phone);
+            })
+
+            // 监听车辆选择页面传递过来的数据
+            api.addEventListener({
+                name: 'chooseCar'
+            },function(ret,err){
+                console.log(JSON.stringify(ret.value))
+                vuebox.userMessage.carBrand=ret.value.data.carBrand;
+                vuebox.userMessage.plateNo=ret.value.data.plateNo;
+                userData.chooseCar=ret.value.data;
+            })
+
+            // 添加车辆成功后监听
+            api.addEventListener({
+                name: 'addCarMessage'
+            },function(ret,err){
+                requestData(vuebox.number);
+            })
+
+            var vuebox=new Vue({
+                el: '#VUE_BOX',
+                data: {
+                    searchType: '车牌号码',
+                    typeList: ['车牌号码','手机号码'],
+                    searchTrue: true, // 是否隐藏搜索类型选项框
+                    number: '',
+                    istrue: false,
+                    startDate: '',
+                    endDate: '请选择预交车时间',
+                    storeName: "选择店铺",
+                    carryPeop: '',
+                    userMessage: {
+                        name: '',
+                        phone: '',
+                        carBrand: '',
+                        plateNo: '',
+                        enterMileage: '',
+                        oilMass: ''
+                    },
+                    cards: {
+                        clubCard: '立即办卡',
+                        cardName: '',
+                        cardBalance: ''
+                    },
+                    pack: {
+                        packCard: '立即购买',
+                        packageName: ''
+                    },
+                    forShort: '', // 选中的简称
+                    forShortList: ['陕','京','津','沪','渝','冀','豫','云','辽','黑','湘','皖','鲁','新','苏','浙','赣','鄂','桂','甘','晋','蒙','吉','闽','贵','粤','青','藏','川','宁','琼','台'],
+                    provinceTrue: true, // 是否隐藏各省简称列表
+                },
+                mounted: function(){
+                    var userInfo = GET_USER_INFO();
+                    request({
+                        url: "app/shop/shop_role_list"
+                    }, function (res) {
+                          var arr = res.shopList;
+                          userData.dianpu = res;
+                          if (!userInfo.shopId) { // 老板
+                              userData.shop = arr[0];
+                              shopMessage = arr;
+                          } else { // 员工
+                              for (var i = 0; i < arr.length; i++) {
+                                  if (arr[i].shopId == userInfo.shopId) {
+                                      userData.shop = arr[i];
+                                      shopMessage = [arr[i]];
+                                      break;
+                                  }
+                              }
+                          }
+                          vuebox.storeName = userData.shop.shopName;
+                    });
+                },
+                methods: {
+                    // 获取店铺信息及选择
+                    chooseShop: function(){
+                        // request({
+                        //     url: "app/shop/shop_role_list",
+                        //     returnAll: true
+                        // },function(res){
+                            var arr=shopMessage;
+                            var data=[];
+                            for(var i=0;i<arr.length;i++){
+                                data[i]=arr[i].shopName;
+                            }
+                            shopMessage=arr;
+                            var title="选择店铺";
+                            api.actionSheet({
+                                title: title,
+                                cancelTitle: '取消',
+                                buttons: data
+                            }, function(ret, err) {
+                                var index = ret.buttonIndex;
+                                if(index!==(data.length+1)){
+                                    vuebox.storeName=data[index-1];
+                                    userData.shop=arr[index-1];
+                                } else {
+                                    vuebox.storeName=vuebox.storeName;
+                                }
+                            });
+                        // })
+                    },
+                    // 打开搜索类型
+                    openSearchType: function(event){
+                        var self=this;
+                        self.searchTrue=false;
+                    },
+                    // 选择搜索类型
+                    choosePopupType: function(item){
+                        var self=this;
+                        self.searchType=item;
+                        self.searchTrue=true;
+                        self.number='';
+                    },
+                    // 打开各省简称列表
+                    openForShort: function(){
+                        var self=this;
+                        self.provinceTrue=false;
+                    },
+                    // 选择车牌简称
+                    chooseForShort: function(item){
+                        var self=this;
+                        self.forShort=item;
+                        self.provinceTrue=true;
+                    },
+                    // 输入手机号查询车辆信息
+                    search: function(telphone){
+                        // if(vuebox.storeName=="选择店铺"){
+                        //     api.toast({
+                        //         msg: '请选择店铺',
+                        //         duration: '2000',
+                        //         location: 'bottom'
+                        //     })
+                        // } else {
+                            var value=this.$refs.telphone.value;
+                            if(value){
+                                requestData(value)
+                            } else {
+                                api.toast({
+                                    msg: '内容不能为空',
+                                    duration: 2000,
+                                    location: 'middle'
+                                })
+                            }
+
+                        // }
+                    },
+                    // 选择车辆型号
+                    carBrand: function(){
+                        // console.log(JSON.stringify(userData.mess))
+                        if(vuebox.userMessage.name==''){
+                            api.toast({
+                                msg: '请查询信息',
+                                duration: 2000,
+                                location: 'middle'
+                            })
+                        } else {
+                            api.openWin({
+                                name: 'p_appUserCarChoose',
+                                url: 'p_appUserCarChoose.html',
+                                pageParam: {
+                                    data: userData.mess
+                                }
+                            })
+                        }
+                    },
+                    // 选择油量剩余
+                    oilMas: function(){
+                        var data=['F',"3/4","1/2","1/4","E"];
+                        api.actionSheet({
+                            title: "请选择剩余油量",
+                            cancelTitle: '取消',
+                            buttons: data
+                        }, function(ret, err) {
+                            var index = ret.buttonIndex;
+                            if(index!==(data.length+1)){
+                                vuebox.userMessage.oilMass=data[index-1];
+                                userData.oilMass=data[index-1];
+                            } else {
+
+                            }
+                        });
+                    },
+                    // 选择进场日期
+                    startDatechoose: function(){
+                        // api.openPicker({
+                        //     type: 'date_time',
+                        //     date: '',
+                        //     title: '选择时间'
+                        // }, function(ret, err) {
+                        //     if (ret) {
+                        //         vuebox.startDate=""+ret.year+"-"+(ret.month<10?'0'+ret.month:ret.month)+"-"+(ret.day<10?'0'+ret.day:ret.day)+" "+(ret.hour<10?"0"+ret.hour:ret.hour)+":"+(ret.minute<10?'0'+ret.minute:ret.minute)+"";
+                        //     } else {
+                        //         alert(JSON.stringify(err));
+                        //     }
+                        // });
+                        var UIActionSelector = api.require('UIActionSelector');
+                        UIActionSelector.open({
+                            datas: chooseTime,
+                            layout: layout,
+                            animation: true,
+                            cancel: cancel,
+                            ok: ok,
+                            title: title,
+                            fixedOn: api.frameName
+                        }, function(ret, err) {
+                            if (ret.eventType=="ok") {
+                                var hour=ret.level2.substring(0,2);
+                                var mintus=ret.level3.substring(0,2);
+                                vuebox.startDate=ret.level1+' '+hour+':'+mintus;
+                                // console.log(vuebox.startDate)
+                            }
+                        });
+                    },
+                    // 选择预交车时间
+                    endDatechoose: function(){
+                        // api.openPicker({
+                        //     type: 'date_time',
+                        //     date: '',
+                        //     title: '选择时间'
+                        // }, function(ret, err) {
+                        //     if (ret) {
+                        //         vuebox.endDate=""+ret.year+"-"+(ret.month<10?'0'+ret.month:ret.month)+"-"+(ret.day<10?'0'+ret.day:ret.day)+" "+(ret.hour<10?"0"+ret.hour:ret.hour)+":"+(ret.minute<10?'0'+ret.minute:ret.minute)+"";
+                        //
+                        //     } else {
+                        //
+                        //     }
+                        // });
+                        var UIActionSelector = api.require('UIActionSelector');
+                        UIActionSelector.open({
+                            datas: chooseTime,
+                            layout: layout,
+                            animation: true,
+                            cancel: cancel,
+                            ok: ok,
+                            title: title,
+                            fixedOn: api.frameName
+                        }, function(ret, err) {
+                            if (ret.eventType=="ok") {
+                                var hour=ret.level2.substring(0,2);
+                                var mintus=ret.level3.substring(0,2);
+                                vuebox.endDate=ret.level1+' '+hour+':'+mintus;
+                                // console.log(vuebox.endDate)
+                            }
+                        });
+                    },
+                    // 接车人员
+                    carryPeople: function(){
+                        var shopId=userData.shop.shopId;
+                        // console.log(userInfo.shopId)
+                        // if(userInfo.shopId==null){
+                        //     console.log(userInfo.shopId==null)
+                        //     shopId='';
+                        // }
+                        request({
+                            url: 'app/staff/staff_list?shopId='+shopId
+                        },function(res){
+                            console.log(JSON.stringify(res))
+                            var arr=[]
+                            for(var i=0;i<res.length;i++){
+                                arr[i]=res[i].staffName;
+                            }
+                            api.actionSheet({
+                                title: "请选择接车人员",
+                                cancelTitle: '取消',
+                                buttons: arr
+                            }, function(ret, err) {
+                                var index = ret.buttonIndex;
+                                if(index!==(arr.length+1)){
+                                    vuebox.carryPeop=arr[index-1];
+                                    userData.carryPeople=res[index-1];
+                                    // console.log(JSON.stringify(userData.shop))
+                                } else {
+
+                                }
+                            });
+                        })
+                    },
+                    // 打开会员卡办理或充值页面
+                    openClubCard: function(){
+                        if(vuebox.userMessage.name==''){
+                            api.toast({
+                                msg: '请完善信息',
+                                duration: 2000,
+                                location: 'bottom'
+                            })
+                        } else {
+                            if(vuebox.cards.clubCard=="立即办卡"){
+                                api.openWin({
+                                    name: 'p_appClubCardManage',
+                                    url: 'p_appClubCardManage.html',
+                                    pageParam: {
+                                        data: userData
+                                    }
+                                })
+                            }
+                            if(vuebox.cards.clubCard=="立即充值"){
+                                api.openWin({
+                                    name: 'p_appClubCardRecharge',
+                                    url: 'p_appClubCardRecharge.html',
+                                    pageParam: {
+                                        data: userData
+                                    }
+                                })
+                            }
+                        }
+
+                    },
+                    // 可用套餐
+                    setMeal: function(){
+                        if(vuebox.userMessage.name==""){
+                            api.toast({
+                                msg: '请查询信息',
+                                duration: 2000,
+                                location: 'bottom'
+                            })
+                        } else {
+                            if(vuebox.pack.packCard=="立即购买"){
+                                api.openWin({
+                                    name: 'p_appSetMeal',
+                                    url: 'p_appSetMeal.html',
+                                    pageParam: {
+                                        data: userData
+                                    }
+                                })
+                            } else {
+                                api.openWin({
+                                    name: 'p_appComboRecharge',
+                                    url: 'p_appComboRecharge.html',
+                                    pageParam: {
+                                        data: userData
+                                    }
+                                })
+                            }
+                        }
+
+                    },
+                    // 历史记录
+                    history: function(){
+                        if(vuebox.userMessage.name==''){
+                            api.toast({
+                                msg: '请查询信息',
+                                duration: 2000,
+                                location: 'bottom'
+                            })
+                        } else {
+                            api.openWin({
+                                name: 'p_appHistory',
+                                url: 'p_appHistory.html',
+                                pageParam: {
+                                    data: userData
+                                }
+                            })
+                        }
+
+                    },
+                    // 点击下一步
+                    nextStep: function(){
+                        userData.startDate=vuebox.startDate;
+                        userData.endDate=vuebox.endDate;
+                        userData.userMessage=vuebox.userMessage;
+                        if(vuebox.userMessage.name==''){
+                            api.toast({
+                                msg: '请完善信息',
+                                duration: 2000,
+                                location: 'bottom'
+                            })
+                            return;
+                        } else {
+                            api.openWin({
+                                name: 'p_appServices',
+                                url: 'p_appServices.html',
+                                pageParam: {
+                                    data: userData
+                                }
+                            })
+                        }
+                    }
+                }
+            })
+
+
+
+        }
+    </script>
+</body>
+
+</html>

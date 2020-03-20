@@ -1,0 +1,213 @@
+<!DOCTYPE HTML>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="maximum-scale=1.0, minimum-scale=1.0, user-scalable=0, initial-scale=1.0, width=device-width" />
+    <meta name="format-detection" content="telephone=no, email=no, date=no, address=no">
+    <title>数据详情</title>
+    <link href="../../css/api.css" rel="stylesheet" type="text/css" />
+    <link href="../../css/Hui.css" rel="stylesheet" type="text/css" />
+    <style>
+        header {
+            height: 40px;
+        }
+        #main {
+            width: 100%;
+            padding: 0px 3% 10px 3%;
+            box-sizing: border-box;
+        }
+        #ser {
+            padding-left: 15px;
+            box-sizing: border-box;
+        }
+        .title {
+            display: flex;
+            justify-content: space-around;
+            padding: 18px 20%;
+            color: #999999;
+            font-size: 18px;
+        }
+
+        .chooseDate {
+            display: flex;
+            background-color: #FFF;
+            border-radius: 35px;
+            overflow: hidden;
+            padding: 10px 18px;
+        }
+        .ul {
+            width: 100%;
+            display: flex;
+            overflow-x: scroll;
+            flex-shrink: 0;
+            font-size: 14px;
+            color: #999999;
+
+        }
+        .ul li {
+            width: 20%;
+            flex-shrink: 0;
+        }
+        .ul li p {
+            width: 100%;
+            text-align: center;
+        }
+        .hint {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: #B0E0E6;
+            border-radius: 10px;
+            width: 70%;
+            height: 210px;
+        }
+        .hint p {
+            width: 100%;
+            text-align: center;
+            font-weight: bold;
+            background-color: #87CEFA;
+            font-size: 16px;
+            padding: 5px 0;
+            border-top-left-radius: 10px;
+            border-top-right-radius: 10px;
+        }
+        .hint div {
+            height: 68%;
+            overflow-y: scroll;
+        }
+        .hint button {
+            padding: 5px 0;
+            width: 100%;
+            border-bottom-left-radius: 10px;
+            border-bottom-right-radius: 10px;
+            background-color: #87CEFA;
+        }
+
+        /*动态添加样式*/
+        .titleStyle {
+            color: #4FA4F3;
+            font-weight: bold;
+        }
+        .sizeColor {
+            color: #4FA4F3;
+        }
+        .isShow {
+            display: none;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="VUE_BOX">
+        <!-- 头部导航 start -->
+        <header class=" H-theme-background-color9" id="header">
+            <span tapmode="" onclick="H.closeWin();" class="H-icon H-position-relative H-display-inline-block H-float-left H-vertical-middle H-theme-font-color-black H-padding-vertical-top-8 H-padding-horizontal-left-5 H-z-index-100">
+                <i class="H-iconfont H-icon-arrow-left H-font-size-18 H-vertical-middle"></i>
+                <label class="H-display-block H-vertical-middle H-font-size-15"></label>
+            </span>
+            <div class="H-header-title H-center-all H-font-size-18 H-text-show-row-1 H-theme-font-color-black H-position-absolute H-padding-vertical-top-8 H-width-100-percent">数据详情</div>
+        </header>
+        <!-- 头部导航 end -->
+        <div id="main">
+            <!-- 本月提成总额 -->
+            <div class="H-text-list H-flexbox-horizontal H-theme-background-color-white H-border-vertical-bottom-margin-left-10-after H-vertical-middle H-margin-vertical-top-12 H-border-radius-15">
+                <div class="H-flex-item H-padding-horizontal-both-10 H-font-size-16 H-padding-vertical-both-12">本月提成总额：<span style="color: #FF0000">{{datas.allMoney ? datas.allMoney : 0}}元</span></div>
+                <span class="H-icon H-padding-horizontal-right-10 H-display-block">{{datas.monthDay}}</span>
+            </div>
+
+            <div v-if="datas.message" style="border-top-left-radius: 9px; border-top-right-radius: 9px;" class="H-padding-vertical-both-8 H-box-sizing-border-box H-theme-background-color-white H-margin-vertical-top-12 H-border-radius-9 H-position-relative">
+                <div class="H-theme-background-color-white">
+                    <template v-for="(value,key,index) in datas.message">
+                        <div style="border-top-left-radius: 9px; border-top-right-radius: 9px;" class="H-touch-active shop-box H-text-list H-flexbox-horizontal  H-theme-background-color-white H-border-vertical-bottom-margin-left-10-after H-vertical-middle">
+                            <div class="H-flex-item H-font-weight-bold H-padding-horizontal-both-10 H-font-size-16 H-padding-vertical-both-12">{{key.substring(5,key.length)}}<span style="margin-left: 12px">服务车辆：{{value.length}}台，合计:{{dayMoney[index].allmoney}}元</span></span></div>
+                            <span class="H-icon H-padding-horizontal-right-10 H-display-block"><i class="arrows H-iconfont H-icon-arrow-right H-theme-font-color-999 H-font-size-14 H-vertical-middle"></i></span>
+                        </div>
+                        <div class="isShow">
+                            <div v-for="item in value" style="display:flex;justify-content: space-between;padding: 10px 12px 8px 12px; border-bottom: 1px solid #EEE;">
+                                <div style="width: 70%;">
+                                    <p>{{item.serviceName}}</p>
+                                    <p style="color: #999999;font-size: 12px">{{new Date(item.createTime).Format("MM")+'月'+new Date(item.createTime).Format("dd")+'日'+' '+new Date(item.createTime).Format("hh")+':'+new Date(item.createTime).Format("mm")}}<span v-if="item.remark">{{'，'+item.remark.replace('车牌号：','')}}</span></p>
+                                </div>
+                                <div style="min-width: 30%;text-align: right; position: relative; top: -5px;">
+                                    <p>提成: <span style="color: #FF0000">{{item.percentage}}元</span></p>
+                                    <p style="background-color: #4FA4F3;color: #FFF;display: inline-block;padding: 1px 5px;border-radius: 5px;font-size: 12px">{{item.percentageName}}</p>
+                                </div>
+                            </div>
+                        </div>
+                    </template>
+                    <div v-if="Object.keys(datas.message).length==0" style="width: 100%; text-align: center; margin: 12px 0;">--暂无数据--</div>
+                </div>
+
+            </div>
+        </div>
+
+
+    </div>
+    <script type="text/javascript" src="../../script/api.js"></script>
+    <script type="text/javascript" src="../../script/hui/H.js"></script>
+    <script type="text/javascript" src="../../script/vue.min.js"></script>
+    <script type="text/javascript" src="../../script/jquery.min.js"></script>
+    <script type="text/javascript" src="../../script/appUtils.js"></script>
+    <script type="text/javascript" src="../../script/echarts.min.js"></script>
+    <script type="text/javascript">
+            apiready = function() {
+            setStatusBarStyleFn('dark'); // 状态栏颜色
+            // 头部沉侵
+            var header = $api.dom('header');
+            var headerH = $api.fixStatusBar(header);
+
+            var datas=api.pageParam.data;
+            // console.log(JSON.stringify(datas));
+            var dayMoney=[];
+            var n=0;
+            if(datas.message){
+                for (var key in datas.message){
+                    dayMoney[n]={};
+                    dayMoney[n].allmoney=0;
+                    for(var i=0;i<datas.message[key].length;i++){
+                        dayMoney[n].allmoney+=datas.message[key][i].percentage
+                    }
+                    n++;
+                }
+            }
+
+
+            var vuebox=new Vue({
+                el: '#VUE_BOX',
+                data: {
+                    datas: datas,
+                    dayMoney: dayMoney,
+                },
+                created: function(){
+                    var isBos=GET_USER_INFO().shopId;
+                    // 请求员工提成统计
+
+
+
+                },
+                methods: {
+
+                }
+            })
+
+
+
+
+
+        }
+        // 每日详情隐藏与显示
+        $(document).on("click",".shop-box",function(){
+            if($(this).next().is(".isShow")){
+                $(this).next().removeClass("isShow");
+                $(this).find('.arrows').removeClass('H-icon-arrow-right').addClass('H-icon-arrow-down');
+            } else {
+                $(this).next().addClass("isShow")
+                $(this).find('.arrows').addClass('H-icon-arrow-right').removeClass('H-icon-arrow-down');
+            }
+        })
+    </script>
+</body>
+
+</html>

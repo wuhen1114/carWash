@@ -1,0 +1,311 @@
+<!DOCTYPE HTML>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="maximum-scale=1.0, minimum-scale=1.0, user-scalable=0, initial-scale=1.0, width=device-width" />
+    <meta name="format-detection" content="telephone=no, email=no, date=no, address=no">
+    <title>收入统计</title>
+    <link href="../../css/api.css" rel="stylesheet" type="text/css" />
+    <link href="../../css/Hui.css" rel="stylesheet" type="text/css" />
+    <style>
+        header {
+            height: 40px;
+        }
+        #main {
+            width: 100%;
+            padding: 0px 3% 10px 3%;
+            box-sizing: border-box;
+        }
+        #ser {
+            padding-left: 15px;
+            box-sizing: border-box;
+        }
+        .takbox {
+            border-radius: 7px;
+            margin-top: 8px;
+        }
+        .listCard {
+            width: 100%;
+            display: inline-block;
+            background:rgba(255,255,255,1);
+            border-radius: 6px;
+            margin: 6px 0%;
+            padding: 12px 6%;
+            box-sizing: border-box;
+            display: flex;
+            justify-content: space-between;
+        }
+        .listCard p {
+            color: #999999;
+            font-size: 14px;
+        }
+        .listCard .firstP {
+            color: #000;
+            font-size: 16px;
+            margin-bottom: 7px;
+        }
+        .listCard p span {
+            color: #FF0000;
+        }
+        .section {
+            background-color: #FFF;
+            padding: 10px 10px;
+        }
+        .messList {
+            display: inline-block;
+            width: 30%;
+            margin: 5px 1%;
+            text-align: center;
+            font-size: 12px;
+        }
+        .messList1:nth-child(3n) {
+            margin: 5px 2%;
+        }
+        .messList .messListBox {
+            width: 100%;
+            padding: 7px 0;
+            border: 1px solid #4FA4F3;
+            border-radius: 7px;
+            margin-bottom: 3px;
+        }
+        .messList .messListBox .list1 {
+            color: #FF0000;
+        }
+        .messList .messListBox .list2 {
+            color: #999;
+        }
+
+
+
+
+        /*动态添加样式*/
+        .titleStyle {
+            color: #4FA4F3;
+            font-weight: bold;
+        }
+        .sizeColor {
+            color: #4FA4F3;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="VUE_BOX">
+        <!-- 头部导航 start -->
+        <header class=" H-theme-background-color9" id="header">
+            <span tapmode="" onclick="H.closeWin();" class="H-icon H-position-relative H-display-inline-block H-float-left H-vertical-middle H-theme-font-color-black H-padding-vertical-top-8 H-padding-horizontal-left-5 H-z-index-100">
+                <i class="H-iconfont H-icon-arrow-left H-font-size-18 H-vertical-middle"></i>
+                <label class="H-display-block H-vertical-middle H-font-size-15"></label>
+            </span>
+            <div class="H-header-title H-center-all H-font-size-18 H-text-show-row-1 H-theme-font-color-black H-position-absolute H-padding-vertical-top-8 H-width-100-percent">{{userData.incomeId==1?"资金收入":"到店消费"}}</div>
+        </header>
+        <!-- 头部导航 end -->
+        <div id="main">
+            <!-- 数据统计 -->
+            <div class="takbox">
+                <div v-if="userData.incomeId==1" class="listCard">
+                    <div>
+                        <p class="firstP">资金收入</p>
+                        <p style="color: #FF0000;font-weight: bold;">{{userData.value.allValue}}</p>
+                    </div>
+                    <div style="width: 40%;margin-top: 3px">
+                        <p>会员: <span>{{userData.value.hValue}}</span></p>
+                        <p>散客: <span>{{userData.value.sValue}}</span></p>
+                    </div>
+                </div>
+                <div v-if="userData.incomeId==2" class="listCard">
+                    <div>
+                        <p class="firstP">到店消费</p>
+                        <p style="color: #FF0000;font-weight: bold;">{{userData.value.allValue}}</p>
+                    </div>
+                    <div style="width: 40%;margin-top: 3px">
+                        <p>会员: <span>{{userData.value.hValue}}</span></p>
+                        <p>散客: <span>{{userData.value.sValue}}</span></p>
+                    </div>
+                </div>
+            </div>
+            <div class="takbox section" v-if="userData.incomeId==1" v-if="datamess">
+                <p>支付方式</p>
+                <div class="messList">
+                    <div class="messListBox">
+                        <p class="list1">{{datamess.cashMoney}}</p>
+                        <p class="list2">{{datamess.cashNum}}笔</p>
+                    </div>
+                    <p class="titBottom">现金</p>
+                </div>
+                <div class="messList">
+                    <div class="messListBox">
+                        <p class="list1">{{datamess.aliPayMoney}}</p>
+                        <p class="list2">{{datamess.aliPayNum}}笔</p>
+                    </div>
+                    <p>支付宝</p>
+                </div>
+                <div class="messList">
+                    <div class="messListBox">
+                        <p class="list1">{{datamess.weiXinMoney==0?datamess.weiXinMoney:datamess.weiXinMoney}}</p>
+                        <p class="list2">{{datamess.weiXinNum}}笔</p>
+                    </div>
+                    <p>微信</p>
+                </div>
+                <div class="messList">
+                    <div class="messListBox">
+                        <p class="list1">{{datamess.payByCardMoney==0?datamess.payByCardMoney:datamess.payByCardMoney}}</p>
+                        <p class="list2">{{datamess.payByCardNum}}笔</p>
+                    </div>
+                    <p>刷卡</p>
+                </div>
+            </div>
+            <div class="takbox section" v-if="userData.incomeId==1" v-if="datamess">
+                <p>收入来源</p>
+                <div class="messList">
+                    <div class="messListBox">
+                        <p class="list1">{{datamess.handleMoney}}</p>
+                        <p class="list2">{{datamess.handleNum}}笔</p>
+                    </div>
+                    <p>储值卡办理</p>
+                </div>
+                <div class="messList">
+                    <div class="messListBox">
+                        <p class="list1">{{datamess.rechargeMoney}}</p>
+                        <p class="list2">{{datamess.rechargeNum}}笔</p>
+                    </div>
+                    <p>储值卡充值</p>
+                </div>
+                <div class="messList">
+                    <div class="messListBox">
+                        <p class="list1">{{datamess.setmealMoney}}</p>
+                        <p class="list2">{{datamess.setmealNum}}笔</p>
+                    </div>
+                    <p>套餐办理</p>
+                </div>
+                <div class="messList">
+                    <div class="messListBox">
+                        <p class="list1">{{(datamess.cashMoney+datamess.aliPayMoney+datamess.weiXinMoney+datamess.payByCardMoney)}}</p>
+                        <p class="list2">{{datamess.cashNum+datamess.aliPayNum+datamess.weiXinNum+datamess.payByCardNum}}笔</p>
+                    </div>
+                    <p>散客消费</p>
+                </div>
+            </div>
+            <div class="takbox section" v-if="userData.incomeId==2">
+                <p>支付方式</p>
+                <div class="messList messList1" v-for="item in dataus.paymentList">
+                    <div class="messListBox">
+                        <p class="list1">{{item.sum}}</p>
+                        <p class="list2">{{item.count}}笔</p>
+                    </div>
+                    <p>{{payMent[item.paymentMethod-1]}}</p>
+                </div>
+            </div>
+            <div class="takbox section" v-if="userData.incomeId==2">
+                <p>消费项目</p>
+                <div class="messList messList1" v-for="item in dataus.serviceList">
+                    <div class="messListBox">
+                        <p class="list1">{{item.sumMoney}}</p>
+                        <p class="list2">{{item.countNum}}笔</p>
+                    </div>
+                    <p>{{item.serviceName}}</p>
+                </div>
+            </div>
+            <div class="takbox section" v-if="userData.incomeId==2">
+                <p>消费产品</p>
+                <div class="messList messList1" v-for="item in dataus.goodsList">
+                    <div class="messListBox">
+                        <p class="list1">{{item.sumMoney}}</p>
+                        <p class="list2">{{item.countNum}}笔</p>
+                    </div>
+                    <p>{{item.serviceName}}</p>
+                </div>
+            </div>
+            <!-- <div class="takbox section" v-if="userData.incomeId==2">
+                <p>套餐购买</p>
+                <div class="messList messList1" v-for="item in dataus.buySetList">
+                    <div class="messListBox">
+                        <p class="list1">{{item.sumMoney}}</p>
+                        <p class="list2">{{item.countNum}}笔</p>
+                    </div>
+                    <p>{{item.cardName}}</p>
+                </div>
+            </div> -->
+        </div>
+
+
+
+    </div>
+    <script type="text/javascript" src="../../script/api.js"></script>
+    <script type="text/javascript" src="../../script/hui/H.js"></script>
+    <script type="text/javascript" src="../../script/vue.min.js"></script>
+    <script type="text/javascript" src="../../script/jquery.min.js"></script>
+    <script type="text/javascript" src="../../script/appUtils.js"></script>
+    <script type="text/javascript">
+        apiready = function() {
+
+            var userData=api.pageParam.data;
+            console.log(JSON.stringify(userData));
+
+
+
+            var vuebox=new Vue({
+                el: '#VUE_BOX',
+                data: {
+                    userData: userData,
+                    datamess: '',
+                    dataus: '',
+                    payMent: ["现金","刷卡","支付宝","微信","会员卡","套餐支付"],
+                    a: 100,
+                },
+                mounted: function(){
+                    setStatusBarStyleFn('dark'); // 状态栏颜色
+                    // 头部沉侵
+                    var header = $api.dom('header');
+                    var headerH = $api.fixStatusBar(header);
+                    console.log(userData.shop.shopId)
+                    var isBos=GET_USER_INFO().shopId;
+                    if(userData.incomeId==1){
+                        request({
+                            url: 'app/shop_chart/capital_income',
+                            method: 'post',
+                            data: {
+                                body: {
+                                    shopId: userData.shop.shopId,
+                                    date: userData.time,
+                                }
+                            }
+                        },function(res){
+                            console.log(JSON.stringify(res));
+                            vuebox.datamess=res;
+                        })
+                    }
+                    if(userData.incomeId==2){
+                        request({
+                            url: 'app/shop_chart/shop_consumption',
+                            method: 'post',
+                            data: {
+                                body: {
+                                    shopId: userData.shop.shopId,
+                                    date: userData.time,
+                                }
+                            }
+                        },function(res){
+                            console.log(JSON.stringify(res))
+                            vuebox.dataus=res;
+                        })
+                    }
+
+
+                },
+                methods: {
+
+
+                }
+            })
+
+
+
+
+
+        }
+    </script>
+</body>
+
+</html>

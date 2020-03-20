@@ -1,0 +1,568 @@
+<!DOCTYPE HTML>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="maximum-scale=1.0, minimum-scale=1.0, user-scalable=0, initial-scale=1.0, width=device-width" />
+    <meta name="format-detection" content="telephone=no, email=no, date=no, address=no">
+    <title></title>
+    <link href="../../css/api.css" rel="stylesheet" type="text/css" />
+    <link href="../../css/Hui.css" rel="stylesheet" type="text/css" />
+    <style>
+        input::-webkit-input-placeholder { /* placeholder样式 */
+            color: #CCCCCC;
+        }
+        ul, li, p{ /* 重置样式 */
+            margin: 0;
+            padding: 0;
+        }
+        ul, li{
+            margin-bottom: 15px;
+        }
+        ul, li:last-child{
+            margin-bottom: 0;
+        }
+        #ul {
+            /*height: 400px;*/
+            overflow-y: scroll;
+        }
+        #ul::-webkit-scrollbar {
+            width: 0;
+        }
+
+        .def-bg{ /* 默认背景 */
+            background-color: #F0F0F0;
+        }
+        .select-tab{ /* 选中tab的样式 */
+            color: #4FA4F3;
+            font-weight: bold;
+        }
+        .search-box{ /* 搜索框 */
+            background-color: #F0F0F0;
+        }
+        .search-input{ /* 搜索输入框 */
+            width: calc(100% - 40px);
+        }
+        .search-box .search-img{ /* 搜索图片 */
+            width: 20px;
+            height: 20px;
+            position: relative;
+            top: 5px;
+        }
+        .license-plate{ /* 车牌样式 */
+            background-image: url('../../image/order/license_plate.png');
+            background-repeat: no-repeat;
+            background-size: 100% 100%;
+            background-position: center center;
+            padding: 8px 5px;
+        }
+        .amount{ /* 金额样式 */
+            color: #FF0000;
+        }
+        .see{ /* 查看样式 */
+            background-color: #4FA4F3;
+            padding: 2px 10px;
+        }
+        .status{ /* 状态 */
+            color: #52A5F3;
+        }
+        .bottom-order-bg{ /* 预约订单和历史订单的背景颜色 */
+            background-color: #4FA4F3;
+        }
+        .fixed-settle-box{ /* 结算状态框 */
+            border: 1px solid #4FA4F3;
+            border-radius: 5px;
+            right: 10px;
+            margin-top: -5px;
+        }
+        .fixed-settle-box .fixed-settle-item:last-child{
+            border-bottom-left-radius: 5px;
+            border-bottom-right-radius: 5px;
+        }
+        .fixed-settle-box .fixed-settle-item{
+            padding: 10px 5px;
+            background-color: #4FA4F3;
+            color: white;
+        }
+        .fixed-settle-box .fixed-settle-item-border{
+            background-color: #4FA4F3;
+        }
+        .fixed-settle-box .fixed-settle-item-border div{
+            background-color: white;
+            height: 1px;
+        }
+        .fixed-settle-box .fixed-settle-item.selected{
+            background-color: white;
+            color: #4FA4F3;
+        }
+        .status-box{ /* 状态盒子 */
+            display: flex;
+            justify-content: space-between;
+        }
+
+        #popupType {
+            position: absolute;
+            top: 100%;
+            left: -1px;
+            width: 100%;
+            z-index: 100;
+            background-color: #fff;
+            border: 1px solid #BBB;
+            border-radius: 5px 0 5px 5px;
+        }
+        #popupType li {
+            width: 100%;
+            text-align: center;
+            padding: 5px 0;
+            border-bottom: 1px solid #BBB;
+            margin-bottom: 0!important;
+        }
+        #popupType li:last-child {
+            border-bottom: 0;
+        }
+        .ishide {
+            display: none;
+        }
+
+        /*各省简称列表*/
+        #popup {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            padding: 12px 18px;
+            box-sizing: border-box;
+            background-color: #f1f1f1;
+        }
+        #popup ul {
+            width: 100%;
+        }
+        #popup ul li {
+            display: inline-block;
+            width: 10%;
+            text-align: center;
+            padding: 2px 0;
+            background-color: #FFF;
+            border-radius: 8px;
+            margin: 6px 1.12%!important;
+        }
+        .provinceHide {
+            display: none;
+        }
+
+    </style>
+</head>
+
+<body class="hRelative">
+    <div id="VUE_BOX">
+        <!-- =================================== 头部 开始 =================================== -->
+        <header class="hHeader" id="header">
+            <span @click="closeWin" class="hIconBox hPaddingLeft_10">
+                <i class="hIcon H-icon-arrow-left"></i>
+            </span>
+            <div class="hChannelTitle">订单管理</div>
+            <span @click="selShop" class="hIconRightBox hMarginRight_20">
+                <label class="hIconFont hFontSize_16 hRelative hTop_3" v-text="selShopData.shopName || '选择店铺'"></label>
+            </span>
+            <img src="../../image/homePage/bottom.png" class="downBoult" alt="">
+        </header>
+        <!-- =================================== 头部 结束 =================================== -->
+
+        <!-- =================================== 状态和搜索 开始 =================================== -->
+        <div id="search" class="hRelative">
+            <div class="status-box def-bg hFontSize_16 hFontColor_999 hWidth_100 hpadding_horizontal_voth_10 hpadding_horizontal_both_15 H-box-sizing-border-box">
+                <div @click="clickTab(null, 'orderStatus')" v-bind:class="{'select-tab': !tab}" class="">全部</div>
+                <div @click="clickTab(1, 'orderStatus')" v-bind:class="{'select-tab': 1 == tab}" class="">未分配</div>
+                <div @click="clickTab(2, 'orderStatus')" v-bind:class="{'select-tab': 2 == tab}" class="">施工中</div>
+                <div @click="clickTab(3, 'orderStatus')" v-bind:class="{'select-tab': 3 == tab}" class="">施工完成</div>
+                <div @click="clickTab(null, 'settleStatus')" v-bind:class="{'select-tab': null != selSettle.status}" class="hTextAlignCenter font-4" v-text="selSettle.name || '结算状态'"></div>
+            </div>
+
+            <!-- 遮罩 -->
+            <div v-show="selSettle.show" @click="selSettle.show = false;" class="HFixed H-z-index-1000 hWidthAndHeight_100 hTop_0 hLeft_0" style="background-color: rgba(0, 0, 0, 0.2);"></div>
+
+            <!-- 结算状态 -->
+            <div v-show="selSettle.show" class="HFixed H-z-index-10000 fixed-settle-box hTextAlignCenter hFontSize_14">
+                <p @click="selSettleFn(2, '已结算')" class="fixed-settle-item">已结算</p>
+                <div class="fixed-settle-item-border hpadding_horizontal_both_5"><div></div></div>
+                <p @click="selSettleFn(1, '未结算')" class="fixed-settle-item">未结算</p>
+                <div class="fixed-settle-item-border hpadding_horizontal_both_5"><div></div></div>
+                <p @click="selSettleFn(3, '挂账')" class="fixed-settle-item">挂账</p>
+                <div class="fixed-settle-item-border hpadding_horizontal_both_5"><div></div></div>
+                <p @click="selSettleFn(4, '退款')" class="fixed-settle-item">退款</p>
+                <div class="fixed-settle-item-border hpadding_horizontal_both_5"><div></div></div>
+                <p @click="selSettleFn(5, '作废')" class="fixed-settle-item">作废</p>
+                <p @click="selSettleFn(null, null)" class="fixed-settle-item selected">结算状态</p>
+            </div>
+
+            <!-- 搜索 -->
+            <!-- <div class="hPaddingbottom_15 hpadding_horizontal_both_15 search-box hWidth_100 H-box-sizing-border-box">
+                <div class="hBgColor_white hBorderRadius_20 hpadding_horizontal_voth_5 hpadding_horizontal_both_10 hWidth_100 H-box-sizing-border-box">
+                    <input v-model="value" @blur="getOrderList(1)" type="text" class="hFontColor_333 hFontSize_14 hPadding_5 H-border-none search-input" placeholder="搜索车牌、电话"/>
+                    <img class="search-img" src="../../image/def/search.png"/>
+                </div>
+            </div> -->
+            <!-- 搜索框 start -->
+            <div class="hpadding_horizontal_voth_10 hpadding_horizontal_both_10 search-box">
+                <div class="hBgColor_white" style="position: relative; border: 1px solid #BBB;border-radius: 5px;">
+                    <span @click="openSearchType" style="font-size: 14px;color: #777;border-right: 1px solid #BBB;padding: 8px 8px 6px 8px;position: relative;">
+                        <span>{{searchType}}</span>
+                        <span style="display: inline-block;width: 6px;height: 6px; border-right: 1px solid #777;border-bottom: 1px solid #777;transform: rotate(45deg);margin-left: 0px;position: relative; top: -3px;"></span>
+                        <ul id="popupType" :class="{ishide: searchTrue}">
+                            <li v-for="(item,index) in typeList" @click.stop="choosePopupType(item)">{{item}}</li>
+                        </ul>
+                    </span>
+                    <input v-if="searchType=='手机号码'" v-model="value" style="padding-top: 8px" ref="telphone" type="text" class="hFontColor_333 hFontSize_14 hPadding_5 H-border-none" placeholder="搜索手机号码"/>
+                    <span v-if="searchType=='车牌号码'" @click="openForShort" style="background-color: #EEE;padding: 0 5px;">
+                        <span style="width: 18px;">{{forShort}}</span>
+                        <span style="display: inline-block;width: 4px;height: 4px; border-right: 1px solid #000;border-bottom: 1px solid #000;transform: rotate(45deg);margin-left: 0px;position: relative; top: -3px;"></span>
+                    </span>
+                    <input v-if="searchType=='车牌号码'" v-model="value" style="padding-top: 8px;width: 90px;" ref="telphone" type="text" class="hFontColor_333 hFontSize_14 hPadding_5 H-border-none" placeholder="搜索车牌号码"/>
+                    <i @click="getOrderList(1)" class="H-iconfont H-icon-search H-font-size-14" style="width: 18px;position: absolute; right: 5%;top: 20%"></i>
+                </div>
+            </div>
+            <!-- 搜索框 end -->
+        </div>
+        <!-- =================================== 状态和搜索 结束 =================================== -->
+
+        <!-- =================================== 订单列表 开始 =================================== -->
+        <ul @scroll="Scroll($event)" class="hpadding_horizontal_both_15 hFontSize_16" id="ul" ref="orderBox" :style="{height: height+'px'}" style="position: relative;">
+            <div class="loadings" style="text-align: center;width: 100%; height: 50px;position: absolute; top: 0;left: 0;" :style="{visibility: isTrue}">
+                <img src="../../image/def/loading.gif" style="width: 30px;margin-top: 5px;" alt="">
+            </div>
+            <li @click="orderDetails(item)" v-for="item in dataList" class="hBgColor_white hPadding_10 hBorderRadius_5">
+                <p class="H-overflow-hidden">
+                    <span v-text="formatDate(item.createTime)"></span>
+                    <span class="hFloatRight status">
+                        <span v-if="0 === item.orderStatus">已预约</span>
+                        <span v-if="1 === item.orderStatus">未分配</span>
+                        <span v-if="2 === item.orderStatus">施工中</span>
+                        <span v-if="3 === item.orderStatus">已施工</span>
+                        <span v-if="1 === item.settleStatus">，未结算</span>
+                        <span v-if="2 === item.settleStatus">，已结算</span>
+                        <span v-if="3 === item.settleStatus">，挂账</span>
+                        <span v-if="4 === item.settleStatus">，退款</span>
+                        <span v-if="5 === item.settleStatus">，作废</span>
+                    </span>
+                </p>
+                <div class="license-plate H_displayInlineBlock hMarginTop_5 hFontColor_white" v-text="item.customerCarVo.plateNo"></div>
+                <p class="H-overflow-hidden hMarginTop_5">
+                    <span class="hFontColor_999" v-text="item.orderDetailVos[0].serviceName"></span>
+                    <span class="hFloatRight H_displayInlineBlock hBorderRadius_3 hFontColor_white hFontSize_12 see">查看</span>
+                    <span class="hFloatRight hMarginRight_5 amount" v-text="'￥' + fixedFn(item.totalMoney)"></span>
+                </p>
+            </li>
+            <!-- =================================== 暂无数据 开始 =================================== -->
+            <div v-show="!dataList || dataList.length == 0" class="hPaddingtop_50 hPaddingbottom_50 hTextAlignCenter hFontColor_999 hFontSize_16">
+                - 暂无数据 -
+            </div>
+            <!-- =================================== 暂无数据 结束 =================================== -->
+            <li style="height: 50px; width: 100%;background-color: #F0F0F0"></li>
+        </ul>
+        <!-- =================================== 订单列表 结束 =================================== -->
+
+        <!-- =================================== 预约和历史订单 开始 =================================== -->
+        <div class="HFixed H-vertical-bottom-10 hWidth_100 H-box-sizing-border-box hLeft_0 H-overflow-hidden hFontColor_white hFontSize_18 hFontWeight_bold hpadding_horizontal_both_15">
+            <div class="hFloatLeft H-box-sizing-border-box hWidth_50 hPaddingRight_5">
+                <div @click="orderListFn({'name': '预约订单', 'orderStatus': 0})" class="bottom-order-bg hTextAlignCenter hBorderRadius_3 hpadding_horizontal_voth_10">
+                    预约订单
+                </div>
+            </div>
+            <div class="hFloatRight H-box-sizing-border-box hWidth_50 hPaddingLeft_5">
+                <div @click="orderListFn({'name': '历史订单', 'orderStatus': null})" class="bottom-order-bg hTextAlignCenter hBorderRadius_3 hpadding_horizontal_voth_10">
+                    历史订单
+                </div>
+            </div>
+        </div>
+        <!-- =================================== 预约和历史订单 结束 =================================== -->
+        <!-- 各地简称列表 -->
+        <div id="popup" :class="{provinceHide: provinceTrue}">
+            <ul>
+                <li v-for="(item,index) in forShortList" @click="chooseForShort(item)">{{item}}</li>
+            </ul>
+        </div>
+        <!-- 各地简称列表 end -->
+
+
+
+        <!-- =================================== 页面底部 结束 =================================== -->
+        <div style="height: 18px"></div>
+        <!-- =================================== 页面底部 开始 =================================== -->
+
+    </div>
+    <script type="text/javascript" src="../../script/api.js"></script>
+    <script type="text/javascript" src="../../script/hui/H.js"></script>
+    <script type="text/javascript" src="../../script/vue.min.js"></script>
+    <script type="text/javascript" src="../../script/jquery.min.js"></script>
+    <script type="text/javascript" src="../../script/appUtils.js"></script>
+    <script type="text/javascript">
+        apiready = function() {
+            // 状态栏颜色
+            setStatusBarStyleFn('dark');
+            // 头部沉侵
+            var header = $api.dom('header');
+            var headerH = $api.fixStatusBar(header);
+            // 固定搜索框和tab
+            fixedHead("search");
+
+
+            window.app = new Vue({
+                el: '#VUE_BOX',
+                data: {
+                    userInfo: GET_USER_INFO(), // 登录数据
+                    tab: null, // 当前选中的tab
+                    dataList: [], // 数据
+                    showLoadMore: false, // 是否有下一页
+                    currentPage: 1, // 当前页
+                    showCount: 10, // 一页查几条
+                    value: null, // 搜索
+                    shopList: [], // 店铺列表
+                    selShopData: {}, // 选择的店铺数据
+                    selSettle: { // 选择的结算状态
+                        status: null, // 结算状态
+                        name: null, // 名称
+                        show: false // 是否显示结算状态选择框
+                    },
+                    height: api.winHeight - headerH - 112,
+                    isTrue: 'hidden',
+                    searchType: '车牌号码',
+                    typeList: ['车牌号码','手机号码'],
+                    searchTrue: true, // 是否隐藏搜索类型选项框
+                    forShort: '', // 选中的简称
+                    forShortList: ['陕','京','津','沪','渝','冀','豫','云','辽','黑','湘','皖','鲁','新','苏','浙','赣','鄂','桂','甘','晋','蒙','吉','闽','贵','粤','青','藏','川','宁','琼','台'],
+                    provinceTrue: true, // 是否隐藏各省简称列表
+                },
+                mounted: function() {
+                    var self = this;
+                    self.listener(); // 监听
+                    self.getShopList(); // 查询店铺列表
+                    // self.refresh(); // 下拉刷新
+                    document.getElementById("ul").scrollIntoView(true);
+                    document.addEventListener('scroll',this.Scroll);
+                },
+                methods: vueDefMethods({
+                    Scroll: function(e){
+                        var self = this;
+                        if(self.$refs.orderBox.scrollTop<=0){
+                            var starty;
+                            var movey;
+                            document.getElementById('ul').addEventListener("touchstart",function(e){
+                                if(self.$refs.orderBox.scrollTop<=0){
+                                    starty=e.touches[0].pageY;
+                                }
+                            },false)
+                            document.getElementById('ul').addEventListener('touchmove',function(e){
+                                if(self.$refs.orderBox.scrollTop<=0){
+                                    movey=e.touches[0].pageY-starty;
+                                    if(movey>50){
+                                        self.isTrue='visible';
+                                    }
+                                    $("#ul").css('padding-top',movey+'px')
+                                }
+                            },false)
+                            document.getElementById('ul').addEventListener("touchend",function(e){
+                                if((movey>50)&&(self.$refs.orderBox.scrollTop<=0)){
+                                    $("#ul").css('padding-top','50px');
+
+                                    self.getOrderList(1); // 查询订单列表
+                                } else {
+                                    $("#ul").css('padding-top','');
+                                }
+                            },false)
+                        }
+                    },
+                    // 下拉刷新
+                    refresh: function () {
+                        // var self = this;
+                        // dropdownRefresh(function () {
+                        //     // self.getOrderList(1); // 查询订单列表
+                        // });
+                    },
+
+                    // 监听
+                    listener: function (e) {
+                        var self = this;
+                        // window显示
+                        api.addEventListener({
+                            name: 'viewappear'
+                        }, function(ret, err){
+                             setStatusBarStyleFn('dark');
+                        });
+                        // 页面底部监听
+                        api.addEventListener({
+                            name:'scrolltobottom',
+                            extra:{
+                                threshold: 0 // 设置距离底部多少距离时触发，默认值为0，数字类型
+                            }
+                        }, function(ret, err) {
+                            if (self.showLoadMore) {
+                                self.getOrderList(self.currentPage); // 查询订单列表
+                            }
+                        });
+                    },
+
+                    // tab选择
+                    clickTab: function (tab, type) {
+                        var self = this;
+                        var selSettle = self.selSettle;
+                        if ('orderStatus' == type) {
+                            self.dataList = [];
+                            self.tab = tab;
+                            self.getOrderList(1); // 查询订单列表
+                        } else if ('settleStatus' == type) {
+                            selSettle.show = true;
+                        }
+                    },
+
+                    // 选择结算状态
+                    selSettleFn: function (status, name) {
+                        var self = this;
+                        var selSettle = self.selSettle;
+                        selSettle.show = !selSettle.show;
+                        selSettle.status = status;
+                        selSettle.name = name;
+                        self.dataList = [];
+                        self.getOrderList(1);
+                    },
+
+                    // 查询店铺列表
+                    getShopList: function () {
+                        var self = this;
+                        var userInfo = self.userInfo;
+                        request({
+                            url: "app/shop/shop_role_list"
+                        }, function (ret) {
+                            var retData = ret.shopList;
+                            if (retData && retData.length > 0) {
+                                if (!userInfo.shopId) { // 老板
+                                    self.shopList = retData;
+                                    self.selShopData = retData[0];
+                                } else {
+                                    var index = 0;
+                                    for (var i = 0; i < retData.length; i++) {
+                                        if (retData[i].shopId == userInfo.shopId) {
+                                            index = i;
+                                            break;
+                                        }
+                                    }
+                                    self.shopList = [retData[index]];
+                                    self.selShopData = retData[index];
+                                }
+                                self.getOrderList(1); // 查询订单列表
+                            }
+                        });
+                    },
+
+                    // 选择店铺
+                    selShop: function () {
+                        var self = this;
+                        var shopList = self.shopList;
+                        var buttons = [];
+                        for (var i = 0; i < shopList.length; i++) {
+                            buttons.push(shopList[i].shopName);
+                        }
+                        api.actionSheet({
+                            title: '请选择店铺',
+                            buttons: buttons
+                        }, function(ret, err) {
+                            var index = ret.buttonIndex;
+                            if (index <= shopList.length) {
+                                self.selShopData = shopList[index - 1];
+                                self.getOrderList(1); // 查询订单列表
+                            }
+                        });
+                    },
+
+                    // 查询订单状态
+                    getOrderList: function (currentPage, loading) {
+                        var self = this;
+                        loading=true;
+                        var searchValue='';
+                        if(self.isTrue=="visible"){
+                            loading=false;
+                        }
+                        if(self.searchType=="车牌号码"){
+                            if(self.forShort!=''){
+                                searchValue=self.forShort+self.value;
+                            } else {
+                                searchValue=self.value;
+                            }
+                        }
+                        var showCount = self.showCount;
+                        var selShopData = self.selShopData;
+                        var paramData = {showCount: showCount, currentPage: currentPage, shopId: selShopData.shopId,
+                            orderStatus: self.tab, search: searchValue, settleStatus: self.selSettle.status};
+                        request({
+                            url: "app/shop_order/list",
+                            method: "post",
+                            data: {body: paramData},
+                            loading: loading
+                        }, function (ret) {
+                            self.paging({
+                                "vue": self,
+                                "retData": ret,
+                                "nowCurrentPage": currentPage
+                            });
+                            // 关闭加载动画
+                            self.isTrue='hidden';
+                            $("#ul").css('padding-top','');
+                        });
+
+                    },
+
+                    // 历史/预约 订单
+                    orderListFn: function (param) {
+                        var self = this;
+                        param.shopId = self.selShopData.shopId;
+                        api.openWin({
+                            name: 'appOtherOrderList',
+                            url: 'p_appOtherOrderList.html',
+                            pageParam: {
+                                param: param
+                            }
+                        });
+                    },
+
+                    // 查看订单详情
+                    orderDetails: function (data) {
+                        api.openWin({
+                            name: 'appOrderDetails',
+                            url: 'p_appOrderDetails.html',
+                            pageParam: {
+                                data: data
+                            }
+                        });
+                    },
+                    // 打开搜索类型
+                    openSearchType: function(event){
+                        var self=this;
+                        self.searchTrue=false;
+                    },
+                    // 选择搜索类型
+                    choosePopupType: function(item){
+                        var self=this;
+                        self.searchType=item;
+                        self.searchTrue=true;
+                        self.value='';
+                    },
+                    // 打开各省简称列表
+                    openForShort: function(){
+                        var self=this;
+                        self.provinceTrue=false;
+                    },
+                    // 选择车牌简称
+                    chooseForShort: function(item){
+                        var self=this;
+                        self.forShort=item;
+                        self.provinceTrue=true;
+                    },
+
+                }),
+            });
+
+
+        }
+    </script>
+</body>
+
+</html>

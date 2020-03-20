@@ -1,0 +1,614 @@
+<!DOCTYPE HTML>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="maximum-scale=1.0, minimum-scale=1.0, user-scalable=0, initial-scale=1.0, width=device-width" />
+    <meta name="format-detection" content="telephone=no, email=no, date=no, address=no">
+    <title>营业统计</title>
+    <link href="../../css/api.css" rel="stylesheet" type="text/css" />
+    <link href="../../css/Hui.css" rel="stylesheet" type="text/css" />
+    <style>
+        header {
+            height: 40px;
+        }
+        #main {
+            width: 100%;
+            padding: 0px 3% 10px 3%;
+            box-sizing: border-box;
+        }
+        #ser {
+            padding-left: 15px;
+            box-sizing: border-box;
+        }
+        .title {
+            display: flex;
+            justify-content: space-around;
+            padding: 18px 20%;
+            color: #999999;
+            font-size: 18px;
+        }
+
+        .chooseDate {
+            display: flex;
+            background-color: #FFF;
+            border-radius: 35px;
+            overflow: hidden;
+            padding: 10px 18px;
+        }
+        .riliImg {
+            width: 38px;
+        }
+        .riliImg img {
+            width: 100%;
+            flex-shrink: 0;
+            vertical-align: middle;
+        }
+        .ul {
+            width: 85%;
+            display: flex;
+            overflow-x: scroll;
+            flex-shrink: 0;
+            font-size: 14px;
+            color: #999999;
+
+        }
+        .wid {
+            width: 100%;
+        }
+        .ul li {
+            width: 20%;
+            flex-shrink: 0;
+        }
+        .widLi {
+            width: 15%;
+        }
+        .ul li p {
+            width: 100%;
+            text-align: center;
+        }
+        .takbox {
+            border-radius: 7px;
+            margin-top: 8px;
+        }
+        .listCard {
+            width: 47%;
+            display: inline-block;
+            background:rgba(255,255,255,1);
+            border-radius:6px;
+            margin: 6px 1.2%;
+            padding: 12px 7px;
+            box-sizing: border-box;
+        }
+        .listCard p {
+            color: #999999;
+            font-size: 14px;
+        }
+        .listCard .firstP {
+            color: #000;
+            font-size: 16px;
+            margin-bottom: 7px;
+        }
+        .listCard p span {
+            color: #FF0000;
+        }
+        .section {
+            background-color: #FFF;
+            padding: 10px 10px;
+        }
+        .messList {
+            display: inline-block;
+            width: 30%;
+            margin: 5px 1%;
+            text-align: center;
+            font-size: 12px;
+        }
+        .messList1:nth-child(3n) {
+            margin: 5px 2%;
+        }
+        .messList .messListBox {
+            width: 100%;
+            padding: 7px 0;
+            border: 1px solid #4FA4F3;
+            border-radius: 7px;
+            margin-bottom: 3px;
+        }
+        .messList .messListBox .list1 {
+            color: #FF0000;
+        }
+        .messList .messListBox .list2 {
+            color: #999;
+        }
+
+
+
+
+        /*动态添加样式*/
+        .titleStyle {
+            color: #4FA4F3;
+            font-weight: bold;
+        }
+        .sizeColor {
+            color: #4FA4F3;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="VUE_BOX" v-if="datamess && dataus">
+        <!-- 头部导航 start -->
+        <header class=" H-theme-background-color9" id="header">
+            <span tapmode="" onclick="H.closeWin();" class="H-icon H-position-relative H-display-inline-block H-float-left H-vertical-middle H-theme-font-color-black H-padding-vertical-top-8 H-padding-horizontal-left-5 H-z-index-100">
+                <i class="H-iconfont H-icon-arrow-left H-font-size-18 H-vertical-middle"></i>
+                <label class="H-display-block H-vertical-middle H-font-size-15"></label>
+            </span>
+            <div class="H-header-title H-center-all H-font-size-18 H-text-show-row-1 H-theme-font-color-black H-position-absolute H-padding-vertical-top-8 H-width-100-percent">营业收入</div>
+            <span @click="chooseShop()" class="H-icon H-position-relative H-display-inline-block H-float-right H-vertical-middle H-theme-font-color-black H-padding-vertical-top-12 H-padding-horizontal-right-20 H-z-index-100">
+                <label class="H-display-block H-vertical-middle H-font-size-14">{{storeName}}</label>
+            </span>
+            <img src="../../image/homePage/bottom.png" class="downBoult" alt="">
+        </header>
+        <!-- 头部导航 end -->
+        <div id="main" v-if="datamess">
+            <div class="title hpadding_horizontal_voth_10 hpadding_horizontal_both_10 search-box">
+                <span @click="daily" :class="{titleStyle: titleId==1}">日报</span>
+                <span @click="monthly" :class="{titleStyle: titleId==2}">月报</span>
+            </div>
+            <!-- 日期 start -->
+            <div class="chooseDate search-box">
+                <div v-if="titleId==1" @click="chooseDate" class="riliImg">
+                    <img src="../../image/manage/rili.png" alt="">
+                </div>
+                <ul class="ul" :class="{wid: titleId==2}">
+                    <template v-for="(item,index) in timeList">
+                        <li @click="sizeColor(index)" :class="{sizeColor: item.ind==inId}">
+                            <p>{{item.time1}}</p>
+                            <p>{{item.time2}}</p>
+                        </li>
+                    </template>
+                </ul>
+            </div>
+            <!-- 日期 end -->
+
+            <!-- 数据统计 -->
+            <div class="takbox">
+                <div class="listCard" @click="income($event,'1')">
+                    <p class="firstP">资金收入 <span>{{((datamess.memberIncome ? datamess.memberIncome : 0.00) + (datamess.individualIncome ? datamess.individualIncome : 0.00))}}</span></p>
+                    <p>会员 <span>{{(datamess.memberIncome ? datamess.memberIncome : 0.00)}}</span></p>
+                    <p>散客 <span>{{datamess.individualIncome}}</span></p>
+                </div>
+                <div class="listCard" @click="income($event,'2')">
+                    <p class="firstP">到店消费 <span>{{(datamess.huiyuanxiaofei ? datamess.huiyuanxiaofei : 0) + (datamess.individualIncome ? datamess.individualIncome : 0)}}</span></p>
+                    <p>会员 <span>{{datamess.huiyuanxiaofei ? datamess.huiyuanxiaofei : 0}}</span></p>
+                    <p>散客 <span>{{datamess.individualIncome ? datamess.individualIncome : 0}}</span></p>
+                </div>
+            </div>
+            <div class="takbox section">
+                <p>到店车辆统计</p>
+                <div class="messList" @click="detailsCar($event,'0')">
+                    <div class="messListBox">
+                        <p class="list1">{{datamess.enterShop.sum}}</p>
+                        <p class="list2">{{datamess.enterShop.count}}辆</p>
+                    </div>
+                    <p class="titBottom">进店车辆</p>
+                </div>
+                <div class="messList" @click="detailsCar($event,'1')">
+                    <div class="messListBox">
+                        <p class="list1">{{datamess.appointment.sum}}</p>
+                        <p class="list2">{{datamess.appointment.count}}辆</p>
+                    </div>
+                    <p>线上预约</p>
+                </div>
+                <div class="messList" @click="detailsCar($event,'2')">
+                    <div class="messListBox">
+                        <p class="list1">{{datamess.stored.sum}}</p>
+                        <p class="list2">{{datamess.stored.count}}辆</p>
+                    </div>
+                    <p>储值卡消费</p>
+                </div>
+                <div class="messList" @click="detailsCar($event,'3')">
+                    <div class="messListBox">
+                        <p class="list1">{{datamess.individual.sum}}</p>
+                        <p class="list2">{{datamess.individual.count}}辆</p>
+                    </div>
+                    <p>散客消费</p>
+                </div>
+                <div class="messList" @click="detailsCar($event,'4')">
+                    <div class="messListBox">
+                        <p class="list1">{{datamess.setMeal.sum}}</p>
+                        <p class="list2">{{datamess.setMeal.count}}辆</p>
+                    </div>
+                    <p>套餐卡消费</p>
+                </div>
+                <div class="messList" @click="detailsCar($event,'5')">
+                    <div class="messListBox">
+                        <p class="list1">0</p>
+                        <p class="list2">0辆</p>
+                    </div>
+                    <p>免单客户</p>
+                </div>
+            </div>
+            <div class="takbox section">
+                <p>充值办卡统计</p>
+                <div class="messList" @click="detailsCard($event,'2')">
+                    <div class="messListBox">
+                        <p class="list1">{{datamess.newStoredCardRealMoney ? datamess.newStoredCardRealMoney : 0}}</p>
+                        <p class="list2">{{datamess.newStoredCardCount ? datamess.newStoredCardCount : 0}}笔</p>
+                    </div>
+                    <p value='2'>新增储值卡会员</p>
+                </div>
+                <div class="messList" @click="detailsCard($event,'3')">
+                    <div class="messListBox">
+                        <p class="list1">{{datamess.storedValueCardRefillMoney ? datamess.storedValueCardRefillMoney : 0}}</p>
+                        <p class="list2">{{datamess.storedValueCardRefillCount ? datamess.storedValueCardRefillCount : 0}}笔</p>
+                    </div>
+                    <p>会员充值</p>
+                </div value="3">
+                <div class="messList" @click="detailsCard($event,'4')">
+                    <div class="messListBox">
+                        <p class="list1">{{datamess.newPackageMoney ? datamess.newPackageMoney : 0}}</p>
+                        <p class="list2">{{datamess.newPackageCount ? datamess.newPackageCount : datamess.newPackageCount}}笔</p>
+                    </div>
+                    <p value='4'>新增套餐会员</p>
+                </div>
+            </div>
+            <div class="takbox section">
+                <p>新增项目排行</p>
+                <div class="messList messList1" v-for="(item,index) in datamess.serviceList" @click="detailsService(index)">
+                    <div class="messListBox">
+                        <p class="list1">{{item.sum}}</p>
+                        <p class="list2">{{item.count}}笔</p>
+                    </div>
+                    <p>{{item.serviceName}}</p>
+                </div>
+            </div>
+            <div class="takbox section">
+                <p>其它统计</p>
+                <div class="messList">
+                    <div class="messListBox">
+                        <p class="list1">{{dataus.overtime}}辆</p>
+                    </div>
+                    <p>超时</p>
+                </div>
+                <div class="messList">
+                    <div class="messListBox">
+                        <p class="list1">{{dataus.complaint}}辆</p>
+                    </div>
+                    <p>投诉</p>
+                </div>
+                <div class="messList">
+                    <div class="messListBox">
+                        <p class="list1">{{dataus.cancel}}辆</p>
+                    </div>
+                    <p>差评</p>
+                </div>
+            </div>
+        </div>
+
+
+
+    </div>
+    <script type="text/javascript" src="../../script/api.js"></script>
+    <script type="text/javascript" src="../../script/hui/H.js"></script>
+    <script type="text/javascript" src="../../script/vue.min.js"></script>
+    <script type="text/javascript" src="../../script/jquery.min.js"></script>
+    <script type="text/javascript" src="../../script/appUtils.js"></script>
+    <script type="text/javascript">
+        apiready = function() {
+
+
+            var userData={};
+            var shopMessage='';
+            var dateList=[];
+            var datamess='';
+
+            function week(item){
+                if(item==0){
+                    return "星期日"
+                } else if(item==1){
+                    return "星期一"
+                } else if(item==2){
+                    return "星期二"
+                } else if(item==3){
+                    return "星期三"
+                } else if(item==4){
+                    return "星期四"
+                } else if(item==5){
+                    return "星期五"
+                } else if(item==6){
+                    return "星期六"
+                }
+            }
+
+            // 获取当前以及前四天日期
+            var oneDay=1000*60*60*24;
+            var time=new Date().getTime();
+            for(var i=0;i<5;i++){
+                dateList[i]={};
+                dateList[i].time=time;
+                dateList[i].time1=new Date(time).Format("MM-dd");
+                dateList[i].time2=week(new Date(time).getDay());
+                dateList[i].ind=i;
+                time-=oneDay;
+            }
+
+
+            // 获取当前及之前月份
+            var monthTime=[31,28,31,30,31,30,31,31,30,31,30,31]
+            var dataMonth=[];
+            var times=new Date().getTime();
+            for(var i=0;i<12;i++){
+                dataMonth[i]={};
+                dataMonth[i].time=times;
+                dataMonth[i].time2=new Date(times).Format("yyyy");
+                dataMonth[i].time1=new Date(times).Format("MM");
+                dataMonth[i].ind=i;
+                if(dataMonth[i].time1=='02'){
+                    var years=new Date(times).Format("yyyy");
+                    if((years%4==0 && years%100!==0) || years%400==0){
+                        times-=1000*60*60*24*29;
+                    } else {
+                        times-=1000*60*60*24*28;
+                    }
+                } else {
+                    var month=parseInt(dataMonth[i].time1);
+                    var days=monthTime[month-2];
+                    times-=days*1000*60*60*24;
+                }
+                dataMonth[i].time1=dataMonth[i].time1+'月';
+            }
+
+            // 获取数据
+            function dateMess(time){
+                var shopId=userData.shop.shopId;
+                request({
+                    url: 'app/shop_chart/income_chart',
+                    method: 'post',
+                    data: {
+                        body: {
+                            shopId: shopId,
+                            date: time,
+                        }
+                    }
+                },function(res){
+                    vuebox.datamess=res;
+                    console.log(JSON.stringify(res))
+                })
+                // 经营管理统计
+                time=new Date(time).getTime();
+                request({
+                    url: 'app/shop_chart/get_order_count',
+                    method: 'post',
+                    data: {
+                        body: {
+                            shopId: shopId,
+                            createTime:time
+                        }
+                    }
+                },function(res){
+                    vuebox.dataus=res;
+                })
+            }
+
+            var vuebox=new Vue({
+                el: '#VUE_BOX',
+                data: {
+                    storeName: '',
+                    timeList: dateList,
+                    inId: 0,
+                    titleId: 1,
+                    datamess: null,
+                    dataus: null,
+                },
+                created: function(){
+                    setStatusBarStyleFn('dark'); // 状态栏颜色
+                    // 头部沉侵
+                    var header = $api.dom('header');
+                    var headerH = $api.fixStatusBar(header);
+
+                    var isBos=GET_USER_INFO().shopId;
+                    // console.log(isBos);
+                    // 打开页面加载当天数据
+                    request({
+                        url: "app/shop/shop_role_list",
+                        returnAll: true
+                    },function(res){
+                        // console.log(JSON.stringify(res))
+                        if(!isBos){
+                            var arr=res.body.data.shopList;
+                            vuebox.storeName=arr[0].shopName;
+                            shopMessage=arr;
+                            userData.shop=arr[0];
+                        } else {
+                            var arr=res.body.data.shopList.splice(0,1);
+                            vuebox.storeName=arr[0].shopName;
+                            shopMessage=arr;
+                            userData.shop=arr[0];
+                        }
+                        var thisDate=new Date().getTime();
+                        thisDate=new Date(thisDate).Format("yyyy-MM-dd");
+                        dateMess(thisDate);
+                        userData.time=thisDate;
+
+                    })
+
+
+                },
+                methods: {
+                    // 日报
+                    daily: function() {
+                        vuebox.titleId=1;
+                        vuebox.timeList=dateList;
+                        var datatime=dateList[vuebox.inId].time;
+                        datatime=new Date(datatime).Format("yyyy-MM-dd");
+                        dateMess(datatime)
+                        userData.time=datatime;
+                    },
+                    // 月报
+                    monthly: function() {
+                        vuebox.titleId=2;
+                        vuebox.timeList=dataMonth;
+                        var datatime=dataMonth[vuebox.inId].time;
+                        datatime=new Date(datatime).Format("yyyy-MM");
+                        dateMess(datatime)
+                        userData.time=datatime;
+                    },
+                    // 获取店铺信息及选择
+                    chooseShop: function(){
+                        var arr=shopMessage;
+                        var data=[];
+                        for(var i=0;i<arr.length;i++){
+                            data[i]=arr[i].shopName;
+                        }
+                        shopMessage=arr;
+                        var title="选择店铺";
+                        api.actionSheet({
+                            title: title,
+                            cancelTitle: '取消',
+                            buttons: data
+                        }, function(ret, err) {
+                            var index = ret.buttonIndex;
+                            if(index!==(data.length+1)){
+                                vuebox.storeName=data[index-1];
+                                userData.shop=arr[index-1];
+                                if(vuebox.titleId==1){
+                                    var datatime=dateList[vuebox.inId].time;
+                                    datatime=new Date(datatime).Format("yyyy-MM-dd");
+                                    dateMess(datatime)
+                                } else {
+                                    var datatime=dataMonth[vuebox.inId].time;
+                                    datatime=new Date(datatime).Format("yyyy-MM");
+                                    dateMess(datatime)
+                                }
+                            } else {
+                                vuebox.storeName=vuebox.storeName;
+                            }
+                        });
+                    },
+                    // 选择日期
+                    chooseDate: function(){
+                        api.openPicker({
+                            type: 'date_time',
+                            date: '',
+                            title: '选择时间'
+                        }, function(ret, err) {
+                            if (ret) {
+                                var datatime=""+ret.year+"-"+(ret.month<10?'0'+ret.month:ret.month)+"-"+(ret.day<10?'0'+ret.day:ret.day)+"";
+                                datatime=new Date(datatime).getTime();
+                                var thisdatatime=new Date().getTime();
+                                if(datatime>thisdatatime){
+                                    api.toast({
+                                        msg: '时间超出范围，请重新选择',
+                                        duration: 2000,
+                                        location: 'middle'
+                                    })
+                                } else {
+                                    datatime=new Date(datatime).Format("yyyy-MM-dd");
+                                    dateMess(datatime)
+                                    userData.time=datatime;
+                                }
+
+                            } else {
+
+                            }
+                        });
+                    },
+                    // 选择展示的日期
+                    sizeColor: function(index){
+                        vuebox.inId=index;
+                        if(vuebox.titleId==1){
+                            var datatime=dateList[index].time;
+                            datatime=new Date(datatime).Format("yyyy-MM-dd");
+                            dateMess(datatime);
+                            userData.time=datatime;
+                        } else {
+                            var datatime=dataMonth[index].time;
+                            datatime=new Date(datatime).Format("yyyy-MM");
+                            dateMess(datatime)
+                            userData.time=datatime;
+                        }
+                    },
+                    // 收入详情
+                    income: function(e,num){
+                        userData.incomeId=num;
+                        if(num==1){
+                            userData.value={};
+                            userData.value.allValue = (vuebox.datamess.memberIncome + vuebox.datamess.individualIncome);
+                            userData.value.hValue = vuebox.datamess.memberIncome;
+                            userData.value.sValue = vuebox.datamess.individualIncome;
+                        }
+                        if(num==2){
+                            userData.value={};
+                            userData.value.allValue = (vuebox.datamess.huiyuanxiaofei + vuebox.datamess.individualIncome);
+                            userData.value.hValue = vuebox.datamess.huiyuanxiaofei;
+                            userData.value.sValue = vuebox.datamess.individualIncome;
+                        }
+                        api.openWin({
+                            name: 'p_appTakingIncome',
+                            url: 'p_appTakingIncome.html',
+                            pageParam: {
+                                data: userData
+                            }
+                        })
+                    },
+                    // 到店车辆
+                    detailsCar: function(event,num){
+                        userData.dataId=1;
+                        userData.incomeSource=num;
+                        userData.incom={};
+                        userData.incom.money=event.currentTarget.firstElementChild.firstElementChild.innerHTML;
+                        userData.incom.number=event.currentTarget.firstElementChild.lastElementChild.innerHTML;
+                        userData.incom.name=event.currentTarget.lastElementChild.innerHTML;
+                        api.openWin({
+                            name: 'p_appTakingDetail',
+                            url: 'p_appTakingDetail.html',
+                            pageParam: {
+                                data: userData
+                            }
+                        })
+                    },
+                    // 充值办卡
+                    detailsCard: function (event,num) {
+                        userData.dataId=2;
+                        userData.incomeSource=num;
+                        userData.incom={};
+                        userData.incom.money=event.currentTarget.firstElementChild.firstElementChild.innerHTML;
+                        userData.incom.number=event.currentTarget.firstElementChild.lastElementChild.innerHTML;
+                        userData.incom.name=event.currentTarget.lastElementChild.innerHTML;
+                        api.openWin({
+                            name: 'p_appTakingDetail',
+                            url: 'p_appTakingDetail.html',
+                            pageParam: {
+                                data: userData
+                            }
+                        })
+                    },
+                    // 新增项目
+                    detailsService: function(index){
+                        userData.dataId=3;
+                        userData.commodity=vuebox.datamess.serviceList[index];
+                        userData.incom={};
+                        userData.incom.money=event.currentTarget.firstElementChild.firstElementChild.innerHTML;
+                        userData.incom.number=event.currentTarget.firstElementChild.lastElementChild.innerHTML;
+                        userData.incom.name=event.currentTarget.lastElementChild.innerHTML;
+                        api.openWin({
+                            name: 'p_appTakingDetail',
+                            url: 'p_appTakingDetail.html',
+                            pageParam: {
+                                data: userData
+                            }
+                        })
+                    },
+
+                }
+            })
+
+
+
+
+
+        }
+    </script>
+</body>
+
+</html>

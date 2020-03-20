@@ -1,0 +1,214 @@
+<!DOCTYPE HTML>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="maximum-scale=1.0, minimum-scale=1.0, user-scalable=0, initial-scale=1.0, width=device-width" />
+    <meta name="format-detection" content="telephone=no, email=no, date=no, address=no">
+    <title>储值卡</title>
+    <link href="../../../css/api.css" rel="stylesheet" type="text/css" />
+    <link href="../../../css/Hui.css" rel="stylesheet" type="text/css" />
+    <style>
+        header {
+            height: 40px;
+        }
+        #main {
+            width: 100%;
+            padding: 0px 3% 20px 3%;
+            box-sizing: border-box;
+        }
+        #ser {
+            padding-left: 15px;
+            box-sizing: border-box;
+        }
+        #main>div {
+            color: #FFF;
+            position: relative;
+        }
+        .secList {
+            height: 120px;
+        }
+        .money {
+            font-weight: bold;
+            font-size: 22px;
+            position: absolute;
+            top: 50%;
+            left: 30%;
+            transform: translate(-50%, -50%);
+            -o-transform: translate(-50%, -50%);
+            -moz-transform: translate(-50%, -50%);
+            -webkit-transform: translate(-50%, -50%);
+        }
+        .amount {
+            min-width: 100px;
+            position: absolute;
+            top: 48%;
+            left: 78%;
+            transform: translate(-50%, -50%);
+            -o-transform: translate(-50%, -50%);
+            -moz-transform: translate(-50%, -50%);
+            -webkit-transform: translate(-50%, -50%);
+        }
+        .amount>p>span {
+            font-size: 25px;
+            font-weight: bold;
+        }
+        .amount .cardTime {
+            display: inline-block;
+            text-align: center;
+            padding: 1px 12px;
+            background-color: #FFF;
+            color: #6E47F7;
+            border-radius: 15px;
+            font-size: 12px;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="VUE_BOX">
+        <!-- 头部导航 start -->
+        <header class=" H-theme-background-color9" id="header">
+            <span tapmode="" onclick="H.closeWin();" class="H-icon H-position-relative H-display-inline-block H-float-left H-vertical-middle H-theme-font-color-black H-padding-vertical-top-8 H-padding-horizontal-left-5 H-z-index-100">
+                <i class="H-iconfont H-icon-arrow-left H-font-size-18 H-vertical-middle"></i>
+                <label class="H-display-block H-vertical-middle H-font-size-15"></label>
+            </span>
+            <div class="H-header-title H-center-all H-font-size-18 H-text-show-row-1 H-theme-font-color-black H-position-absolute H-padding-vertical-top-8 H-width-100-percent">{{valueCard.title}}</div>
+
+        </header>
+        <!-- 头部导航 end -->
+        <div id="main">
+            <p v-if="typeId==1" style="color: #FF0000; text-align: center; font-weight: bold; padding: 18px 0 4px 0;font-size: 18px">储值卡余额共计{{money}}元</p>
+            <template v-for="(item,index) in valueCard">
+                <div @click="details(index)" class="secList H-margin-vertical-top-10" style="border-radius: 7px" v-if="item.cardType==1" :style="{backgroundColor: item.cardColor}">
+                    <div class="money">{{item.cardName}}</div>
+                    <div class="amount">
+                        <p v-if="item.refillMoney">￥<span>{{item.refillMoney}}</span></p>
+                        <p class="cardTime">办卡数量 ({{item.total?item.total:0}})</p>
+                    </div>
+                </div>
+            </template>
+        </div>
+
+
+
+    </div>
+    <script type="text/javascript" src="../../../script/api.js"></script>
+    <script type="text/javascript" src="../../../script/hui/H.js"></script>
+    <script type="text/javascript" src="../../../script/vue.min.js"></script>
+    <script type="text/javascript" src="../../../script/jquery.min.js"></script>
+    <script type="text/javascript" src="../../../script/appUtils.js"></script>
+    <script type="text/javascript">
+        apiready = function() {
+            setStatusBarStyleFn('dark'); // 状态栏颜色
+            // 头部沉侵
+            var header = $api.dom('header');
+            var headerH = $api.fixStatusBar(header);
+            // 接收参数
+            var cardDate=api.pageParam.data;
+            console.log(JSON.stringify(cardDate))
+            // if(cardDate.typeId==1){
+            //     recard.title="储值卡";
+            // }
+            // if(cardDate.typeId==2){
+            //     recard.title="计次卡";
+            // }
+
+
+
+            var recard=new Vue({
+                el: '#VUE_BOX',
+                data: {
+                    valueCard: '',
+                    money: cardDate.cardMessage.balance,
+                    typeId: cardDate.typeId
+                },
+                created(){
+                    if(cardDate.typeId==1){
+                        // 查询全部会员卡信息
+
+                        request({
+                            url: 'app/shop_card/card_list?isValid='+1
+                        },function(res){
+                            // 将卡片颜色拼接到mess中
+                            var mess=res;
+                            for(var i=0;i<mess.length;i++){
+                                for(var j=0;j<cardDate.cardColor.length;j++){
+                                    if(mess[i].cardColor==cardDate.cardColor[j].dictId){
+                                        mess[i].cardColor=cardDate.cardColor[j].dictName;
+                                    }
+                                }
+                            }
+
+                            //查询各种储值卡笔数
+                            request({
+                                url: 'app/shop_chart/getStoredValueCardCountList?shopId='+''+'&sellerId='+cardDate.shopList.shopList[0].sellerId
+                            },function(res){
+                                console.log(JSON.stringify(res))
+                                for(var i=0;i<mess.length;i++){
+                                    for(var j=0;j<res.length;j++){
+                                        if(mess[i].cardId==res[j].card_id){
+                                            mess[i].total=res[j].total;
+                                        }
+                                    }
+                                }
+                                mess.title="储值卡";
+                                recard.valueCard=mess;
+                                // console.log(JSON.stringify(recard.valueCard))
+                                cardDate.cardAll=mess;
+                            })
+                        })
+                    }
+                    if(cardDate.typeId==2){
+
+                        //查询各种套餐卡笔数
+                        request({
+                            url: 'app/shop_chart/getPackageCardCountList?shopId='+''+'&sellerId='+cardDate.shopList.shopList[0].sellerId
+                        },function(res){
+                            console.log(JSON.stringify(res))
+                            for(var i=0;i<res.length;i++){
+                                res[i].cardColor='#232229';
+                                res[i].cardName=res[i].package_name;
+                                res[i].cardType=1;
+                            }
+
+                            // for(var i=0;i<mess.length;i++){
+                            //     for(var j=0;j<res.length;j++){
+                            //         if(mess[i].cardId==res[j].card_id){
+                            //             mess[i].total=res[j].total;
+                            //         }
+                            //     }
+                            // }
+                            res.title="计次卡";
+                            recard.valueCard=res;
+                            // console.log(JSON.stringify(recard.valueCard))
+                            cardDate.cardAll=res;
+                        })
+                    }
+
+
+
+                },
+                methods: {
+                    details(index){
+                        cardDate.thisCard=cardDate.cardAll[index];
+                        api.openWin({
+                            name: 'p_appValueCardDetail',
+                            url: 'p_appValueCardDetail.html',
+                            pageParam: {
+                                data: cardDate
+                            }
+                        })
+                    }
+                }
+            })
+
+
+
+
+
+        }
+    </script>
+</body>
+
+</html>

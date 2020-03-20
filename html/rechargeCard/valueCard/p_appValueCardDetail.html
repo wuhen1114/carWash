@@ -1,0 +1,185 @@
+<!DOCTYPE HTML>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="maximum-scale=1.0, minimum-scale=1.0, user-scalable=0, initial-scale=1.0, width=device-width" />
+    <meta name="format-detection" content="telephone=no, email=no, date=no, address=no">
+    <title>充值卡数据统计</title>
+    <link href="../../../css/api.css" rel="stylesheet" type="text/css" />
+    <link href="../../../css/Hui.css" rel="stylesheet" type="text/css" />
+    <style>
+        header {
+            height: 40px;
+        }
+        #main {
+            width: 100%;
+            padding: 0px 3% 20px 3%;
+            box-sizing: border-box;
+        }
+        #ser {
+            padding-left: 15px;
+            box-sizing: border-box;
+        }
+        #main>div:first-child {
+            color: #FFF;
+            position: relative;
+        }
+        #main>div {
+            position: relative;
+        }
+        .secList {
+            height: 120px;
+        }
+        .money {
+            font-weight: bold;
+            font-size: 22px;
+            position: absolute;
+            top: 50%;
+            left: 30%;
+            transform: translate(-50%, -50%);
+            -o-transform: translate(-50%, -50%);
+            -moz-transform: translate(-50%, -50%);
+            -webkit-transform: translate(-50%, -50%);
+        }
+        .amount {
+            min-width: 100px;
+            position: absolute;
+            top: 45%;
+            left: 75%;
+            transform: translate(-50%, -50%);
+            -o-transform: translate(-50%, -50%);
+            -moz-transform: translate(-50%, -50%);
+            -webkit-transform: translate(-50%, -50%);
+        }
+        .amount>p>span {
+            font-size: 25px;
+            font-weight: bold;
+        }
+        .amount .cardTime {
+            display: inline-block;
+            text-align: center;
+            padding: 1px 12px;
+            background-color: #FFF;
+            color: #6E47F7;
+            border-radius: 15px;
+            font-size: 12px;
+
+        }
+    </style>
+</head>
+
+<body>
+    <div id="VUE_BOX">
+        <!-- 头部导航 start -->
+        <header class=" H-theme-background-color9" id="header">
+            <span tapmode="" onclick="H.closeWin();" class="H-icon H-position-relative H-display-inline-block H-float-left H-vertical-middle H-theme-font-color-black H-padding-vertical-top-8 H-padding-horizontal-left-5 H-z-index-100">
+                <i class="H-iconfont H-icon-arrow-left H-font-size-18 H-vertical-middle"></i>
+                <label class="H-display-block H-vertical-middle H-font-size-15"></label>
+            </span>
+            <div class="H-header-title H-center-all H-font-size-18 H-text-show-row-1 H-theme-font-color-black H-position-absolute H-padding-vertical-top-8 H-width-100-percent">{{custom.title}}</div>
+        </header>
+        <!-- 头部导航 end -->
+        <div id="main">
+            <div class="secList H-margin-vertical-top-15" style="border-radius: 7px" v-if="valueCard.cardType==1" :style="{backgroundColor: valueCard.cardColor}">
+                <div class="money">{{valueCard.cardName}}</div>
+                <div class="amount">
+                    <p v-if="valueCard.reffillMoney">￥<span>{{valueCard.refillMoney}}</span></p>
+                    <p class="cardTime">办卡数量 ({{valueCard.total?valueCard.total:0}})</p>
+                </div>
+            </div>
+            <div v-if="custom.length!==0 && custom[0]!=null" v-for="(item,index) in custom" class="H-margin-vertical-top-10 H-theme-background-color-white H-border-vertical-both-after" style="border-radius: 7px; padding: 18px 12px 12px 12px">
+                <div>
+                    <span v-if="typeId==1" style="padding: 5px 5px;background:url(../../../image/charge/chepai.png) no-repeat 0 0; background-size: 100% 100%; color: #FFF;position:relative;top: -5px">{{plateNos[index]}}</span>
+                    <span v-if="typeId==2" style="padding: 5px 5px;background:url(../../../image/charge/chepai.png) no-repeat 0 0; background-size: 100% 100%; color: #FFF;position:relative;top: -5px">{{item.plateNo}}</span>
+                    <span style="margin-left: 5%;position: relative;top: -5px">{{item.customerMobile}}</span>
+                    <span v-if="typeId==1" style="color: #FF0000;position:absolute;right: 5%">余额 {{item.cardBalance}}元</span>
+                    <span v-if="typeId==2" style="color: #FF0000;position:absolute;right: 5%">剩余{{item.unusedCount}}次</span>
+                </div>
+                <div style="color: #999999; margin-top: 3px">开卡店铺  {{item.shopName}}</div>
+            </div>
+
+        </div>
+
+
+
+    </div>
+    <script type="text/javascript" src="../../../script/api.js"></script>
+    <script type="text/javascript" src="../../../script/hui/H.js"></script>
+    <script type="text/javascript" src="../../../script/vue.min.js"></script>
+    <script type="text/javascript" src="../../../script/jquery.min.js"></script>
+    <script type="text/javascript" src="../../../script/appUtils.js"></script>
+    <script type="text/javascript">
+        apiready = function() {
+            setStatusBarStyleFn('dark'); // 状态栏颜色
+            // 头部沉侵
+            var header = $api.dom('header');
+            var headerH = $api.fixStatusBar(header);
+            // 接收参数
+            var cardDate=api.pageParam.data;
+            console.log(JSON.stringify(cardDate))
+
+
+            var recard=new Vue({
+                el: '#VUE_BOX',
+                data: {
+                    typeId: cardDate.typeId,
+                    valueCard: cardDate.thisCard,
+                    custom: '',
+                    plateNos: ''
+                },
+                created(){
+                    if(cardDate.typeId==1){
+                        url='app/shop_chart/getStoredValueCardDetail?shopId='+''+'&cardId='+cardDate.thisCard.cardId;
+                    }
+                    if(cardDate.typeId==2){
+                        url='app/shop_chart/getPackageCardDetail?shopId='+''+'&packageId='+cardDate.thisCard.package_id;
+                    }
+                    // 查询办卡充值页面数据统计-储值卡详细信息
+                    request({
+                        url: url
+                    },function(res){
+                        console.log(JSON.stringify(res))
+                        if(cardDate.typeId==1){
+                            res.customerList.title="充值卡数据统计";
+                        }
+                        if(cardDate.typeId==2){
+                            res.customerList.title="计次卡数据统计";
+                        }
+                        recard.custom=res.customerList;
+
+                        var s=0;
+                        var arr=[];
+                        if(cardDate.typeId==1){
+                            // 通过手机号查询用户信息获取车牌号码
+                            for(var i=0;i<res.customerList.length;i++){
+                                request({
+                                    url: 'app/user/get_info?type=1&value='+res.customerList[i].customerMobile+'&shopId='+cardDate.shopList.shopList[0].shopId
+                                },function(ret){
+                                    arr[s]=ret.cars[0].plateNo;
+                                    if(s==res.customerList.length-1){
+                                        recard.plateNos=arr;
+                                    }
+                                    s++;
+
+                                })
+                            }
+                        }
+
+                    })
+
+                },
+                methods: {
+
+                }
+            })
+
+
+
+
+
+        }
+    </script>
+</body>
+
+</html>

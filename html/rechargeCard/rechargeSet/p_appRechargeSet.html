@@ -1,0 +1,181 @@
+<!DOCTYPE HTML>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="maximum-scale=1.0, minimum-scale=1.0, user-scalable=0, initial-scale=1.0, width=device-width" />
+    <meta name="format-detection" content="telephone=no, email=no, date=no, address=no">
+    <title>充值设置</title>
+    <link href="../../../css/api.css" rel="stylesheet" type="text/css" />
+    <link href="../../../css/Hui.css" rel="stylesheet" type="text/css" />
+    <style>
+        header {
+            height: 40px;
+        }
+        #main {
+            width: 100%;
+            padding: 0px 3% 20px 3%;
+            box-sizing: border-box;
+        }
+        .secList {
+            color: #FFF;
+            width: 100%;
+            position: relative;
+        }
+        .secList img {
+            width: 100%;
+        }
+        .secList .title {
+            font-weight: bold;
+            font-size: 22px;
+            position: absolute;
+            top: 35%;
+            left: 20%;
+            transform: translate(-50%, -50%);
+            -o-transform: translate(-50%, -50%);
+            -moz-transform: translate(-50%, -50%);
+            -webkit-transform: translate(-50%, -50%);
+        }
+        .secList .money {
+            display: inline-block;
+            position: absolute;
+            top: 25%;
+            left: 50%;
+            width: 40%;
+            text-align: right;
+        }
+        .secList .money>span {
+            font-weight: bold;
+            font-size: 25px;
+        }
+        .amount {
+            font-size: 14px;
+            min-width: 200px;
+            position: absolute;
+            bottom: -1%;
+            left: 86%;
+            transform: translate(-50%, -50%);
+            -o-transform: translate(-50%, -50%);
+            -moz-transform: translate(-50%, -50%);
+            -webkit-transform: translate(-50%, -50%);
+        }
+        .amount span {
+            display: inline-block;
+            padding: 2px 5px;
+            font-size: 14px;
+            border-radius: 4px;
+            margin: 0 0 0 5px;
+        }
+        .amount span:first-child {
+            color: #999999;
+        }
+        .amount span:last-child {
+            background-color: #4FA4F3;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="VUE_BOX">
+        <!-- 头部导航 start -->
+        <header class=" H-theme-background-color9" id="header">
+            <span tapmode="" onclick="H.closeWin();" class="H-icon H-position-relative H-display-inline-block H-float-left H-vertical-middle H-theme-font-color-black H-padding-vertical-top-8 H-padding-horizontal-left-5 H-z-index-100">
+                <i class="H-iconfont H-icon-arrow-left H-font-size-18 H-vertical-middle"></i>
+                <label class="H-display-block H-vertical-middle H-font-size-15"></label>
+            </span>
+            <div class="H-header-title H-center-all H-font-size-18 H-text-show-row-1 H-theme-font-color-black H-position-absolute H-padding-vertical-top-8 H-width-100-percent">充值设置</div>
+            
+        </header>
+        <!-- 头部导航 end -->
+        <div id="main">
+            <!-- <template v-for="(item,index) in setMeal"> -->
+                <div @click="details()" class="secList H-margin-vertical-top-10" style="border-radius: 7px">
+                    <img src="../../../image/charge/chongzhizp.png" alt="">
+                    <P class="title">充值金额</P>
+                    <p class="money">￥<span>30.00</span></p>
+                    <div class="amount">
+                        <span>车主端显示</span>
+                        <span>启用</span>
+                    </div>
+                </div>
+                <div @click="details()" class="secList H-margin-vertical-top-10" style="border-radius: 7px">
+                    <img src="../../../image/charge/chongzhi.png" alt="">
+                    <P class="title">充值金额</P>
+                    <p class="money">￥<span>2988.00</span></p>
+                    <div class="amount">
+                        <span>车主端显示</span>
+                        <span>启用</span>
+                    </div>
+                </div>
+                <div @click="details()" class="secList H-margin-vertical-top-10" style="border-radius: 7px">
+                    <img src="../../../image/charge/chongzhi.png" alt="">
+                    <P class="title">充值金额</P>
+                    <p class="money">￥<span>688.00</span></p>
+                    <div class="amount">
+                        <span>车主端显示</span>
+                        <span>启用</span>
+                    </div>
+                </div>
+            <!-- </template> -->
+        </div>
+
+
+
+    </div>
+    <script type="text/javascript" src="../../../script/api.js"></script>
+    <script type="text/javascript" src="../../../script/hui/H.js"></script>
+    <script type="text/javascript" src="../../../script/vue.min.js"></script>
+    <script type="text/javascript" src="../../../script/jquery.min.js"></script>
+    <script type="text/javascript" src="../../../script/appUtils.js"></script>
+    <script type="text/javascript">
+        apiready = function() {
+            setStatusBarStyleFn('dark'); // 状态栏颜色
+            // 头部沉侵
+            var header = $api.dom('header');
+            var headerH = $api.fixStatusBar(header);
+            // 接收参数
+            var cardDate=api.pageParam.data;
+            // console.log(JSON.stringify(cardDate))
+
+
+
+            var recard=new Vue({
+                el: '#VUE_BOX',
+                data: {
+                    setMeal: ''
+                },
+                created(){
+                    // request({
+                    //     url: 'app/shop_package/package_list?shopId='
+                    // },function(res){
+                    //     // console.log(JSON.stringify(res))
+                    //     recard.setMeal=res;
+                    //     cardDate.setMeal=res;
+                    // })
+
+
+
+                },
+                methods: {
+                    details(){
+                        // cardDate.thisCard=cardDate.setMeal[index];
+                        api.openWin({
+                            name: 'p_appRechargeSetDetail',
+                            url: 'p_appRechargeSetDetail.html',
+                            pageParam: {
+                                data: cardDate
+                            }
+                        })
+                    }
+                }
+            })
+
+
+
+
+
+        }
+    </script>
+</body>
+
+</html>

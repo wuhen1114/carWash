@@ -1,0 +1,145 @@
+<!DOCTYPE HTML>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="maximum-scale=1.0, minimum-scale=1.0, user-scalable=0, initial-scale=1.0, width=device-width" />
+    <meta name="format-detection" content="telephone=no, email=no, date=no, address=no">
+    <title>编辑客户</title>
+    <link href="../../../css/api.css" rel="stylesheet" type="text/css" />
+    <link href="../../../css/Hui.css" rel="stylesheet" type="text/css" />
+    <style>
+        header {
+            height: 40px;
+        }
+        #main {
+            width: 100%;
+            padding: 0px 2%;
+            box-sizing: border-box;
+        }
+        footer span {
+            background-color: #4FA4F3;
+            border-radius: 2px;
+            font-weight: bold;
+        }
+        div {
+            position: relative;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="VUE_BOX">
+        <!-- 头部导航 start -->
+        <header class=" H-theme-background-color9" id="header">
+            <span tapmode="" onclick="H.closeWin();" class="H-icon H-position-relative H-display-inline-block H-float-left H-vertical-middle H-theme-font-color-black H-padding-vertical-top-8 H-padding-horizontal-left-5 H-z-index-100">
+                <i class="H-iconfont H-icon-arrow-left H-font-size-18 H-vertical-middle"></i>
+                <label class="H-display-block H-vertical-middle H-font-size-15"></label>
+            </span>
+            <div class="H-header-title H-center-all H-font-size-18 H-text-show-row-1 H-theme-font-color-black H-position-absolute H-padding-vertical-top-8 H-width-100-percent">新增用户</div>
+        </header>
+        <!-- 头部导航 end -->
+        <div id="main">
+            <!-- 基本信息 -->
+            <div class="H-margin-vertical-top-10 H-theme-background-color-white H-border-vertical-both-after" style="border-radius: 7px">
+                <div class="H-text-list H-flexbox-horizontal  H-theme-background-color-white H-border-vertical-bottom-margin-left-10-after H-vertical-middle H-touch-active">
+                    <div class="H-flex-item H-padding-horizontal-both-10 H-font-size-16 H-padding-vertical-both-12">客户姓名<input v-model="custom.name" style="margin-left: 12px;width: 55%;outline: none" type="text" placeholder="请输入客户姓名"></div>
+                </div>
+                <div class="H-text-list H-flexbox-horizontal  H-theme-background-color-white H-border-vertical-bottom-margin-left-10-after H-vertical-middle H-touch-active">
+                    <div class="H-flex-item H-padding-horizontal-both-10 H-font-size-16 H-padding-vertical-both-12">手机号码<input v-model="custom.phone" style="margin-left: 12px;width: 55%;outline: none"  type="text" placeholder="请输入手机号码"></div>
+                </div>
+                <div @click="genderChoose()" class="H-text-list H-flexbox-horizontal  H-theme-background-color-white H-border-vertical-bottom-margin-left-10-after H-vertical-middle H-touch-active">
+                    <div class="H-flex-item H-padding-horizontal-both-10 H-font-size-16 H-padding-vertical-both-12">客户性别<span style="margin-left: 12px;width: 55%;outline: none"  type="text">{{custom.gender}}</span></div>
+                    <i style="position: absolute; right: 5%;top: 30%" class="H-iconfont H-icon-arrow-right H-theme-font-color-999 H-font-size-14 H-vertical-middle"></i>
+                </div>
+                <div @click="dateBirth()" class="H-text-list H-flexbox-horizontal  H-theme-background-color-white H-border-vertical-bottom-margin-left-10-after H-vertical-middle H-touch-active">
+                    <div class="H-flex-item H-padding-horizontal-both-10 H-font-size-16 H-padding-vertical-both-12">客户生日<span style="margin-left: 12px;width: 55%;outline: none"  type="text">{{custom.birth}}</span></div>
+                    <i style="position: absolute; right: 5%;top: 30%" class="H-iconfont H-icon-arrow-right H-theme-font-color-999 H-font-size-14 H-vertical-middle"></i>
+                </div>
+            </div>
+
+            <!-- 下一步按钮 start -->
+            <footer @click="nextBtn()" class="H-text-align-center H-margin-vertical-top-15 H-position-relative" style="border-radius: 7px">
+                <span class="H-theme-font-color-white H-font-size-18 H-margin-vertical-bottom-15 H-display-block H-position-absolute H-padding-vertical-both-10" style="left:10px;right:10px;">保存</span>
+            </footer>
+            <!-- 下一步按钮 end -->
+        </div>
+
+
+
+    </div>
+    <script type="text/javascript" src="../../../script/api.js"></script>
+    <script type="text/javascript" src="../../../script/hui/H.js"></script>
+    <script type="text/javascript" src="../../../script/vue.min.js"></script>
+    <script type="text/javascript" src="../../../script/jquery.min.js"></script>
+    <script type="text/javascript" src="../../../script/appUtils.js"></script>
+    <script type="text/javascript">
+        apiready = function() {
+            setStatusBarStyleFn('dark'); // 状态栏颜色
+            // 头部沉侵
+            var header = $api.dom('header');
+            var headerH = $api.fixStatusBar(header);
+            var userData=api.pageParam.data;
+            console.log(JSON.stringify(userData))
+
+            var addUser=new Vue({
+                el: '#VUE_BOX',
+                data: {
+                    custom: {
+                        name: userData.mess.custom.customerName,
+                        phone: userData.mess.custom.customerMobile,
+                        gender: '',
+                        birth: ''
+                    }
+
+                },
+                methods: {
+                    genderChoose() {
+                        data=['男','女'];
+                        api.actionSheet({
+                            title: "选择性别",
+                            cancelTitle: '取消',
+                            buttons: data
+                        }, function(ret, err) {
+                            var index = ret.buttonIndex;
+                            if(index!==(data.length+1)){
+                                addUser.custom.gender=data[index-1];
+                            } else {
+                                addUser.custom.gender=addUser.custom.gender;
+                            }
+                        });
+                    },
+                    dateBirth(){
+                        api.openPicker({
+                            type: 'date_time',
+                            date: '',
+                            title: '选择时间'
+                        }, function(ret, err) {
+                            if (ret) {
+                                addUser.custom.birth=ret.year+"-"+(ret.month<10?'0'+ret.month:ret.month)+"-"+(ret.day<10?'0'+ret.day:ret.day);
+                            } else {
+
+                            }
+                        });
+                    },
+                    nextBtn: function(){
+                        api.sendEvent({
+                            name: 'editCus',
+                            extra: {
+                                message: addUser.custom
+                            }
+                        })
+                        api.closeWin();
+                    }
+
+                }
+            })
+
+
+
+
+        }
+    </script>
+</body>
+
+</html>

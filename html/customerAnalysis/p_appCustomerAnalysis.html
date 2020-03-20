@@ -1,0 +1,212 @@
+<!DOCTYPE HTML>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="maximum-scale=1.0, minimum-scale=1.0, user-scalable=0, initial-scale=1.0, width=device-width" />
+    <meta name="format-detection" content="telephone=no, email=no, date=no, address=no">
+    <title></title>
+    <link href="../../css/api.css" rel="stylesheet" type="text/css" />
+    <link href="../../css/Hui.css" rel="stylesheet" type="text/css" />
+    <style>
+        ul, li, h3, p{
+            margin: 0;
+            padding: 0;
+        }
+        .search-box{ /* 搜索框 */
+            background-color: #F0F0F0;
+        }
+        .search-box .search-img{ /* 搜索图片 */
+            width: 20px;
+            height: 20px;
+            position: relative;
+            top: 5px;
+        }
+        .item{ /* 每一张卡 */
+            padding: 20px 10px;
+        }
+        .img{ /* 卡的图片 */
+            background-repeat: no-repeat;
+            background-size: contain;
+            background-position: center center;
+            margin: auto 0;
+        }
+        .img.img_1{ /* 卡1 */
+            width: 116px;
+            height: 45px;
+        }
+        .img.img_2{ /* 卡2 */
+            width: 116px;
+            height: 47px;
+        }
+        .img.img_3{ /* 卡3 */
+            width: 116px;
+            height: 39px;
+        }
+        .text{ /* 数量 */
+            margin: auto;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="VUE_BOX">
+        <!-- =================================== 头部 开始 =================================== -->
+        <header class="hHeader" id="header">
+            <span @click="closeWin" class="hIconBox hPaddingLeft_10">
+                <i class="hIcon H-icon-arrow-left"></i>
+            </span>
+            <div class="hChannelTitle">客户分析</div>
+            <span @click="selShop" class="hIconRightBox hMarginRight_20">
+                <label class="hIconFont hFontSize_16 hRelative hTop_3" v-text="selShopData.shopName || '选择店铺'"></label>
+            </span>
+            <img src="../../image/homePage/bottom.png" class="downBoult" alt="">
+        </header>
+        <!-- =================================== 头部 结束 =================================== -->
+
+        <!-- =================================== 统计信息 开始 =================================== -->
+        <ul class="hMarginTop_10 hpadding_horizontal_both_10">
+            <li @click="details({'title': '储值卡客户', 'type': 'STORED'})" class="hBgColor_white hBorderRadius_5 item H-box-sizing-border-box H_displayFlex hMarginBottom_10">
+                <div class="img img_1" style="background-image: url('../../image/customerAnalysis/img_1.png');"></div>
+                <p class="hFontSize_40 text hFontColor_999" v-text="result[0]"></p>
+            </li>
+
+            <li @click="details({'title': '计次卡客户', 'type': 'COUNT'})" class="hBgColor_white hBorderRadius_5 item H-box-sizing-border-box H_displayFlex hMarginBottom_10">
+                <div class="img img_2" style="background-image: url('../../image/customerAnalysis/img_2.png');"></div>
+                <p class="hFontSize_40 text hFontColor_999" v-text="result[1]"></p>
+            </li>
+
+            <li @click="details({'title': '散客客户', 'type': 'INDIVIDUAL'})" class="hBgColor_white hBorderRadius_5 item H-box-sizing-border-box H_displayFlex hMarginBottom_10">
+                <div class="img img_3" style="background-image: url('../../image/customerAnalysis/img_3.png');"></div>
+                <p class="hFontSize_40 text hFontColor_999" v-text="result[2]"></p>
+            </li>
+        </ul>
+        <!-- =================================== 统计信息 结束 =================================== -->
+
+        <!-- =================================== 页面底部 开始 =================================== -->
+        <div class="hPaddingtop_30"></div>
+        <!-- =================================== 页面底部 结束 =================================== -->
+    </div>
+    <script type="text/javascript" src="../../script/api.js"></script>
+    <script type="text/javascript" src="../../script/hui/H.js"></script>
+    <script type="text/javascript" src="../../script/vue.min.js"></script>
+    <script type="text/javascript" src="../../script/jquery.min.js"></script>
+    <script type="text/javascript" src="../../script/appUtils.js"></script>
+    <script type="text/javascript">
+        apiready = function() {
+            // 状态栏颜色
+            setStatusBarStyleFn('dark');
+            // 头部沉侵
+            var header = $api.dom('header');
+            var headerH = $api.fixStatusBar(header);
+
+            window.app = new Vue({
+                el: '#VUE_BOX',
+                data: {
+                    userInfo: GET_USER_INFO(), // 登录数据
+                    selShopData: {}, // 选择的店铺信息
+                    shopList: [], // 店铺列表
+                    result: [0, 0, 0], // 储值卡， 计次卡， 散客
+                },
+                mounted: function() {
+                    var self = this;
+                    self.listener(); // 监听
+                    self.getShopList(); // 查询店铺列表
+                    self.getCount(); // 查询数量
+                },
+                methods: vueDefMethods({
+                    // 监听
+                    listener: function () {
+                        var self = this;
+                        // window显示
+                        api.addEventListener({
+                            name: 'viewappear'
+                        }, function(ret, err){
+                             setStatusBarStyleFn('dark');
+                        });
+                    },
+
+                    // 查询店铺列表
+                    getShopList: function () {
+                        var self = this;
+                        request({
+                            url: "app/shop/shop_role_list"
+                        }, function (ret) {
+                            var retData = ret.shopList;
+                            self.shopList = retData;
+                            self.selShopData = retData[0];
+                        });
+                    },
+
+                    // 选择店铺
+                    selShop: function () {
+                        var self = this;
+                        var shopList = self.shopList;
+                        if (!shopList || shopList.length == 0) {
+                            toastFn("暂无其他店铺");
+                            return;
+                        }
+                        var buttons = [];
+                        for (var i = 0; i < shopList.length; i++) {
+                            buttons.push(shopList[i].shopName);
+                        }
+                        api.actionSheet({
+                            title: '请选择店铺',
+                            buttons: buttons
+                        }, function(ret, err) {
+                            var index = ret.buttonIndex;
+                            if (index <= shopList.length) {
+                                self.selShopData = shopList[index - 1];
+                            } else {
+                                self.selShopData = {};
+                            }
+                            self.getCount(); // 查询数量
+                        });
+                    },
+
+                    // 查询数量
+                    getCount: function () {
+                        var self = this;
+                        var userInfo = self.userInfo;
+                        var selShopData = self.selShopData;
+                        var url = "app/shop_chart/statistics?sellerId="
+                            + userInfo.sellerId
+                            + "&shopId=" + ((selShopData && selShopData.shopId) ? selShopData.shopId : '');
+                        request({
+                            "url": url
+                        }, function (ret) {
+                            var result = self.result;
+                            self.result = [
+                                ret.storedValueCard,
+                                ret.countingCard,
+                                ret.individual
+                            ];
+                        });
+                    },
+
+                    // 查看详情
+                    details: function (param) {
+                        var self = this;
+                        var selShopData = self.selShopData;
+                        if (selShopData && selShopData.shopId) {
+                            param.selShopData = selShopData;
+                        }
+                        api.openWin({
+                            name: 'appCustomerList',
+                            url: 'p_appCustomerList.html',
+                            pageParam: {
+                                data: param
+                            }
+                        });
+                    },
+
+
+                }),
+            });
+
+
+        }
+    </script>
+</body>
+
+</html>

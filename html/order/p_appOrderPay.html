@@ -1,0 +1,298 @@
+<!DOCTYPE HTML>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="maximum-scale=1.0, minimum-scale=1.0, user-scalable=0, initial-scale=1.0, width=device-width" />
+    <meta name="format-detection" content="telephone=no, email=no, date=no, address=no">
+    <title></title>
+    <link href="../../css/api.css" rel="stylesheet" type="text/css" />
+    <link href="../../css/Hui.css" rel="stylesheet" type="text/css" />
+    <style>
+        ul, li, p, table, tr, td{ /* 重置样式 */
+            margin: 0;
+            padding: 0;
+        }
+        .header-box td,.content-box td{ /* 服务头部和表格的公共样式 */
+            padding: 15px 0;
+            text-align: center;
+            width: 25%;
+        }
+        .header-box td{ /* 服务头部 */
+            padding: 10px 0;
+            color: #4FA4F3;
+            font-weight: bold;
+        }
+        .font-color-red{
+            color: #CC0000;
+        }
+        .border-bottom{
+            border-bottom: 1px solid rgba(240, 240, 240, 1);
+        }
+        .display-flex{
+            display: flex;
+            justify-content: space-between;
+        }
+        .upd-price{
+            padding: 3px 15px;
+            background-color: rgba(79,164,243,1);
+            border-radius: 3px;
+        }
+        .pay-type-img{
+            width: 30px;
+            top: -2px;
+        }
+        .pay-type-sel{
+            width: 25px;
+            height: 25px;
+            margin-right: 10px;
+            position: relative;
+            top: 2px;
+        }
+    </style>
+</head>
+
+<body class="hRelative">
+    <div id="VUE_BOX">
+        <!-- =================================== 头部 开始 =================================== -->
+        <header class="hHeader" id="header">
+            <span @click="closeWin" class="hIconBox hPaddingLeft_10">
+                <i class="hIcon H-icon-arrow-left"></i>
+            </span>
+            <div class="hChannelTitle">确认支付</div>
+        </header>
+        <!-- =================================== 头部 结束 =================================== -->
+
+        <!-- =================================== 服务项目和金额 开始 =================================== -->
+        <div class="hMarginTop_10 hpadding_horizontal_both_10">
+            <div class="hBgColor_white hBorderRadius_5">
+                <table class="hWidth_100 hFontColor_333 hFontSize_16">
+                    <tr class="header-box border-bottom">
+                        <td>服务项目</td>
+                        <td>数量</td>
+                        <td>会员价</td>
+                        <td>价格</td>
+                    </tr>
+                    <tr class="content-box" v-for="(item, index) in serviceList" v-bind:class="{'border-bottom': index == pageParam.orderDetailVos.length - 1}">
+                        <td v-text="item.serviceName"></td>
+                        <td v-text="item.goodsQty"></td>
+                        <td class="font-color-red" v-text="fixedFn(item.memberPrice, 2)"></td>
+                        <td class="font-color-red" v-text="fixedFn(item.totalPrice, 2)"></td>
+                    </tr>
+                </table>
+                <div class="hPadding_10 display-flex border-bottom">
+                    <p class="font-color-red">
+                        <span class="hFontColor_333">服务金额</span>
+                        <input id="inputPrice" v-show="updPriceFocus" @blur="inputPriceBlur" type="number" v-model="pageParam.totalMoney" class="H-border-none hWidth_80px font-color-red hMarginLeft_10">
+                        <span v-show="!updPriceFocus" class="hMarginLeft_10" v-text="fixedFn(pageParam.totalMoney, 2) + '元'"></span>
+                    </p>
+                    <div v-show="6 != payType && 5 != payType" @click="inputPriceFocus" class="upd-price hFontSize_14 hFontColor_white">可改价钱</div>
+                    <div v-show="6 == payType || 5 == payType" class="upd-price hFontSize_14 hFontColor_white" style="background-color: #ccc;">可改价钱</div>
+                </div>
+            </div>
+        </div>
+        <!-- =================================== 服务项目和金额 结束 =================================== -->
+
+        <!-- =================================== 支付方式 开始 =================================== -->
+        <div class="hMarginTop_10 hpadding_horizontal_both_10">
+            <div class="hBgColor_white hBorderRadius_5">
+                <p class="hPadding_10 hFontColor_999 border-bottom">支付方式</p>
+                <ul class="hPaddingLeft_10">
+                    <li @click="selectPayType(5)" class="display-flex border-bottom hpadding_horizontal_voth_15">
+                        <div>
+                            <img src="../../image/homePage/vip.png" class="pay-type-img H-vertical-align-middle hRelative" style="width: 25px;"/>
+                            <span v-bind:class="{'hFontColor_black': 5 == payType}" class="hMarginLeft_10 hFontColor_ccc">会员卡支付</span>
+                        </div>
+                        <img v-bind:src="5 == payType ? '../../image/homePage/xuanze.png' : '../../image/homePage/weixuan.png'" class="pay-type-sel H-vertical-align-middle"/>
+                    </li>
+                    <li @click="selectPayType(1)" class="display-flex border-bottom hpadding_horizontal_voth_15">
+                        <div>
+                            <img src="../../image/homePage/xianjin.png" class="pay-type-img H-vertical-align-middle hRelative"/>
+                            <span v-bind:class="{'hFontColor_black': 1 == payType}" class="hMarginLeft_10 hFontColor_ccc">现金支付</span>
+                        </div>
+                        <img v-bind:src="1 == payType ? '../../image/homePage/xuanze.png' : '../../image/homePage/weixuan.png'" class="pay-type-sel H-vertical-align-middle"/>
+                    </li>
+                    <li @click="selectPayType(2)" class="display-flex border-bottom hpadding_horizontal_voth_15">
+                        <div>
+                            <img src="../../image/homePage/shuaka.png" class="pay-type-img H-vertical-align-middle hRelative"/>
+                            <span v-bind:class="{'hFontColor_black': 2 == payType}" class="hMarginLeft_10 hFontColor_ccc">刷卡支付</span>
+                        </div>
+                        <img v-bind:src="2 == payType ? '../../image/homePage/xuanze.png' : '../../image/homePage/weixuan.png'" class="pay-type-sel H-vertical-align-middle"/>
+                    </li>
+                    <li @click="selectPayType(3)" class="display-flex border-bottom hpadding_horizontal_voth_15">
+                        <div>
+                            <img src="../../image/homePage/zhifubao.png" class="pay-type-img H-vertical-align-middle hRelative"/>
+                            <span v-bind:class="{'hFontColor_black': 3 == payType}" class="hMarginLeft_10 hFontColor_ccc">支付宝</span>
+                        </div>
+                        <img v-bind:src="3 == payType ? '../../image/homePage/xuanze.png' : '../../image/homePage/weixuan.png'" class="pay-type-sel H-vertical-align-middle"/>
+                    </li>
+                    <li @click="selectPayType(4)" class="display-flex border-bottom hpadding_horizontal_voth_15">
+                        <div>
+                            <img src="../../image/homePage/weixin.png" class="pay-type-img H-vertical-align-middle hRelative"/>
+                            <span v-bind:class="{'hFontColor_black': 4 == payType}" class="hMarginLeft_10 hFontColor_ccc">微信</span>
+                        </div>
+                        <img v-bind:src="4 == payType ? '../../image/homePage/xuanze.png' : '../../image/homePage/weixuan.png'" class="pay-type-sel H-vertical-align-middle"/>
+                    </li>
+                    <li @click="selectPayType(6)" class="display-flex border-bottom hpadding_horizontal_voth_15">
+                        <div>
+                            <img src="../../image/homePage/set_meal.png" class="pay-type-img H-vertical-align-middle hRelative" style="width: 25px;"/>
+                            <span v-bind:class="{'hFontColor_black': 6 == payType}" class="hMarginLeft_10 hFontColor_ccc">套餐</span>
+                        </div>
+                        <img v-bind:src="6 == payType ? '../../image/homePage/xuanze.png' : '../../image/homePage/weixuan.png'" class="pay-type-sel H-vertical-align-middle"/>
+                    </li>
+                </ul>
+            </div>
+        </div>
+        <!-- =================================== 支付方式 结束 =================================== -->
+
+        <!-- =================================== 备注 开始 =================================== -->
+        <div class="hpadding_horizontal_both_10 hMarginTop_10">
+            <div class="hBgColor_white hBorderRadius_5 hPadding_10 H-box-sizing-border-box">
+                <p class="hFontColor_999">
+                    备注<span class="hFontColor_ccc hMarginLeft_10">请输入备注信息</span>
+                </p>
+                <textarea v-model="pageParam.orderRemark" class="hWidth_100 H-border-none hFontColor_333 hPadding_10 H-box-sizing-border-box" rows="3"></textarea>
+            </div>
+        </div>
+        <!-- =================================== 备注 结束 =================================== -->
+
+        <!-- =================================== 支付按钮 开始 =================================== -->
+        <div class="hPadding_10">
+            <div @click="save" class="hFontColor_white hFontSize_18 hTextAlignCenter hpadding_horizontal_voth_10 hBorderRadius_5"
+              style="background-color: #4FA4F3;">确认支付</div>
+        </div>
+        <!-- =================================== 支付按钮 结束 =================================== -->
+
+    </div>
+    <script type="text/javascript" src="../../script/api.js"></script>
+    <script type="text/javascript" src="../../script/hui/H.js"></script>
+    <script type="text/javascript" src="../../script/vue.min.js"></script>
+    <script type="text/javascript" src="../../script/jquery.min.js"></script>
+    <script type="text/javascript" src="../../script/appUtils.js"></script>
+    <script type="text/javascript">
+        apiready = function() {
+            // 状态栏颜色
+            setStatusBarStyleFn('dark');
+            // 头部沉侵
+            var header = $api.dom('header');
+            var headerH = $api.fixStatusBar(header);
+
+            window.app = new Vue({
+                el: '#VUE_BOX',
+                data: {
+                    userInfo: GET_USER_INFO(), // 登录数据
+                    pageParam: api.pageParam.data, // 订单数据
+                    payType: null, // 支付方式 现金-1, 刷卡-2, 支付宝-3, 微信-4, 会员卡支付-5
+                    updPriceFocus: false, // 显示价格输入框
+                    tempPrice: null, // 存放上次保存的正确数据
+                    memberPrice: null, // 会员价
+                    serviceList: [], // 服务列表
+                },
+                mounted: function() {
+                    var self = this;
+                    self.tempPrice = self.pageParam.totalMoney;
+                    self.listener(); // 监听
+                    self.getMemberPrice(); // 获取会员价
+                },
+                methods: vueDefMethods({
+                    // 选择支付方式
+                    selectPayType: function (payType) {
+                        var self = this, pageParam = self.pageParam;
+                        if (5 == payType) {
+                            pageParam.totalMoney = self.memberPrice;
+                        } else if (6 == payType) {
+                            pageParam.totalMoney = 0;
+                        } else {
+                            pageParam.totalMoney = self.tempPrice;
+                        }
+                        self.payType = payType;
+                    },
+
+                    // 监听
+                    listener: function () {
+                        var self = this;
+                        // window显示
+                        api.addEventListener({
+                            name: 'viewappear'
+                        }, function(ret, err){
+                             setStatusBarStyleFn('dark');
+                        });
+                    },
+
+                    // 查询会员价
+                    getMemberPrice: function () {
+                        var self = this, pageParam = self.pageParam;
+                        request({
+                            url: "app/shop_order/order_services/" + pageParam.orderId,
+                        }, function (ret) {
+                            var memberPrice = 0;
+                            self.serviceList = ret;
+                            for (var i = 0; i < ret.length; i++) {
+                                memberPrice += ret[i].memberPrice;
+                            }
+                            self.memberPrice = memberPrice;
+                        });
+                    },
+
+                    // 价格输入框失去焦点
+                    inputPriceBlur: function () {
+                        var self = this;
+                        var pageParam = self.pageParam;
+                        var totalMoney = pageParam.totalMoney;
+                        if (null == totalMoney || totalMoney <= 0) {
+                            toastFn("金额错误");
+                            pageParam.totalMoney = self.tempPrice;
+                        } else {
+                            self.tempPrice = totalMoney;
+                        }
+                        self.updPriceFocus = false;
+                    },
+
+                    // 价格输入框获取焦点
+                    inputPriceFocus: function () {
+                        var self = this;
+                        var pageParam = self.pageParam;
+                        self.tempPrice = pageParam.totalMoney;
+                        self.updPriceFocus = true;
+                        setTimeout(function () {
+                            $("#inputPrice").focus();
+                        }, 500);
+                    },
+
+                    // 保存
+                    save: function () {
+                        var self = this;
+                        var payType = self.payType; // 支付方式 现金-1, 刷卡-2, 支付宝-3, 微信-4, 会员卡支付-5
+                        if (!payType) {
+                            toastFn("请选择支付方式");
+                            return;
+                        }
+                        var pageParam = self.pageParam;
+                        var paramData = {
+                            orderId: pageParam.orderId,
+                            totalMoney: pageParam.totalMoney,
+                            paymentMethod: payType,
+                            orderRemark: pageParam.orderRemark,
+                            settleStatusEnum: "SETTLED"
+                        };
+                        request({
+                            url: "app/shop_order/upd_order_settle_status",
+                            method: "post",
+                            data: {body: paramData},
+                        }, function (ret) {
+                            toastFn("支付成功");
+                            setTimeout(function () {
+                                self.closeWin();
+                            }, 2000);
+                        });
+                    },
+
+                }),
+            });
+
+
+        }
+    </script>
+</body>
+
+</html>

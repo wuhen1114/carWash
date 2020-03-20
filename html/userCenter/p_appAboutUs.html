@@ -1,0 +1,95 @@
+<!DOCTYPE HTML>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="maximum-scale=1.0, minimum-scale=1.0, user-scalable=0, initial-scale=1.0, width=device-width" />
+    <meta name="format-detection" content="telephone=no, email=no, date=no, address=no">
+    <title></title>
+    <link href="../../css/api.css" rel="stylesheet" type="text/css" />
+    <link href="../../css/Hui.css" rel="stylesheet" type="text/css" />
+    <style>
+        html, body{
+            width: 100%!important;
+            height: 100%!important;
+            background-color: white!important;
+        }
+        p{
+            margin: 0;
+            padding: 0;
+        }
+        .border-bottom{
+            border-bottom: 1px solid #F5F5F5;
+        }
+    </style>
+</head>
+
+<body class="hRelative">
+    <div id="VUE_BOX">
+        <!-- =================================== 头部 开始 =================================== -->
+        <header class="hHeader" id="header">
+            <span @click="closeWin" class="hIconBox hPaddingLeft_10">
+                <i class="hIcon H-icon-arrow-left"></i>
+            </span>
+            <div class="hChannelTitle">关于我们</div>
+        </header>
+        <!-- =================================== 头部 结束 =================================== -->
+
+
+        <!-- =================================== logo 开始 =================================== -->
+        <div class="hTextAlignCenter" style="margin-top: 25vh;">
+            <img src="../../image/def/logo.png" class="hWidth_50"/>
+            <p class="hFontColor_999 hMarginTop_10" v-text="'V' + version"></p>
+        </div>
+        <!-- =================================== logo 结束 =================================== -->
+
+
+        <!-- =================================== copyright 开始 =================================== -->
+        <div class="hWidth_100 hTextAlignCenter hAbsolute hFontColor_333 hFontSize_12" style="bottom: 50px;">
+            <p>西安维珍计算机科技有限公司</p>
+            <p>Copyright©2015-2019</p>
+        </div>
+        <!-- =================================== copyright 结束 =================================== -->
+
+    </div>
+    <script type="text/javascript" src="../../script/api.js"></script>
+    <script type="text/javascript" src="../../script/hui/H.js"></script>
+    <script type="text/javascript" src="../../script/vue.min.js"></script>
+    <script type="text/javascript" src="../../script/jquery.min.js"></script>
+    <script type="text/javascript" src="../../script/appUtils.js"></script>
+    <script type="text/javascript">
+        apiready = function() {
+            // 状态栏颜色
+            setStatusBarStyleFn('dark');
+            // 头部沉侵
+            var header = $api.dom('header');
+            var headerH = $api.fixStatusBar(header);
+
+            window.app = new Vue({
+                el: '#VUE_BOX',
+                data: {
+                    version: api.appVersion, // 比如： 1.0.0
+                },
+                mounted: function() {
+                    var self = this;
+                    self.listener(); // 监听
+                },
+                methods: vueDefMethods({
+                    // 监听
+                    listener: function () {
+                        // window显示
+                        api.addEventListener({
+                            name: 'viewappear'
+                        }, function(ret, err){
+                             setStatusBarStyleFn('dark');
+                        });
+                    },
+                }),
+            });
+
+
+        }
+    </script>
+</body>
+
+</html>

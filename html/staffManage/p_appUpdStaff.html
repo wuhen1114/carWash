@@ -1,0 +1,511 @@
+<!DOCTYPE HTML>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="maximum-scale=1.0, minimum-scale=1.0, user-scalable=0, initial-scale=1.0, width=device-width" />
+    <meta name="format-detection" content="telephone=no, email=no, date=no, address=no">
+    <title></title>
+    <link href="../../css/api.css" rel="stylesheet" type="text/css" />
+    <link href="../../css/Hui.css" rel="stylesheet" type="text/css" />
+    <style>
+        ul, li{
+            margin: 0;
+            padding: 0;
+        }
+        input::-webkit-input-placeholder{
+            color: #CCCCCC;
+        }
+        .box{
+            margin: 10px 10px 0;
+            padding: 0 5%;
+            box-sizing: border-box;
+        }
+        .box .item{
+            padding: 10px 0;
+            width: 100%;
+            border-bottom: 1px solid #F0F0F0;
+        }
+        .box .item1{
+            padding: 5px 0;
+        }
+        .box .item:last-child{
+            border: none;
+        }
+        .idCard {
+            width: 100%;
+            height: 150px;
+            border: 1px solid #F0F0F0;
+            border-radius: 5px;
+            overflow-y: scroll;
+            position: relative;
+        }
+        .idCard::-webkit-scrollbar {
+            width: 0;
+        }
+        .idCard img {
+            width: 100%;
+            display: block;
+        }
+        .addImage {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%,-50%);
+            font-size: 35px;
+            color: #ccc;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="VUE_BOX">
+        <!-- =================================== 头部 开始 =================================== -->
+        <header class="hHeader" id="header">
+            <span @click="closeWin" class="hIconBox hPaddingLeft_10">
+                <i class="hIcon H-icon-arrow-left"></i>
+            </span>
+            <div class="hChannelTitle" v-text="isInsert ? '新增员工' : '编辑员工'"></div>
+        </header>
+        <!-- =================================== 头部 结束 =================================== -->
+
+        <!-- =================================== 头部 开始 =================================== -->
+        <ul class="box hBgColor_white hBorderRadius_5 hFontSize_14 hFontColor_333">
+            <li class="item">
+                <span class="hMarginRight_10 hFontColor_999">员工姓名</span>
+                <input type="text" v-model="pageParam.staffName" class="H-border-none" placeholder="姓名" />
+            </li>
+            <li @click="updSex" class="item">
+                <span class="hMarginRight_10 hFontColor_999">员工性别</span>
+                <span v-show="1 === pageParam.staffGender">男</span>
+                <span v-show="2 === pageParam.staffGender">女</span>
+            </li>
+            <li class="item">
+                <span class="hMarginRight_10 hFontColor_999">身份证号</span>
+                <input type="text" v-model="pageParam.staffIdcard" class="H-border-none" placeholder="身份证号" />
+            </li>
+            <li class="item">
+                <span class="hMarginRight_10 hFontColor_999">手机号码</span>
+                <input v-if="isInsert" type="tel" v-model="pageParam.staffMobile" class="H-border-none" placeholder="手机号码" />
+                <span v-if="!isInsert" v-text="pageParam.staffMobile"></span>
+            </li>
+        </ul>
+
+        <!-- 添加身份证照片 -->
+        <ul class="box hBgColor_white hBorderRadius_5 hFontSize_14 hFontColor_333" style="padding: 5px 5%">
+            <li class="item1">
+                <span class="hMarginRight_10 hFontColor_999">请添加身份证正面照片</span>
+            </li>
+            <li class="item1">
+                <span class="idCard" @click="chooseImg($event,'1')">
+                    <img :src="imgFront" alt="">
+                    <span v-if="!imgFront" class="addImage">+</span>
+                </span>
+            </li>
+            <li class="item1">
+                <span class="hMarginRight_10 hFontColor_999">请添加身份证背面照片</span>
+            </li>
+            <li class="item1">
+                <span class="idCard" @click="chooseImg($event,'2')">
+                    <img :src="imgReverse" alt="">
+                    <span v-if="!imgReverse" class="addImage">+</span>
+                </span>
+            </li>
+        </ul>
+
+        <!-- 添加驾驶证照片 -->
+        <ul class="box hBgColor_white hBorderRadius_5 hFontSize_14 hFontColor_333" style="padding: 5px 5%;position: relative;">
+            <li class="item1">
+                <span class="hMarginRight_10 hFontColor_999">请添加驾驶证照片</span>
+            </li>
+            <li class="item1">
+                <span class="idCard" @click="chooseImg($event,'3')">
+                    <img :src="imgDriving" alt="">
+                    <span v-if="!imgDriving" class="addImage">+</span>
+                </span>
+            </li>
+            <li style="position: absolute;top: 8px; right: 20px;">
+                <input type="checkbox" style="vertical-align: middle;" :checked="imgDriving=='' ? '' : true"><span style="margin-left: 3px;">有</span>
+            </li>
+        </ul>
+
+        <ul class="box hBgColor_white hBorderRadius_5 hFontSize_14 hFontColor_333">
+            <li @click="selShop()" class="item" style="position: relative">
+                <span class="hMarginRight_10 hFontColor_999">所属店铺</span>
+                <span v-text="pageParam.shopName"></span>
+                <span class="H-icon H-padding-horizontal-right-10 H-display-block" style=" position:absolute;top: 50%;right: 0%;transform: translateY(-50%)"><i class="H-iconfont H-icon-arrow-right H-theme-font-color-999 H-font-size-14 H-vertical-middle"></i></span>
+            </li>
+            <li @click="selRole" class="item">
+                <span class="hMarginRight_10 hFontColor_999">员工角色</span>
+                <span v-text="pageParam.roleName"></span>
+            </li>
+        </ul>
+
+        <ul class="box hBgColor_white hBorderRadius_5 hFontSize_14 hFontColor_333">
+            <li @click="selTime" class="item">
+                <span class="hMarginRight_10 hFontColor_999">入职时间</span>
+                <span v-text="pageParam.staffDate"></span>
+            </li>
+            <li @click="selValid" class="item">
+                <span class="hMarginRight_10 hFontColor_999">在职状态</span>
+                <span v-show="1 == pageParam.isValid">在职</span>
+                <span v-show="2 == pageParam.isValid">离职</span>
+            </li>
+        </ul>
+        <!-- =================================== 头部 结束 =================================== -->
+
+        <!-- =================================== 按钮 开始 =================================== -->
+        <div class="hpadding_horizontal_both_10 hMarginTop_10">
+            <div @click="save" class="hFontColor_white hFontSize_18 hTextAlignCenter hpadding_horizontal_voth_10 hBorderRadius_5"
+              style="background-color: #4FA4F3;">保存</div>
+        </div>
+        <!-- =================================== 按钮 结束 =================================== -->
+
+        <!-- =================================== 页面底部 结束 =================================== -->
+        <div class="hPaddingtop_30"></div>
+        <!-- =================================== 页面底部 开始 =================================== -->
+
+    </div>
+    <script type="text/javascript" src="../../script/api.js"></script>
+    <script type="text/javascript" src="../../script/hui/H.js"></script>
+    <script type="text/javascript" src="../../script/vue.min.js"></script>
+    <script type="text/javascript" src="../../script/jquery.min.js"></script>
+    <script type="text/javascript" src="../../script/appUtils.js"></script>
+    <script type="text/javascript">
+        apiready = function() {
+            // 状态栏颜色
+            setStatusBarStyleFn('dark');
+            // 头部沉侵
+            var header = $api.dom('header');
+            var headerH = $api.fixStatusBar(header);
+
+            window.app = new Vue({
+                el: '#VUE_BOX',
+                data: {
+                    userInfo: GET_USER_INFO(), // 登录数据
+                    pageParam: {}, // 选择的员工数据
+                    shopList: [], // 店铺列表
+                    roleList: [], // 角色数据
+                    isInsert: false, // 是否新增
+                    imgFront: '',
+                    imgReverse: '',
+                    imgDriving: '',
+                },
+                mounted: function() {
+                    var self = this;
+                    self.init(); // 初始化数据
+                    self.listener(); // 监听
+                    self.getShopList(); // 查询店铺列表
+                },
+                methods: vueDefMethods({
+                    // 初始化
+                    init: function () {
+                        var self = this;
+                        var pageData = api.pageParam.data;
+                        var pageParam = self.pageParam;
+                        if (pageData) {
+                            self.pageParam = pageData;
+                            self.isInsert = false;
+                            if(pageData.idCardFront){
+                                self.imgFront=pageData.idCardFront;
+                            }
+                            if(pageData.idCardReverse){
+                                self.imgReverse=pageData.idCardReverse;
+                            }
+                            if(pageData.driverLicense){
+                                self.imgDriving=pageData.driverLicense;
+                            }
+                        } else {
+                            self.pageParam = {
+                                "staffName": null, // 员工姓名
+                                "staffGender": 1, // 员工性别 1-男，2-女
+                                "staffIdcard": null, // 身份证号
+                                "staffMobile": null, // 手机号
+                                "shopId": null, // 店铺id
+                                "shopName": null, // 店铺名
+                                "staffRoleId": null, //角色id
+                                "roleName": null, //岗位角色
+                                "staffDate": self.formatDate(new Date(), 'yyyy-MM-dd'), // 入职日期
+                                "isValid": 1, // 在职状态1-在职，2-离职
+                            };
+                            self.isInsert = true;
+                        }
+                    },
+
+                    // 监听
+                    listener: function () {
+                        // window显示
+                        api.addEventListener({
+                            name: 'viewappear'
+                        }, function(ret, err){
+                             setStatusBarStyleFn('dark');
+                        });
+                    },
+
+                    // 修改性别
+                    updSex: function () {
+                        var self = this;
+                        api.actionSheet({
+                            title: '请选择性别',
+                            buttons: ['男', '女']
+                        }, function(ret, err) {
+                            var index = ret.buttonIndex;
+                            if (index < 3) {
+                                self.pageParam.staffGender = index;
+                            }
+                        });
+                    },
+
+                    // 查询店铺列表
+                    getShopList: function () {
+                        var self = this;
+                        var pageParam = self.pageParam;
+                        request({
+                            url: "app/shop/shop_role_list"
+                        }, function (ret) {
+                            self.shopList = ret.shopList;
+                            self.roleList = ret.roleList;
+                            if (self.isInsert
+                                  && ret.shopList && ret.shopList.length > 0
+                                  && ret.roleList && ret.roleList.length > 0) {
+                                pageParam.shopName = ret.shopList[0].shopName;
+                                pageParam.shopId = ret.shopList[0].shopId;
+                                pageParam.roleName = ret.roleList[0].roleName;
+                                pageParam.staffRoleId = ret.roleList[0].roleId;
+                            }
+                        });
+                    },
+
+                    // 上传身份证、驾驶证照片
+                    chooseImg: function(event,num){
+                        var self=this;
+                        // 上传图片返回路径
+                        // selectUploadImgType({
+                        //     maxCount: 1, // 本次最多上传几张照片
+                        // }, function (ret) {
+                        //     if(num==1){
+                        //         self.imgFront=ret;
+                        //     }
+                        //     if(num==2){
+                        //         self.imgReverse=ret;
+                        //     }
+                        // });
+                        api.actionSheet({
+                            title: '选择图片',
+                            cancelTitle: '取消',
+                            destructiveTitle: '',
+                            buttons: ['相册', '相机']
+                        }, function(ret, err) {
+                            var index = ret.buttonIndex;
+                            if(index==1){
+                                api.getPicture({
+                                    sourceType: 'library',
+                                    encodingType: 'jpg',
+                                    mediaValue: 'pic',
+                                    destinationType: 'url',
+                                    allowEdit: true,
+                                    quality: 50,
+                                    saveToPhotoAlbum: false
+                                }, function(ret, err) {
+                                    if (ret) {
+                                        self.reajax(ret.data,function(ret){
+                                            if(num==1){
+                                                self.imgFront=ret.data;
+                                                self.pageParam.idCardFront=ret.data;
+                                            }
+                                            if(num==2){
+                                                self.imgReverse=ret.data;
+                                                self.pageParam.idCardReverse=ret.data;
+                                            }
+                                            if(num==3){
+                                                self.imgDriving=ret.data;
+                                                self.pageParam.driverLicense=ret.data;
+                                            }
+                                        });
+                                    }
+                                });
+                            };
+                            if(index==2){
+                                api.getPicture({
+                                    sourceType: 'camera',
+                                    encodingType: 'jpg',
+                                    mediaValue: 'pic',
+                                    destinationType: 'url',
+                                    allowEdit: true,
+                                    quality: 50,
+                                    saveToPhotoAlbum: false
+                                }, function(ret, err) {
+                                    if (ret) {
+                                        self.reajax(ret.data,function(ret){
+                                            if(num==1){
+                                                self.imgFront=ret.data;
+                                                self.pageParam.idCardFront=ret.data;
+                                            }
+                                            if(num==2){
+                                                self.imgReverse=ret.data;
+                                                self.pageParam.idCardReverse=ret.data;
+                                            }
+                                            if(num==3){
+                                                self.imgDriving=ret.data;
+                                                self.pageParam.driverLicense=ret.data;
+                                            }
+                                        });
+                                    }
+                                });
+                            };
+                        });
+                    },
+
+                    // 上传图片
+                    reajax: function(url,callback){
+                        var self=this;
+                        api.ajax({
+                            url: BASEPATH + 'app/tool/stu_par_upload',
+                            method: 'post',
+                            dataType: 'json',
+                            headers: {
+                                'Auth-Id': self.userInfo.authId,
+                                'Auth-Token': self.userInfo.authToken,
+                            },
+                            data: {
+                                files: {
+                                    file: url
+                                }
+                            }
+                        }, function(ret, err) {
+                            if (ret) {
+                                callback(ret);
+                            } else {
+                                toastFn("上传失败，请重新上传");
+                            }
+                        });
+                    },
+                    // 选择店铺
+                    selShop: function () {
+                        var self = this;
+                        var pageParam = self.pageParam;
+                        if (!pageParam.shopId) {
+                            toastFn("管理者账号不可选择店铺");
+                            return;
+                        }
+                        var shopList = self.shopList;
+                        var arr = [];
+                        for (var i = 0; i < shopList.length; i++) {
+                            arr.push(shopList[i].shopName);
+                        }
+                        api.actionSheet({
+                            title: '请选择店铺',
+                            buttons: arr
+                        }, function(ret, err) {
+                            var index = ret.buttonIndex;
+                            if (index <= shopList.length) {
+                                var sel = shopList[index - 1];
+                                pageParam.shopName = sel.shopName;
+                                pageParam.shopId = sel.shopId;
+                            }
+                        });
+                    },
+
+                    // 选择角色
+                    selRole: function () {
+                        var self = this;
+                        var pageParam = self.pageParam;
+                        if (!pageParam.shopId) {
+                            toastFn("管理者账号不可选择角色");
+                            return;
+                        }
+                        var roleList = self.roleList;
+                        var arr = [];
+                        for (var i = 0; i < roleList.length; i++) {
+                            arr.push(roleList[i].roleName);
+                        }
+                        api.actionSheet({
+                            title: '请选择角色',
+                            buttons: arr
+                        }, function(ret, err) {
+                            var index = ret.buttonIndex;
+                            if (index <= roleList.length) {
+                                var sel = roleList[index - 1];
+                                pageParam.roleName = sel.roleName;
+                                pageParam.staffRoleId = sel.roleId;
+                            }
+                        });
+                    },
+
+                    // 选择入职时间
+                    selTime: function () {
+                        var self = this;
+                        var pageParam = self.pageParam;
+                        var now = self.formatDate(new Date(), 'yyyy-MM-dd');
+                        api.openPicker({
+                            type: 'date',
+                            date: now,
+                            title: '选择入职时间'
+                        }, function(ret, err) {
+                            if (ret) {
+                                pageParam.staffDate = (ret.year + "-" + self.numFill(ret.month, 2) + "-" + self.numFill(ret.day, 2));
+                            }
+                        });
+                    },
+
+                    // 选择在职和离职
+                    selValid: function () {
+                        var self = this;
+                        var pageParam = self.pageParam;
+                        api.actionSheet({
+                            title: '请选择在职状态',
+                            buttons: ['在职', '离职']
+                        }, function(ret, err) {
+                            var index = ret.buttonIndex;
+                            if (index < 3) {
+                                pageParam.isValid = index;
+                            }
+                        });
+                    },
+
+                    // 更新数据
+                    save: function () {
+                        var self = this;
+                        if (!self.verify()) {
+                            return;
+                        }
+                        request({
+                            url: self.isInsert ? "app/staff/add_staff" : "app/staff/upd_staff",
+                            method: "post",
+                            data: {body: self.pageParam},
+                        }, function (ret) {
+                            toastFn("更新成功");
+                            setTimeout(function () {
+                                api.closeToWin({name: 'root'});
+                            }, 2000);
+                        });
+                    },
+
+                    // 验证数据
+                    verify: function () {
+                        var self = this;
+                        var pageParam = self.pageParam;
+                        if (!pageParam.staffName) {
+                            toastFn("请输入员工姓名");
+                            return false;
+                        }
+                        if (!pageParam.staffIdcard) {
+                            toastFn("请输入员工身份证号码");
+                            return false;
+                        }
+                        if (!pageParam.staffMobile) {
+                            toastFn("请输入员工手机号码");
+                            return false;
+                        }
+                        return true;
+                    },
+
+                }),
+            });
+
+
+        }
+    </script>
+</body>
+
+</html>

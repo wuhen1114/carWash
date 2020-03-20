@@ -1,0 +1,233 @@
+<!DOCTYPE HTML>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="maximum-scale=1.0, minimum-scale=1.0, user-scalable=0, initial-scale=1.0, width=device-width" />
+    <meta name="format-detection" content="telephone=no, email=no, date=no, address=no">
+    <title>确认支付</title>
+    <link href="../../../css/api.css" rel="stylesheet" type="text/css" />
+    <link href="../../../css/Hui.css" rel="stylesheet" type="text/css" />
+    <style>
+        header {
+            height: 40px;
+        }
+        #main {
+            width: 100%;
+            padding: 0px 2%;
+            box-sizing: border-box;
+        }
+        footer span {
+            background-color: #4FA4F3;
+            border-radius: 2px;
+            font-weight: bold;
+        }
+        .titColor {
+            color: #000!important;
+        }
+
+    </style>
+</head>
+
+<body>
+    <div id="VUE_BOX">
+        <!-- 头部导航 start -->
+        <header class=" H-theme-background-color9" id="header">
+            <span tapmode="" onclick="H.closeWin();" class="H-icon H-position-relative H-display-inline-block H-float-left H-vertical-middle H-theme-font-color-black H-padding-vertical-top-8 H-padding-horizontal-left-5 H-z-index-100">
+                <i class="H-iconfont H-icon-arrow-left H-font-size-18 H-vertical-middle"></i>
+                <label class="H-display-block H-vertical-middle H-font-size-15"></label>
+            </span>
+            <div class="H-header-title H-center-all H-font-size-18 H-text-show-row-1 H-theme-font-color-black H-position-absolute H-padding-vertical-top-8 H-width-100-percent">确认支付</div>
+        </header>
+        <!-- 头部导航 end -->
+        <div id="main">
+            <div class="H-margin-vertical-top-10 H-theme-background-color-white H-border-vertical-both-after" style="border-radius: 7px">
+                <div class="H-text-list H-flexbox-horizontal  H-theme-background-color-white H-border-vertical-bottom-margin-left-10-after H-vertical-middle H-touch-active">
+                    <div class="H-flex-item H-padding-horizontal-both-10 H-font-size-16 H-padding-vertical-both-12">{{title}}</div>
+                </div>
+                <div class="H-text-list H-flexbox-horizontal  H-theme-background-color-white H-border-vertical-bottom-margin-left-10-after H-vertical-middle H-touch-active">
+                    <div class="H-flex-item H-padding-horizontal-both-10 H-font-size-16 H-padding-vertical-both-12">应付金额：<span style="margin-left: 12px;width: 55%;outline: none; color: #FF0E0E" >{{money}}元</span></div>
+                </div>
+                <div class="H-text-list H-flexbox-horizontal  H-theme-background-color-white H-border-vertical-bottom-margin-left-10-after H-vertical-middle H-touch-active">
+                    <div class="H-flex-item H-padding-horizontal-both-10 H-font-size-16 H-padding-vertical-both-12">实付金额：<input style="margin-left: 12px;outline: none; color: #FF0E0E; width: 20%;border: 1px solid #eee;padding: 0 4px" type="number" v-model="actualMoney"><span style="color: #FF0E0E">元</span></div>
+                </div>
+            </div>
+            <div class="H-margin-vertical-top-10 H-theme-background-color-white H-border-vertical-both-after" style="border-radius: 7px">
+                <div class="H-text-list H-flexbox-horizontal  H-theme-background-color-white H-border-vertical-bottom-margin-left-10-after H-vertical-middle H-touch-active">
+                    <div class="H-flex-item H-padding-horizontal-both-10 H-font-size-16 H-padding-vertical-both-12" style="color: #999">支付方式</div>
+                </div>
+                <div class="H-text-list H-flexbox-horizontal  H-theme-background-color-white H-border-vertical-bottom-margin-left-10-after H-vertical-middle H-touch-active">
+                    <div class="H-flex-item H-padding-horizontal-both-10 H-font-size-16 H-padding-vertical-both-12"><img style="width: 30px;height: 30px; vertical-align: middle" src="../../../image/homePage/xianjin.png" alt=""><span :class="{titColor:payType==1}" style="margin-left: 12px;width: 55%;color: #ccc" type="text">现金支付</span></div>
+                    <img @click="payType=1" :src="payType==1?imgUrl2:imgUrl1" style="width: 30px;height: 30px; vertical-align: middle;position: absolute; right: 5%;top: 30%" class="H-iconfont H-icon-arrow-right H-theme-font-color-999 H-font-size-14 H-vertical-middle">
+                </div>
+                <div class="H-text-list H-flexbox-horizontal  H-theme-background-color-white H-border-vertical-bottom-margin-left-10-after H-vertical-middle H-touch-active">
+                    <div class="H-flex-item H-padding-horizontal-both-10 H-font-size-16 H-padding-vertical-both-12"><img style="width: 30px;height: 30px; vertical-align: middle" src="../../../image/homePage/shuaka.png" alt=""><span :class="{titColor:payType==2}" style="margin-left: 12px;width: 55%;color: #ccc" type="text">刷卡支付</span></div>
+                    <img @click="payType=2" :src="payType==2?imgUrl2:imgUrl1" style="width: 30px;height: 30px; vertical-align: middle;position: absolute; right: 5%;top: 30%" class="H-iconfont H-icon-arrow-right H-theme-font-color-999 H-font-size-14 H-vertical-middle">
+                </div>
+                <div class="H-text-list H-flexbox-horizontal  H-theme-background-color-white H-border-vertical-bottom-margin-left-10-after H-vertical-middle H-touch-active">
+                    <div class="H-flex-item H-padding-horizontal-both-10 H-font-size-16 H-padding-vertical-both-12"><img style="width: 30px;height: 30px; vertical-align: middle" src="../../../image/homePage/zhifubao.png" alt=""><span :class="{titColor:payType==3}" style="margin-left: 12px;width: 55%;color: #ccc" type="text">支付宝</span></div>
+                    <img @click="payType=3" :src="payType==3?imgUrl2:imgUrl1" style="width: 30px;height: 30px; vertical-align: middle;position: absolute; right: 5%;top: 30%" class="H-iconfont H-icon-arrow-right H-theme-font-color-999 H-font-size-14 H-vertical-middle">
+                </div>
+                <div class="H-text-list H-flexbox-horizontal  H-theme-background-color-white H-border-vertical-bottom-margin-left-10-after H-vertical-middle H-touch-active">
+                    <div class="H-flex-item H-padding-horizontal-both-10 H-font-size-16 H-padding-vertical-both-12"><img style="width: 30px;height: 30px; vertical-align: middle" src="../../../image/homePage/weixin.png" alt=""><span :class="{titColor:payType==4}" style="margin-left: 12px;width: 55%;color: #ccc" type="text">微信支付</span></div>
+                    <img @click="payType=4" :src="payType==4?imgUrl2:imgUrl1" style="width: 30px;height: 30px; vertical-align: middle;position: absolute; right: 5%;top: 30%" class="H-iconfont H-icon-arrow-right H-theme-font-color-999 H-font-size-14 H-vertical-middle">
+                </div>
+                <div v-if="1 != payId && 2 != payId" class="H-text-list H-flexbox-horizontal  H-theme-background-color-white H-border-vertical-bottom-margin-left-10-after H-vertical-middle H-touch-active">
+                    <div class="H-flex-item H-padding-horizontal-both-10 H-font-size-16 H-padding-vertical-both-12"><img style="width: 30px;height: 30px; vertical-align: middle" src="../../../image/homePage/vip.png" alt=""><span :class="{titColor:payType==5}" style="margin-left: 12px;width: 55%;color: #ccc" type="text">会员卡</span></div>
+                    <img @click="payType=5" :src="payType==5?imgUrl2:imgUrl1" style="width: 30px;height: 30px; vertical-align: middle;position: absolute; right: 5%;top: 30%" class="H-iconfont H-icon-arrow-right H-theme-font-color-999 H-font-size-14 H-vertical-middle">
+                </div>
+
+            </div>
+            <!-- 立即支付按钮 start -->
+            <footer @click="subMit()" class="H-text-align-center H-margin-vertical-top-15 H-position-relative" style="border-radius: 7px">
+                <span class="H-theme-font-color-white H-font-size-18 H-margin-vertical-bottom-15 H-display-block H-position-absolute H-padding-vertical-both-10" style="left:10px;right:10px;">立即支付</span>
+            </footer>
+            <!-- 立即支付按钮 end -->
+        </div>
+
+
+
+    </div>
+    <script type="text/javascript" src="../../../script/api.js"></script>
+    <script type="text/javascript" src="../../../script/hui/H.js"></script>
+    <script type="text/javascript" src="../../../script/vue.min.js"></script>
+    <script type="text/javascript" src="../../../script/jquery.min.js"></script>
+    <script type="text/javascript" src="../../../script/appUtils.js"></script>
+    <script type="text/javascript">
+        apiready = function() {
+            setStatusBarStyleFn('dark'); // 状态栏颜色
+            // 头部沉侵
+            var header = $api.dom('header');
+            var headerH = $api.fixStatusBar(header);
+            var data=api.pageParam.data;
+            console.log(JSON.stringify(data));
+            if(data.payId==2){
+                var title='办理会员卡：'+data.chooseCard.cardName;
+                var money=data.chooseCard.refillMoney;
+            }
+            if(data.payId==1) {
+                var title='会员卡充值：'+data.mess.card.cardName;
+                var money=data.subData.customerRefillMoney
+            }
+            if(data.payId==3){
+                var title="购买基础套餐："+data.package.packageName;
+                var money=data.package.packagePrice;
+            }
+            if(data.payId==4){
+                var title="购买基础套餐："+data.package.packageName;
+                var money=data.package.packagePrice;
+            }
+
+            // 未输入提示
+            function toast(title){
+                api.toast({
+                    msg: title,
+                    duration: 2000,
+                    location: 'bottom'
+                })
+            }
+            request({
+                url: 'app/dict/dict_list?dictDescValue=5'
+            },function(res){
+
+            })
+
+
+
+            var manage=new Vue({
+                el: '#VUE_BOX',
+                data: {
+                    title: title,
+                    datas: data,
+                    money: money,
+                    actualMoney: money,
+                    imgUrl1: '../../../image/homePage/weixuan.png',
+                    imgUrl2: '../../../image/homePage/xuanze.png',
+                    isid: 0,
+                    payType: null,
+                    payId: data.payId, // 1-会员卡充值,2-办理会员卡
+                },
+                mounted: function(){
+
+                },
+                methods: {
+                    subMit: function () {
+                        data.pay=manage.payType;
+                        if(data.payId==2){
+                            // 会员卡办理
+                            var param= {
+                                customerId: data.mess.custom.customerId,
+                                shopId: data.shop.shopId,
+                                cardId: data.chooseCard.cardId,
+                                cardName: data.chooseCard.cardName,
+                                customerRefillMoney: data.chooseCard.refillMoney,
+                                customerCardColor: data.chooseCard.cardColor,
+                                userId: data.carryPeople.staffId,
+                                paymentMethod: data.pay,
+                                customerGiveMoney: data.chooseCard.giveMoney
+                            }
+                            var url='app/user/add_card_user';
+                        } else if(data.payId==1){
+                            // 会员卡充值
+                            data.subData.paymentMethod=data.pay;
+                            var param=data.subData;
+                            var url="app/user/upd_card_user"
+                        } else if(data.payId==3){
+                            // 购买套餐支付
+                            var arr1=[];
+                            var packList=data.package.packageDetailList;
+                            for(var i=0;i<packList.length;i++){
+                                arr1[i]=new Object;
+                                arr1[i].packageDetailId=packList[i].packageDetailId;
+                                arr1[i].serviceName=packList[i].serviceName;
+                                arr1[i].totalTimes=packList[i].serviceTimes;
+                            }
+                            var param={
+                                packageId: data.package.packageId,
+                                packageName: data.package.packageName,
+                                packagePrice: manage.actualMoney,
+                                validMonth: data.package.validMonth,
+                                customerId: data.mess.custom.customerId,
+                                shopId: data.shop.shopId,
+                                staffId: data.carryPeople.staffId,
+                                paymentMethod: data.pay,
+                                packageServiceList: arr1
+                            }
+                            var url="app/user/add_package_user";
+                        }
+                        console.log(JSON.stringify(param))
+                        request({
+                            url: url,
+                            method: 'post',
+                            data: {body: param}
+                        },function(res){
+                            toast("支付成功");
+                            api.sendEvent({
+                                name: 'closeAddUser',
+                                extra: {
+                                    phone: data.phone
+                                }
+                            })
+                            api.closeWin({
+                                name: 'p_appSetMeal'
+                            })
+                            api.closeWin({
+                                name: 'p_appClubCardRecharge'
+                            })
+                            api.closeWin({
+                                name: 'p_appClubCardManage'
+                            })
+                            api.closeWin();
+                        })
+                    }
+                }
+            })
+
+
+
+
+        }
+    </script>
+</body>
+
+</html>

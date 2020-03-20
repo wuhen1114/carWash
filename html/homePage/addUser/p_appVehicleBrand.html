@@ -1,0 +1,162 @@
+<!DOCTYPE HTML>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="maximum-scale=1.0, minimum-scale=1.0, user-scalable=0, initial-scale=1.0, width=device-width" />
+    <meta name="format-detection" content="telephone=no, email=no, date=no, address=no">
+    <title>车辆品牌</title>
+    <link href="../../../css/api.css" rel="stylesheet" type="text/css" />
+    <link href="../../../css/Hui.css" rel="stylesheet" type="text/css" />
+    <style>
+        html,body{-webkit-overflow-scrolling: touch;}
+        header {
+            height: 40px;
+        }
+        #main {
+            width: 100%;
+            padding: 0px 2%;
+            box-sizing: border-box;
+
+        }
+        .carBrandAll {
+            overflow-y: scroll;
+            -webkit-overflow-scrolling: touch;
+            z-index: 10;
+        }
+        footer span {
+            background-color: #4FA4F3;
+            border-radius: 2px;
+            font-weight: bold;
+        }
+        div {
+            position: relative;
+        }
+        .letterTab {
+            background-color: #eee;
+            padding: 3px 0 3px 5px;
+
+        }
+        .letter {
+            position: fixed;
+            right: 5px;
+            top: 58%;
+            transform: translateY(-50%);
+            padding: 8px 8px;
+            border-radius: 15px;
+            z-index: 100;
+        }
+        .letter a {
+            display: block;
+            color: #000;
+            font-size: 13px;
+            text-align: center;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="VUE_BOX">
+        <!-- 头部导航 start -->
+        <header class=" H-theme-background-color9" id="header">
+            <span tapmode="" onclick="H.closeWin();" class="H-icon H-position-relative H-display-inline-block H-float-left H-vertical-middle H-theme-font-color-black H-padding-vertical-top-8 H-padding-horizontal-left-5 H-z-index-100">
+                <i class="H-iconfont H-icon-arrow-left H-font-size-18 H-vertical-middle"></i>
+                <label class="H-display-block H-vertical-middle H-font-size-15"></label>
+            </span>
+            <div class="H-header-title H-center-all H-font-size-18 H-text-show-row-1 H-theme-font-color-black H-position-absolute H-padding-vertical-top-8 H-width-100-percent">车辆品牌</div>
+        </header>
+        <!-- 头部导航 end -->
+        <div id="main">
+            <!-- 搜索框 start -->
+            <div class="hpadding_horizontal_voth_10 hpadding_horizontal_both_10 search-box" id="search">
+                <div class="hBgColor_white hBorderRadius_20 hPaddingLeft_25" style="position: relative">
+                    <input v-model="searchCar" style="padding-top: 8px" ref="telphone" type="text" class="hFontColor_333 hFontSize_14 hPadding_5 H-border-none" placeholder="请输入车辆品牌"/>
+                    <i class="H-iconfont H-icon-search H-font-size-14" style="width: 18px;position: absolute; right: 5%;top: 20%"></i>
+                </div>
+            </div>
+            <!-- 车辆品牌 -->
+            <div class="H-border-vertical-both-after carBrandAll" style="border-radius: 7px;margin-bottom: 15px;" :style="{height: height}">
+                <template v-for="(item,index) in carBrand">
+                    <div class="letterTab" v-if="(0 == index || carBrand[index].initials != carBrand[index - 1].initials) && (searchCar == '')" :id='item.initials' data-group-name='item.initials' style="width: 100%;padding-right: 5%;box-sizing: border-box;">{{item.initials}}</div>
+                    <div v-show="searchCar==''||item.name.indexOf(searchCar)>=0"  @click="vehicleModel(index)" style="border-radius: 4px;" class="H-theme-background-color-white H-text-list H-flexbox-horizontal  H-theme-background-color-white H-border-vertical-bottom-margin-left-10-after H-vertical-middle H-touch-active">
+                        <div class="H-flex-item H-padding-horizontal-both-10 H-font-size-16 H-padding-vertical-both-12">{{item.name}}</div>
+                        <i style="position: absolute; right: 12%;top: 30%" class="H-iconfont H-icon-arrow-right H-theme-font-color-ccc H-font-size-14 H-vertical-middle"></i>
+                    </div>
+                </template>
+            </div>
+            <div class="letter" @click="location()">
+                <template v-for="item in letter">
+                    <a :href="'#'+item" data-index-name='item'>{{item}}</a>
+                </template>
+
+            </div>
+
+        </div>
+
+
+
+    </div>
+    <script type="text/javascript" src="../../../script/api.js"></script>
+    <script type="text/javascript" src="../../../script/hui/H.js"></script>
+    <script type="text/javascript" src="../../../script/vue.min.js"></script>
+    <script type="text/javascript" src="../../../script/jquery.min.js"></script>
+    <script type="text/javascript" src="../../../script/appUtils.js"></script>
+    <script type="text/javascript">
+        apiready = function() {
+            setStatusBarStyleFn('dark'); // 状态栏颜色
+            // 头部沉侵
+            var header = $api.dom('header');
+            var headerH = $api.fixStatusBar(header);
+            var searchH = document.getElementById('search').offsetHeight;
+            // 提示信息
+            function toast(title){
+                api.toast({
+                    msg: title,
+                    duration: 2000,
+                    location: 'middle'
+                })
+            }
+            var cars=new Vue({
+                el: '#VUE_BOX',
+                data: {
+                    carBrand: '',
+                    searchCar: '',
+                    letter: ['A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z'],
+                    height: api.winHeight-headerH-searchH-15+'px',
+                },
+                mounted: function(){
+                    request({
+                        url: 'app/car_brand/card_brand_list'
+                    },function(res){
+                        // console.log(JSON.stringify(res));
+                        var carAll=res;
+                        cars.carBrand=res;
+
+                    })
+                },
+                methods: {
+                    vehicleModel: function(index){
+                        // console.log(index)
+                        var xx=api.winWidth*0.4;
+                        api.openWin({
+                            name: 'p_appVehicleModel',
+                            url: 'p_appVehicleModel.html',
+                            pageParam: {
+                                data: cars.carBrand[index]
+                            }
+                        })
+                    },
+                    location: function(){
+
+                    },
+                }
+            })
+
+
+
+
+        }
+    </script>
+</body>
+
+</html>

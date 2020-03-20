@@ -1,0 +1,211 @@
+<!DOCTYPE HTML>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="maximum-scale=1.0, minimum-scale=1.0, user-scalable=0, initial-scale=1.0, width=device-width" />
+    <meta name="format-detection" content="telephone=no, email=no, date=no, address=no">
+    <title></title>
+    <link href="../../css/api.css" rel="stylesheet" type="text/css" />
+    <link href="../../css/Hui.css" rel="stylesheet" type="text/css" />
+    <style>
+        html, body{
+            width: 100%!important;
+            min-height: 100%!important;
+            background-color: white!important;
+        }
+        ul, li, h3{
+            margin: 0;
+            padding: 0;
+        }
+        .head-portrait{
+            width: 35%;
+            padding-left: 10%;
+            box-sizing: border-box;
+        }
+        .tel{
+            width: 35px;
+        }
+        .name-tel{
+            width: 65%;
+            box-sizing: border-box;
+            padding-top: 5%;
+            padding-left: 4%;
+        }
+        .staff-info-box{
+            margin: 0 10px;
+            background-color: #F0F0F0;
+            margin-top: -50px;
+            padding: 50px 10px 10px;
+        }
+        .staff-info-item{
+            padding: 10px;
+            margin-bottom: 10px;
+            white-space: nowrap;
+            text-overflow: ellipsis;
+        }
+        .idCard {
+            width: 48%;
+            height: 100px;
+        }
+        .idCard:first-child {
+            margin-right: 2%;
+        }
+        .idCard img {
+            width: 100%;
+            height: 100%;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="VUE_BOX" v-if="pageParam">
+        <!-- =================================== 头部 开始 =================================== -->
+        <header class="hHeader" id="header">
+            <span @click="closeWin" class="hIconBox hPaddingLeft_10">
+                <i class="hIcon H-icon-arrow-left"></i>
+            </span>
+            <div class="hChannelTitle">员工资料</div>
+            <span @click="updStaff" v-if="!userInfo.shopId" class="hIconRightBox hMarginRight_10">
+                <label class="hIconFont hFontSize_16 hRelative hTop_3">编辑</label>
+            </span>
+        </header>
+        <!-- =================================== 头部 结束 =================================== -->
+
+        <!-- =================================== banner信息 开始 =================================== -->
+        <div class="hpadding_horizontal_both_20 hRelative hMarginTop_5">
+            <div class="hRelative">
+                <img src="../../image/staff/banner.png" class="hBorderRadius_10 hWidth_100"/>
+                <div class="hAbsolute hWidthAndHeight_100 hTop_0 hLeft_0">
+                    <div class="H-overflow-hidden hPaddingtop_15">
+                        <div class="hFloatLeft head-portrait">
+                            <img class="hWidth_100 H_displayBlock hBorderRadius_50"
+                            :src="pageParam.staffPhoto || 'error'"
+                            onerror='src="../../image/def/def_user.png"'/>
+                        </div>
+                        <div class="hFloatLeft name-tel hFontColor_white">
+                            <h3 class="hFontSize_16" v-text="pageParam.staffName || '暂无'"></h3>
+                            <p class="hFontSize_14" v-text="pageParam.staffMobile || '暂无'"></p>
+                        </div>
+                    </div>
+                    <div @click="call(pageParam.staffMobile)" class="hTextAlignCenter">
+                         <img src="../../image/staff/tel.png" class="tel H-vertical-align-middle"/>
+                         <span class="hFontColor_white hFontSize_14">拨打电话</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- =================================== banner信息 结束 =================================== -->
+
+        <!-- =================================== 员工详细 开始 =================================== -->
+        <ul class="staff-info-box hBorderRadius_10 hFontSize_14 hFontColor_333">
+            <li class="hBgColor_white hBorderRadius_3 staff-info-item hWidth_100 H-overflow-hidden H-box-sizing-border-box">
+                <span class="hFontColor_999 hMarginRight_10">所属店铺</span>
+                <span v-text="pageParam.shopName"></span>
+            </li>
+            <li class="hBgColor_white hBorderRadius_3 staff-info-item hWidth_100 H-overflow-hidden H-box-sizing-border-box">
+                <span class="hFontColor_999 hMarginRight_10">员工角色</span>
+                <span v-text="pageParam.roleName"></span>
+            </li>
+            <li class="hBgColor_white hBorderRadius_3 staff-info-item hWidth_100 H-overflow-hidden H-box-sizing-border-box">
+                <span class="hFontColor_999 hMarginRight_10">入职时间</span>
+                <span v-text="pageParam.staffDate"></span>
+            </li>
+            <li class="hBgColor_white hBorderRadius_3 staff-info-item hWidth_100 H-overflow-hidden H-box-sizing-border-box">
+                <span class="hFontColor_999 hMarginRight_10">在职状态</span>
+                <span v-show="1 === pageParam.isValid">在职</span>
+                <span v-show="2 === pageParam.isValid">离职</span>
+            </li>
+            <li class="hBgColor_white hBorderRadius_3 staff-info-item hWidth_100 H-overflow-hidden H-box-sizing-border-box">
+                <span class="hFontColor_999 hMarginRight_10">身份证号</span>
+                <span v-text="pageParam.staffIdcard"></span>
+            </li>
+            <!-- 身份证照片 -->
+            <li v-if="pageParam.idCardFront || pageParam.idCardReverse" class="hBgColor_white hBorderRadius_3 staff-info-item hWidth_100 H-overflow-hidden H-box-sizing-border-box">
+                <p class="hFontColor_999">身份证</p>
+                <span @click="imgShow([pageParam.idCardFront], 0)" v-if="pageParam.idCardFront" class="idCard">
+                    <img :src="pageParam.idCardFront" alt="">
+                </span>
+                <span @click="imgShow([pageParam.idCardReverse], 0)" v-if="pageParam.idCardReverse" class="idCard">
+                    <img :src="pageParam.idCardReverse" alt="">
+                </span>
+            </li>
+            <!-- 驾驶证照片 -->
+            <li v-if="pageParam.driverLicense" class="hBgColor_white hBorderRadius_3 staff-info-item hWidth_100 H-overflow-hidden H-box-sizing-border-box">
+                <p class="hFontColor_999">驾驶证</p>
+                <span @click="imgShow([pageParam.driverLicense], 0)" v-if="pageParam.idCardFront" class="idCard">
+                    <img :src="pageParam.driverLicense" alt="">
+                </span>
+            </li>
+        </ul>
+        <!-- =================================== 员工详细 结束 =================================== -->
+
+        <!-- =================================== 页面底部 结束 =================================== -->
+        <div class="hPaddingtop_30"></div>
+        <!-- =================================== 页面底部 开始 =================================== -->
+
+    </div>
+    <script type="text/javascript" src="../../script/api.js"></script>
+    <script type="text/javascript" src="../../script/hui/H.js"></script>
+    <script type="text/javascript" src="../../script/vue.min.js"></script>
+    <script type="text/javascript" src="../../script/jquery.min.js"></script>
+    <script type="text/javascript" src="../../script/appUtils.js"></script>
+    <script type="text/javascript">
+        apiready = function() {
+            // 状态栏颜色
+            setStatusBarStyleFn('dark');
+            // 头部沉侵
+            var header = $api.dom('header');
+            var headerH = $api.fixStatusBar(header);
+            console.log(JSON.stringify(api.pageParam.data));
+
+            window.app = new Vue({
+                el: '#VUE_BOX',
+                data: {
+                    userInfo: GET_USER_INFO(), // 登录数据
+                    pageParam: api.pageParam.data || {}, // 选择的员工数据
+                },
+                mounted: function() {
+                    var self = this;
+                    self.listener(); // 监听
+                },
+                methods: vueDefMethods({
+                    // 监听
+                    listener: function () {
+                        // window显示
+                        api.addEventListener({
+                            name: 'viewappear'
+                        }, function(ret, err){
+                             setStatusBarStyleFn('dark');
+                        });
+                    },
+
+                    // 编辑员工
+                    updStaff: function () {
+                        var self = this;
+                        api.openWin({
+                            name: 'appUpdStaff',
+                            url: 'p_appUpdStaff.html',
+                            pageParam: {
+                                data: self.pageParam
+                            }
+                        });
+                    },
+
+                    // 处理身份证号
+                    handleIdCard: function (idCard) {
+                        var self = this;
+                        var userInfo = self.userInfo;
+                        return (!userInfo.shopId && idCard && idCard.length > 10)
+                                ? idCard
+                                : (idCard.substr(0, 4) + "**********" + idCard.substr(14, 18));
+                    }
+                }),
+            });
+
+
+        }
+    </script>
+</body>
+
+</html>

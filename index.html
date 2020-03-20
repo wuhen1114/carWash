@@ -1,0 +1,172 @@
+<!doctype html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,initial-scale=1.0,width=device-width" />
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+    <title>维珍洗美</title>
+    <link rel="stylesheet" type="text/css" href="./css/api.css" />
+    <link rel="stylesheet" type="text/css" href="./css/Hui.css" />
+    <style type="text/css">
+        header {
+            width: 100%;
+            background-color: #3caaf0;
+            background: #3caaf0;
+        }
+        footer {
+            height: 60px!important;
+            width: 100%;
+            border-top:2px solid rgba(0,0,0,0.1);
+            border-top-left-radius: 15px;
+            border-top-right-radius: 15px;
+        }
+        .wrap {
+            display: -webkit-box;
+            -webkit-box-orient: vertical;
+            -webkit-flex-flow: column;
+        }
+        .flex-1 {
+            -webkit-box-flex: 1;
+            -webkit-flex: 1;
+            background-color:#fff;
+        }
+        .img{
+            width: 25px;
+            height: 25px;
+        }
+    </style>
+</head>
+
+<body class="wrap">
+    <header></header>
+
+    <!--内容显示区 start-->
+    <section class="flex-1"></section>
+    <!--内容显示区 end-->
+
+    <!--app底部按钮 start-->
+    <footer id="footer" class="hFooter hBgColor_white">
+        <div onclick="navClk('1')" class="hFlexItem hFontColor_999">
+            <div id="index">
+                <span class="hFooterIconSpan hFontColor_color1">
+                    <img src="" class="img"/>
+                </span>
+                <strong class="hFontSize_11 hFooterStrong hFontWeight_normal hMarginBottom_2">首页</strong>
+            </div>
+        </div>
+        <div onclick="navClk('2')" class="hFlexItem hFontColor_999">
+            <div id="mail">
+                <span class="hFooterIconSpan hFontColor_color1">
+                    <img src="" class="img"/>
+                </span>
+                <strong class="hFontSize_11 hFooterStrong hFontWeight_normal hMarginBottom_2">通讯录</strong>
+            </div>
+        </div>
+        <div onclick="navClk('3')" class="hFlexItem hFontColor_999">
+            <div id="my">
+                <span class="hFooterIconSpan hFontColor_color4">
+                    <img src="image/foot/my_blue.png" class="img"/>
+                </span>
+                <strong class="hFontSize_11 hFooterStrong hFontWeight_normal hMarginBottom_2">我的</strong>
+            </div>
+        </div>
+    </footer>
+    <!--app底部按钮 end-->
+
+</body>
+<script type="text/javascript" src="./script/api.js"></script>
+<script type="text/javascript" src="./script/jquery.min.js"></script>
+<script type="text/javascript" src="./script/hui/H.js"></script>
+<script type="text/javascript" src="./script/appUtils.js"></script>
+<script type="text/javascript">
+    var userInfo = null; // 用户登录数据
+    apiready = function() {
+        navClk(1);
+        monitor();
+    };
+
+    // 登录成功之后刷新所有的页面
+    function refresh () {
+        navClk(3, true);
+        navClk(2, true);
+        navClk(1, true);
+    }
+
+    function navClk (pageIndex, reload) {
+        clickFooter(pageIndex);
+        userInfo = GET_USER_INFO(); // 获取用户登录数据
+        var bounces = true;
+        var header = $api.dom('header'); // 获取 header 标签元素
+        var footer = $api.dom('footer'); // 获取 footer 标签元素
+        var headerH = $api.fixStatusBar(header);
+        var footerH = $api.fixTabBar(footer);// 最新api.js为了适配iPhoneX增加的方法，修复底部Footer部分与iPhoneX的底部虚拟横条键重叠的问题；
+        var pageName, pageUrl;
+        if (1 == pageIndex) { // 首页
+            setStatusBarStyleFn('light');
+            bounces = false;
+            pageName = "appIndex";
+            pageUrl = "html/p_appIndex.html";
+        } else if (2 == pageIndex) { // 通讯录
+            setStatusBarStyleFn('dark');
+            if (!!userInfo.shopId) { // 员工
+                pageName = "appUserMailList";
+                pageUrl = "html/p_appUserMailList.html";
+            } else { // 老板
+                pageName = "appMailList";
+                pageUrl = "html/p_appMailList.html";
+            }
+        } else if (3 == pageIndex) { // 我的
+            setStatusBarStyleFn('dark');
+            pageName = "appUsercenter";
+            pageUrl = "html/p_appUsercenter.html";
+        } else {
+            return;
+        }
+
+        if(EMPTY(reload)){reload = false;} // 如果reload为空，打开页面不刷新，为true，刷新，默认不刷新
+        api.openFrame({
+            name: pageName,
+            url: pageUrl,
+            bounces: bounces,
+            bgColor: '#f0f0f0',
+            reload: reload,
+            rect: { // 推荐使用Margin布局，用于适配屏幕的动态变化
+                marginTop: 0, // main页面距离win顶部的高度
+                marginBottom: footerH, // main页面距离win底部的高度
+                w: 'auto' // main页面的宽度 自适应屏幕宽度
+            },
+        });
+    }
+
+    // 底部样式
+    function clickFooter (index) {
+        index = parseInt(index) - 1;
+        var array = ["index", "mail", "my"];
+        for (var i = 0; i < array.length; i++) {
+            var item = array[i];
+            if(index == i){ // 选中
+                $("#footer #"+item+" span img").attr("src","image/foot/"+item+"_blue.png");
+                $("#footer #"+item+" strong").attr("style", "color: #51A5F3");
+            }else{ // 未选
+                $("#footer #"+item+" span img").attr("src","image/foot/"+item+".png");
+                $("#footer #"+item+" strong").attr("style", "color: #ccc");
+            }
+        }
+    }
+
+    /**
+     * 监听
+     */
+    function monitor () {
+        // 断网
+        api.addEventListener({
+            name:'offline'
+        }, function(ret, err){
+            toastFn('网络连接已断开');
+        });
+    }
+
+</script>
+
+</html>

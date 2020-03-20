@@ -1,0 +1,247 @@
+<!DOCTYPE HTML>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="maximum-scale=1.0, minimum-scale=1.0, user-scalable=0, initial-scale=1.0, width=device-width" />
+    <meta name="format-detection" content="telephone=no, email=no, date=no, address=no">
+    <title></title>
+    <link href="../../css/api.css" rel="stylesheet" type="text/css" />
+    <link href="../../css/Hui.css" rel="stylesheet" type="text/css" />
+    <style>
+        ul, li, h3{ /* 重置样式 */
+            margin: 0;
+            padding: 0;
+        }
+        .box-left, .box-right{ /* 盒子公共样式 */
+            border-top: 1px solid rgba(225, 225, 225, 1);
+            box-sizing: border-box;
+            overflow-y: scroll;
+        }
+        .box-left{ /* 左边盒子样式 */
+            width: 27.78%;
+        }
+        .box-right{ /* 右边盒子样式 */
+            width: 72.22%;
+        }
+        .service-item{ /* 每个服务的样式 */
+            padding: 10px 0;
+            font-size: 1.4rem;
+            color: #999;
+        }
+        .service-item.service-select{ /* 选中服务的样式 */
+            background-color: white;
+            padding: 15px 0;
+            font-size: 1.6rem;
+            color: #4FA4F3;
+        }
+        .user-item{ /* 每个人的样式 */
+            padding-left: 10px;
+        }
+        .user-item-box{ /* 每个人里边的盒子的样式 */
+            padding: 10px 10px 10px 0;
+            border-bottom: 1px solid rgba(240, 240, 240, 1);
+            display: flex;
+            justify-content: space-between;
+        }
+        .user-item-box img{ /* 选择人员里边的图片样式 */
+            width: 25px;
+            height: 25px;
+        }
+    </style>
+</head>
+
+<body class="hRelative">
+    <div id="VUE_BOX">
+        <!-- =================================== 头部 开始 =================================== -->
+        <header class="hHeader" id="header">
+            <span @click="closeWin" class="hIconBox hPaddingLeft_10">
+                <i class="hIcon H-icon-arrow-left"></i>
+            </span>
+            <div class="hChannelTitle">分配人员</div>
+            <span @click="save" class="hIconRightBox hMarginRight_10">
+                <label class="hIconFont hFontSize_16 hRelative hTop_3">完成</label>
+            </span>
+        </header>
+        <!-- =================================== 头部 结束 =================================== -->
+
+        <!-- =================================== 分配人员 开始 =================================== -->
+        <ul class="H_displayFlex" v-bind:style="boxStyle">
+            <li class="box-left">
+                <ul>
+                    <li @click="selServiceFn(item)"
+                        class="hTextAlignCenter service-item"
+                        v-bind:class="{'service-select': selService && item.orderDetailId == selService.orderDetailId}"
+                        v-for="item in pageParam.orderDetailVos"
+                        v-text="item.serviceName">
+                    </li>
+                </ul>
+            </li>
+            <li class="box-right hBgColor_white">
+                <ul v-if="selUser">
+                    <li @click="selFn(item)" class="user-item" v-for="item in users">
+                        <div class="user-item-box">
+                            <h3 class="hFontWeight_normal hFontSize_16 hFontColor_333" v-text="item.staffName"></h3>
+                            <img
+                                class="H-vertical-align-middle"
+                                v-bind:src="contain(selUser, item.staffId) ? '../../image/homePage/xuanze.png' : '../../image/homePage/weixuan.png'"/>
+                        </div>
+                    </li>
+                </ul>
+            </li>
+        </ul>
+        <!-- =================================== 分配人员 结束 =================================== -->
+    </div>
+    <script type="text/javascript" src="../../script/api.js"></script>
+    <script type="text/javascript" src="../../script/hui/H.js"></script>
+    <script type="text/javascript" src="../../script/vue.min.js"></script>
+    <script type="text/javascript" src="../../script/jquery.min.js"></script>
+    <script type="text/javascript" src="../../script/appUtils.js"></script>
+    <script type="text/javascript">
+        apiready = function() {
+            // 状态栏颜色
+            setStatusBarStyleFn('dark');
+            // 头部沉侵
+            var header = $api.dom('header');
+            var headerH = $api.fixStatusBar(header);
+            // 页面高度
+            var winHeight = api.winHeight;
+
+            window.app = new Vue({
+                el: '#VUE_BOX',
+                data: {
+                    userInfo: GET_USER_INFO(), // 登录数据
+                    pageParam: api.pageParam.data || {orderDetailVos: []}, // 订单数据
+                    boxStyle: { // 盒子属性
+                        height: (winHeight - headerH) + 'px'
+                    },
+                    selService: {}, // 当前选择的服务（正在操作的服务）
+                    selUser: null, // 选择的人员，用服务id做键 多个人员的数组做值（人员要姓名和id）
+                    users: [], // 员工列表
+                },
+                mounted: function() {
+                    var self = this;
+                    var orderDetailVos = self.pageParam.orderDetailVos;
+                    self.listener(); // 监听
+                    self.getUsers(); // 查询员工列表
+                    self.selServiceFn(orderDetailVos[0]); // 默认选中第一个服务
+                    // 给 selUser 添加 key
+                    var selUser = {};
+                    for (var i = 0; i < orderDetailVos.length; i++) {
+                        selUser[orderDetailVos[i].orderDetailId + ""] = [];
+                    }
+                    self.selUser = selUser;
+                },
+                methods: vueDefMethods({
+                    // 监听
+                    listener: function () {
+                        var self = this;
+                        // window显示
+                        api.addEventListener({
+                            name: 'viewappear'
+                        }, function(ret, err){
+                             setStatusBarStyleFn('dark');
+                        });
+                    },
+
+                    // 选择服务
+                    selServiceFn: function (service) {
+                        this.selService = service;
+                    },
+
+                    // 查询员工列表
+                    getUsers: function () {
+                        var self = this, pageParam = self.pageParam;
+                        request({
+                            url: "app/staff/staff_list?shopId=" + pageParam.shopId
+                        }, function (ret) {
+                            self.users = ret;
+                        });
+                    },
+
+                    // 选择/取消 员工
+                    selFn: function (user) {
+                        var self = this;
+                        var selService = self.selService;
+                        var serviceId = selService.orderDetailId + "";
+                        var selUser = self.selUser;
+                        if (!selUser[serviceId]) { // 该服务下没有选择人
+                            selUser[serviceId] = [{"staffId": user.staffId, "staffName": user.staffName}];
+                            return;
+                        }
+                        // 该服务已经选择人了 查看是否选中 选中了删除 没有选中添加
+                        var index = -1; // -1 没有选中 其他 选择的下标
+                        for (var i = 0; i < selUser[serviceId].length; i++) {
+                            var item = selUser[serviceId][i];
+                            if (item.staffId == user.staffId) {
+                                index = i;
+                                break;
+                            }
+                        }
+                        if (-1 == index) {
+                            selUser[serviceId].push({"staffId": user.staffId, "staffName": user.staffName});
+                        } else {
+                            selUser[serviceId].splice(index, 1);
+                        }
+                    },
+
+                    // 判断一个人是否选择一个服务
+                    contain: function (selUser, staffId) {
+                        var self = this;
+                        var selService = self.selService;
+                        var serviceId = selService.orderDetailId + "";
+                        if (!selUser[serviceId]) {
+                            return false;
+                        }
+                        var arr = selUser[serviceId];
+                        for (var i = 0; i < arr.length; i++) {
+                            if (arr[i].staffId == staffId) {
+                                return true;
+                            }
+                        }
+                        return false;
+                    },
+
+                    // 保存
+                    save: function () {
+                        var self = this;
+                        var selUser = self.selUser;
+                        var pageParam = self.pageParam;
+                        var orderDetailVos = pageParam.orderDetailVos;
+                        var orderDetailConditions = [];
+                        for (var i = 0; i < orderDetailVos.length; i++) {
+                            var item = orderDetailVos[i];
+                            var arr = selUser[item.orderDetailId + ""];
+                            if (!arr || 0 == arr.length) {
+                                toastFn("请给“" + item.serviceName + "”分配人员");
+                                return;
+                            }
+                            orderDetailConditions.push({"orderDetailId": item.orderDetailId, "adminStaffConditions": arr});
+                        }
+                        var paramData = {
+                            orderId: pageParam.orderId,
+                            orderStatusEnum: "UNDER_CONSTRUCTION",
+                            orderDetailConditions: orderDetailConditions,
+                            initialPhoto: pageParam.initialPhoto,
+                        };
+                        request({
+                            method: "post",
+                            url: "app/shop_order/upd_order_status",
+                            data: {body: paramData}
+                        }, function (ret) {
+                            toastFn("分配成功");
+                            setTimeout(function () {
+                                self.closeWin();
+                            }, 2000);
+                        });
+                    },
+
+                }),
+            });
+
+
+        }
+    </script>
+</body>
+
+</html>

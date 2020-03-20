@@ -1,0 +1,322 @@
+<!DOCTYPE HTML>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="maximum-scale=1.0, minimum-scale=1.0, user-scalable=0, initial-scale=1.0, width=device-width" />
+    <meta name="format-detection" content="telephone=no, email=no, date=no, address=no">
+    <title>经营管理</title>
+    <link href="../../css/api.css" rel="stylesheet" type="text/css" />
+    <link href="../../css/Hui.css" rel="stylesheet" type="text/css" />
+    <style>
+        header {
+            height: 40px;
+        }
+        #main {
+            width: 100%;
+            padding: 0px 3%;
+            box-sizing: border-box;
+        }
+        #ser {
+            padding-left: 15px;
+            box-sizing: border-box;
+        }
+        footer span {
+            background-color: #4FA4F3;
+            border-radius: 2px;
+            font-weight: bold;
+        }
+        .listCard {
+            width: 47%;
+            display: inline-block;
+            background:rgba(255,255,255,1);
+            border-radius:6px;
+            margin: 6px 1.2%;
+            text-align:center;
+            padding: 25px 0 25px 0;
+        }
+        .listCard img {
+            width: 40%;
+            position: relative;
+            top: 5px;
+        }
+        .chooseDate {
+            display: flex;
+            background-color: #FFF;
+            border-radius: 35px;
+            overflow: hidden;
+            padding: 10px 18px;
+        }
+        .riliImg {
+            width: 38px;
+        }
+        .riliImg img {
+            width: 100%;
+            flex-shrink: 0;
+            vertical-align: middle;
+        }
+        .ul {
+            width: 85%;
+            display: flex;
+            overflow-x: scroll;
+            flex-shrink: 0;
+            font-size: 14px;
+            color: #999999;
+
+        }
+        .ul li {
+            width: 20%;
+            flex-shrink: 0;
+        }
+        .ul li p {
+            width: 100%;
+            text-align: center;
+        }
+        .sizeColor {
+            color: #4FA4F3;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="VUE_BOX">
+        <!-- 头部导航 start -->
+        <header class=" H-theme-background-color9" id="header">
+            <span tapmode="" onclick="H.closeWin();" class="H-icon H-position-relative H-display-inline-block H-float-left H-vertical-middle H-theme-font-color-black H-padding-vertical-top-8 H-padding-horizontal-left-5 H-z-index-100">
+                <i class="H-iconfont H-icon-arrow-left H-font-size-18 H-vertical-middle"></i>
+                <label class="H-display-block H-vertical-middle H-font-size-15"></label>
+            </span>
+            <div class="H-header-title H-center-all H-font-size-18 H-text-show-row-1 H-theme-font-color-black H-position-absolute H-padding-vertical-top-8 H-width-100-percent">经营管理</div>
+            <span @click="chooseShop()" class="H-icon H-position-relative H-display-inline-block H-float-right H-vertical-middle H-theme-font-color-black H-padding-vertical-top-12 H-padding-horizontal-right-20 H-z-index-100">
+                <label class="H-display-block H-vertical-middle H-font-size-14">{{storeName}}</label>
+            </span>
+            <img src="../../image/homePage/bottom.png" class="downBoult" alt="">
+        </header>
+        <!-- 头部导航 end -->
+        <div id="main">
+            <div class="hpadding_horizontal_voth_10 hpadding_horizontal_both_10 search-box">
+                <img src="../../image/manage/dingdan.png" style="width: 38px;vertical-align: middle" alt="">
+                <span style="margin-left: 2px;font-size: 18px">服务订单</span>
+            </div>
+            <!-- 日期 start -->
+            <div class="chooseDate search-box">
+                <div @click="chooseDate" class="riliImg">
+                    <img src="../../image/manage/rili.png" alt="">
+                </div>
+
+                <ul class="ul">
+                    <template v-for="(item,index) in timeList">
+                        <li @click="sizeColor(index)" :class="{sizeColor: item.ind==inId}">
+                            <p>{{item.week}}</p>
+                            <p>{{item.time}}</p>
+                        </li>
+                    </template>
+                </ul>
+            </div>
+            <!-- 日期 end -->
+
+            <div class="H-theme-background-color-white H-border-vertical-both-after" style="border-radius: 7px;position: relative;margin-top: 12px">
+                <img style="width: 100%" src="../../image/manage/banner.png" alt="">
+                <div style="position: absolute;left: 78%;top: 50%;transform: translate(-50%,-50%);min-width: 90px">
+                    <p style="width: 100%;text-align: center;color: #4FA4F3;font-weight: bold;margin-bottom: 5px">{{message.all}}</p>
+                    <p style="width: 100%;text-align: center;font-weight: bold">总服务车辆</p>
+                </div>
+            </div>
+
+            <div class="" style="border-radius: 7px;margin-top: 8px">
+                <div class="listCard">
+                    <p style="color: #4FA4F3;font-weight: bold;font-size: 18px">{{message.cancel}}</p>
+                    <p>作废</p>
+                </div>
+                <div class="listCard">
+                    <p style="color: #4FA4F3;font-weight: bold;font-size: 18px">{{message.normal}}</p>
+                    <p>正常</p>
+                </div>
+                <div class="listCard">
+                    <p style="color: #4FA4F3;font-weight: bold;font-size: 18px">{{message.complaint}}</p>
+                    <p>投诉</p>
+                </div>
+                <div class="listCard">
+                    <p style="color: #4FA4F3;font-weight: bold;font-size: 18px">{{message.overtime}}</p>
+                    <p>超时</p>
+                </div>
+            </div>
+        </div>
+
+
+
+    </div>
+    <script type="text/javascript" src="../../script/api.js"></script>
+    <script type="text/javascript" src="../../script/hui/H.js"></script>
+    <script type="text/javascript" src="../../script/vue.min.js"></script>
+    <script type="text/javascript" src="../../script/jquery.min.js"></script>
+    <script type="text/javascript" src="../../script/appUtils.js"></script>
+    <script type="text/javascript">
+        apiready = function() {
+            setStatusBarStyleFn('dark'); // 状态栏颜色
+            // 头部沉侵
+            var header = $api.dom('header');
+            var headerH = $api.fixStatusBar(header);
+
+            var userData={};
+            var shopMessage='';
+            var dateList=[];
+
+            function week(item){
+                if(item==0){
+                    return "星期日"
+                } else if(item==1){
+                    return "星期一"
+                } else if(item==2){
+                    return "星期二"
+                } else if(item==3){
+                    return "星期三"
+                } else if(item==4){
+                    return "星期四"
+                } else if(item==5){
+                    return "星期五"
+                } else if(item==6){
+                    return "星期六"
+                }
+            }
+
+            // 获取当前以及前四天日期
+            var oneDay=1000*60*60*24;
+            var time=new Date().getTime();
+            for(var i=4;i>=0;i--){
+                dateList[i]={};
+                dateList[i].time=new Date(time).Format("MM-dd");
+                dateList[i].week=week(new Date(time).getDay());
+                dateList[i].ind=i;
+                time-=oneDay;
+            }
+
+            // 获取某天数据
+            function dayDate(time){
+                request({
+                    url: 'app/shop_chart/get_order_count',
+                    method: 'post',
+                    data: {
+                        body: {
+                            shopId: userData.shop.shopId,
+                            createTime:time
+                        }
+                    }
+                },function(res){
+                    vuebox.message=res;
+                })
+            }
+
+
+            var vuebox=new Vue({
+                el: '#VUE_BOX',
+                data: {
+                    storeName: '',
+                    timeList: dateList,
+                    inId: 4,
+                    message: '',
+                },
+                created: function(){
+                    // 判断身份
+                    var isBos=GET_USER_INFO().shopId;
+                    // console.log(isBos);
+                    // 获取店铺信息
+                    request({
+                        url: "app/shop/shop_role_list",
+                        returnAll: true
+                    },function(res){
+                        if(!isBos){
+                            var arr=res.body.data.shopList;
+                            vuebox.storeName=arr[0].shopName;
+                            shopMessage=arr;
+                            userData.shop=arr[0];
+                        } else {
+                            var arr=res.body.data.shopList.splice(0,1);
+                            vuebox.storeName=arr[0].shopName;
+                            shopMessage=arr;
+                            userData.shop=arr[0];
+                        }
+                        dayDate(time);
+
+                    })
+
+
+
+
+                },
+                methods: {
+                    // 获取店铺信息及选择
+                    chooseShop: function(){
+                        var arr=shopMessage;
+                        var data=[];
+                        for(var i=0;i<arr.length;i++){
+                            data[i]=arr[i].shopName;
+                        }
+                        shopMessage=arr;
+                        var title="选择店铺";
+                        api.actionSheet({
+                            title: title,
+                            cancelTitle: '取消',
+                            buttons: data
+                        }, function(ret, err) {
+                            var index = ret.buttonIndex;
+                            if(index!==(data.length+1)){
+                                vuebox.storeName=data[index-1];
+                                userData.shop=arr[index-1];
+                            } else {
+                                vuebox.storeName=vuebox.storeName;
+                            }
+                        });
+                    },
+                    // 选择日期
+                    chooseDate: function(){
+                        api.openPicker({
+                            type: 'date_time',
+                            date: '',
+                            title: '选择时间'
+                        }, function(ret, err) {
+                            if (ret) {
+                                var date=""+ret.year+"-"+(ret.month<10?'0'+ret.month:ret.month)+"-"+(ret.day<10?'0'+ret.day:ret.day)+"";
+                                if((new Date(date).getTime())>(new Date().getTime())){
+                                    api.toast({
+                                        msg: '当前日期无效，请重新选择',
+                                        duration: 2000,
+                                        location: 'middle'
+                                    })
+                                } else {
+                                    dayDate(new Date(date).getTime());
+                                }
+                            } else {
+
+                            }
+                        });
+                    },
+                    // 选择展示的日期
+                    sizeColor: function(index){
+                        vuebox.inId=index;
+                        var time=new Date().getTime();
+                        if(index==4){
+                            dayDate(time);
+                        } else if(index==3){
+                            dayDate(time-oneDay*1);
+                        } else if(index==2){
+                            dayDate(time-oneDay*2);
+                        } else if(index==1){
+                            dayDate(time-oneDay*3);
+                        } else if(index==0){
+                            dayDate(time-oneDay*4);
+                        }
+                    }
+
+                }
+            })
+
+
+
+
+
+        }
+    </script>
+</body>
+
+</html>

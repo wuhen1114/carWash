@@ -1,0 +1,133 @@
+<!DOCTYPE HTML>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="maximum-scale=1.0, minimum-scale=1.0, user-scalable=0, initial-scale=1.0, width=device-width" />
+    <meta name="format-detection" content="telephone=no, email=no, date=no, address=no">
+    <title>设置</title>
+    <link href="../../css/api.css" rel="stylesheet" type="text/css" />
+    <link href="../../css/Hui.css" rel="stylesheet" type="text/css" />
+    <style>
+        .icon_80{
+            width: 80px;
+            height: 80px;
+        }
+        .productInfo img{
+            max-width: 100%;
+        }
+        .product_defBgColor{
+            background-color: #ffe24c;
+        }
+        #VUE_BOX{
+            background-image: url('../image/icon/detail/bg_jlt.png');
+            background-position: top center;
+            background-size: 100% auto;
+            background-repeat: no-repeat;
+        }
+    </style>
+</head>
+
+<body>
+<div id="VUE_BOX" class="hBgColor_f4f4f4">
+    <div class="HFixed hBottom_0 hWidth_100 hWidth_75px">
+        <button @click="closeCurPage" class="hButton hFontSize_15 hBgColor_transparent hFontColor_color3 hButtonClick_color3 hButtonBox_color3 HFixed" style="left:10px;bottom:10px;">返回</button>
+        <button @click="saveHeadImg" class="hButton hFontSize_15 hBgColor_transparent hFontColor_color3 hButtonClick_color3 hButtonBox_color3 HFixed" style="right:10px;bottom:10px;">确定上传</button>
+    </div>
+
+</div>
+<script type="text/javascript" src="../../script/api.js"></script>
+<script type="text/javascript" src="../../script/hui/H.js"></script>
+<script type="text/javascript" src="../../script/vue.min.js"></script>
+<script type="text/javascript" src="../../script/jquery.min.js"></script>
+<script type="text/javascript" src="../../script/appUtils.js"></script>
+<script type="text/javascript">
+apiready=function(){
+    var FNImageClip = api.require('FNImageClip');
+    var app = new Vue({
+      el: '#VUE_BOX',
+      data: {
+          userInfo: GET_USER_INFO(), // 本地数据
+          img_path: api.pageParam.imgPath, // 选择的地址
+      },
+      mounted: function () {
+          var self = this;
+          self.cutHeadImg();
+      },
+      methods:{
+          // 关闭当前页面
+          closeCurPage: function () {
+              api.closeWin();
+          },
+
+          // 裁剪头像
+          cutHeadImg: function () {
+              var self = this;
+              var header = $api.dom('header'); // 获取 header 标签元素
+              var footer = $api.dom('footer'); // 获取 footer 标签元素
+              var headerH = $api.fixStatusBar(header);
+              var footerH = $api.fixTabBar(footer);
+              FNImageClip.open({
+                  rect: {x: 0, y: 0, w: api.winWidth, h: api.winHeight - headerH - footerH - 75},
+                  srcPath: self.img_path,
+                  highDefinition:false,
+                  style: {
+                      mask: 'rgba(0, 0, 0, 0.65)',
+                      clip: {
+                          w: 100, h: 100,
+                          x: (api.winWidth - 200) / 2,
+                          y: (api.winHeight - headerH - footerH - 75 - 200) / 2,
+                          borderColor: '#000', borderWidth: 1,
+                          appearance: 'circular'
+                      }
+                  }
+              }, function(ret, err) {});
+          },
+
+          // 保存截图到本地目录
+          saveHeadImg: function () {
+              var self = this;
+              var userInfo = self.userInfo;
+              FNImageClip.save({
+                  destPath: 'fs://savePath/userHeadImg.jpg',
+                  copyToAlbum: false,
+                  quality: 0.5
+              }, function(ret, err) {
+                  if (typeof(ret.destPath) != 'undefined') {
+                      uploadImg({ // 上传
+                          url: ret.destPath
+                      }, function (img) { // 完成修改用户信息
+                          var data = {
+                              staffId: userInfo.staffId,
+                              shopId: userInfo.shopId,
+                              staffName: userInfo.staffName,
+                              staffGender: userInfo.staffGender,
+                              staffRoleId: userInfo.roleId,
+                              staffPhoto: img
+                          };
+                          request({
+                              url: "app/staff/upd_staff",
+                              method: "post",
+                              data: {body: data}
+                          },function (ret) {
+                              toastFn("修改成功");
+                              userInfo.staffPhoto = img;
+                              $api.setStorage(APP_USER_INFO, JSON.stringify(userInfo));  // 将用户数据放到本地
+                              setTimeout(function () {
+                                  self.closeCurPage();
+                              }, 2000);
+                          });
+                      });
+                  } else {
+                    api.toast({msg:'裁剪头像失败，请稍候重试',duration: 3000,location: 'middle'});
+                  }
+              });
+          },
+
+
+      }
+    });
+  }
+</script>
+</body>
+</html>

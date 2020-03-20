@@ -1,0 +1,116 @@
+<!DOCTYPE HTML>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="maximum-scale=1.0, minimum-scale=1.0, user-scalable=0, initial-scale=1.0, width=device-width" />
+    <meta name="format-detection" content="telephone=no, email=no, date=no, address=no">
+    <title></title>
+    <link href="../../css/api.css" rel="stylesheet" type="text/css" />
+    <link href="../../css/Hui.css" rel="stylesheet" type="text/css" />
+    <style>
+        .border-bottom{
+            border-bottom: 1px solid #F5F5F5;
+        }
+        input::-webkit-input-placeholder, textarea::-webkit-input-placeholder {
+            color: #CCCCCC;
+        }
+    </style>
+</head>
+
+<body class="hRelative">
+    <div id="VUE_BOX">
+        <!-- =================================== 头部 开始 =================================== -->
+        <header class="hHeader" id="header">
+            <span @click="closeWin" class="hIconBox hPaddingLeft_10">
+                <i class="hIcon H-icon-arrow-left"></i>
+            </span>
+            <div class="hChannelTitle">意见反馈</div>
+        </header>
+        <!-- =================================== 头部 结束 =================================== -->
+
+        <!-- =================================== 反馈内容和按钮 开始 =================================== -->
+        <div class="content-box hRelative" :style="'height:' + contentHeight + 'px;'">
+            <!-- 反馈内容 -->
+            <div class="hPadding_10">
+                <div class="hBgColor_white hBorderRadius_3">
+                    <p id="title" class="hFontColor_999 hPadding_10 hPaddingtop_15 H-box-sizing-border-box">反馈内容</p>
+                    <textarea v-model="feedback" :maxLength="maxCount" id="textbox" class="H-textbox H-vertical-align-middle H-vertical-middle H-flex-item H-box-sizing-border-box H-border-none H-outline-none H-padding-12 hWidth_100 H-box-sizing-border-box" placeholder="请输入反馈内容"></textarea>
+                    <p id="count" class="hTextAlignRight hFontColor_ccc hpadding_horizontal_both_10 H-box-sizing-border-box" v-text="feedback.length + '/' + maxCount"></p>
+                </div>
+            </div>
+
+            <!-- 联系方式和提交按钮 用户js获取高度 计算出反馈内容的高度 -->
+            <div id="but" class="hAbsolute hBottom_0 hWidth_100 hPaddingbottom_20">
+                <!-- 联系方式 -->
+                <div class="hBgColor_white H-margin-10 H-margin-vertical-top-0 hPadding_10 hpadding_top border-bottom hBorderRadius_5">
+                    <span class="hFontColor_999 hMarginRight_10">联系方式</span>
+                    <input type="text" class="hFontColor_333 H-border-none" placeholder="请输入联系方式" />
+                </div>
+                <!-- 提交 -->
+                <div class="hpadding_horizontal_both_10">
+                    <div class="hFontColor_white hFontSize_18 hTextAlignCenter hpadding_horizontal_voth_10 hBorderRadius_5"
+                      style="background-color: #4FA4F3;">提交</div>
+                </div>
+            </div>
+        </div>
+        <!-- =================================== 反馈内容和按钮 结束 =================================== -->
+    </div>
+    <script type="text/javascript" src="../../script/api.js"></script>
+    <script type="text/javascript" src="../../script/hui/H.js"></script>
+    <script type="text/javascript" src="../../script/vue.min.js"></script>
+    <script type="text/javascript" src="../../script/jquery.min.js"></script>
+    <script type="text/javascript" src="../../script/appUtils.js"></script>
+    <script type="text/javascript">
+        apiready = function() {
+            // 状态栏颜色
+            setStatusBarStyleFn('dark');
+            // 头部沉侵
+            var header = $api.dom('header');
+            var headerH = $api.fixStatusBar(header);
+            // 页面总高度
+            var winHeight = api.winHeight;
+
+            window.app = new Vue({
+                el: '#VUE_BOX',
+                data: {
+                    contentHeight: (winHeight - headerH), // 内容总高度
+                    maxCount: 200, // 最大输入长度
+                    feedback: "", // 反馈内容
+                    tel: null, // 联系电话
+                },
+                mounted: function() {
+                    var self = this;
+                    self.listener(); // 监听
+                    self.heightFn(); // 计算富文本框高度
+                },
+                methods: {
+                    // 监听
+                    listener: function () {
+                        // window显示
+                        api.addEventListener({
+                            name: 'viewappear'
+                        }, function(ret, err){
+                             setStatusBarStyleFn('dark');
+                        });
+                    },
+
+                    // 关闭本页
+                    closeWin: function () {
+                        api.closeWin();
+                    },
+
+                    // 计算富文本框高度
+                    heightFn: function () {
+                        var self = this;
+                        $("#textbox").height((self.contentHeight - $("#but").height() - $("#title").height() - $("#count").height() - 90) + "px");
+                    },
+                }
+            });
+
+
+        }
+    </script>
+</body>
+
+</html>

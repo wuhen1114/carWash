@@ -1,0 +1,146 @@
+<!DOCTYPE HTML>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="maximum-scale=1.0, minimum-scale=1.0, user-scalable=0, initial-scale=1.0, width=device-width" />
+    <meta name="format-detection" content="telephone=no, email=no, date=no, address=no">
+    <title></title>
+    <link href="../../css/api.css" rel="stylesheet" type="text/css" />
+    <link href="../../css/Hui.css" rel="stylesheet" type="text/css" />
+    <style>
+        ul, li{
+            margin: 0;
+            margin: 0;
+        }
+        input::-webkit-input-placeholder {
+            color: #CCCCCC;
+        }
+        .border-bottom{
+            border-bottom: 1px solid #F5F5F5;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="VUE_BOX">
+        <!-- =================================== 头部 开始 =================================== -->
+        <header class="hHeader" id="header">
+            <span @click="closeWin" class="hIconBox hPaddingLeft_10">
+                <i class="hIcon H-icon-arrow-left"></i>
+            </span>
+            <div class="hChannelTitle">修改密码</div>
+        </header>
+        <!-- =================================== 头部 结束 =================================== -->
+
+        <!-- =================================== 数据 开始 =================================== -->
+        <ul class="H-margin-10 hBgColor_white hPaddingLeft_10 hBorderRadius_10 H-font-size-16">
+            <li class="hpadding_horizontal_voth_10 border-bottom">
+                <span class="hFontColor_999 hMarginRight_10">旧&nbsp;&nbsp;密&nbsp;&nbsp;码</span>
+                <input v-model="oldPassword" type="password" maxLength="16" class="hFontColor_333 H-border-none" placeholder="请输入旧密码" />
+            </li>
+            <li class="hpadding_horizontal_voth_10 border-bottom">
+                <span class="hFontColor_999 hMarginRight_10">新&nbsp;&nbsp;密&nbsp;&nbsp;码</span>
+                <input v-model="newPassword1" type="password" maxLength="16" class="hFontColor_333 H-border-none" placeholder="请输入新密码" />
+            </li>
+            <li class="hpadding_horizontal_voth_10">
+                <span class="hFontColor_999 hMarginRight_10">确认密码</span>
+                <input v-model="newPassword2" type="password" maxLength="16" class="hFontColor_333 H-border-none" placeholder="请再次输入新密码" />
+            </li>
+        </ul>
+        <!-- =================================== 数据 结束 =================================== -->
+
+        <!-- =================================== 按钮 开始 =================================== -->
+        <div class="hpadding_horizontal_both_10">
+            <div @click="save" class="hFontColor_white hFontSize_18 hTextAlignCenter hpadding_horizontal_voth_10 hBorderRadius_5"
+              style="background-color: #4FA4F3;">保存</div>
+        </div>
+        <!-- =================================== 按钮 结束 =================================== -->
+    </div>
+    <script type="text/javascript" src="../../script/api.js"></script>
+    <script type="text/javascript" src="../../script/hui/H.js"></script>
+    <script type="text/javascript" src="../../script/vue.min.js"></script>
+    <script type="text/javascript" src="../../script/jquery.min.js"></script>
+    <script type="text/javascript" src="../../script/appUtils.js"></script>
+    <script type="text/javascript">
+        apiready = function() {
+            // 状态栏颜色
+            setStatusBarStyleFn('dark');
+            // 头部沉侵
+            var header = $api.dom('header');
+            var headerH = $api.fixStatusBar(header);
+
+            window.app = new Vue({
+                el: '#VUE_BOX',
+                data: {
+                    oldPassword: "", // 旧密码
+                    newPassword1: "", // 新密码1
+                    newPassword2: "", // 新密码2
+                },
+                mounted: function() {
+                    var self = this;
+                    self.listener(); // 监听
+                },
+                methods: vueDefMethods({
+                    // 监听
+                    listener: function () {
+                        // window显示
+                        api.addEventListener({
+                            name: 'viewappear'
+                        }, function(ret, err){
+                             setStatusBarStyleFn('dark');
+                        });
+                    },
+
+                    // 修改密码
+                    save: function () {
+                        var self = this;
+                        if (!self.verify()) {
+                            return;
+                        }
+                        request({
+                            url: "app/staff/upd_password?oldPassword=" + self.oldPassword + "&newPassword=" + self.newPassword1
+                        }, function (ret) {
+                            toastFn("修改成功");
+                            setTimeout(function () {
+                                APP_GO_LOGIN();
+                            }, 2000);
+                        });
+                    },
+
+                    // 验证密码
+                    verify: function () {
+                        var self = this;
+                        var oldPassword = self.oldPassword;
+                        var newPassword1 = self.newPassword1;
+                        var newPassword2 = self.newPassword2;
+                        var fn = function (password) { // 格式验证
+                            password = password + "";
+                            console.log(password);
+                            return !!password && password.length >= 6 && password.length <= 16;
+                        };
+                        if (!fn(oldPassword)) {
+                            toastFn("旧密码错误");
+                            return false;
+                        }
+                        if (!fn(newPassword1) || !fn(newPassword2)) {
+                            toastFn("新密码错误");
+                            return false;
+                        }
+                        if (newPassword1 != newPassword2) {
+                            toastFn("新密码不一致");
+                            return false;
+                        }
+                        return true;
+                    },
+
+
+                }),
+            });
+
+
+        }
+    </script>
+</body>
+
+</html>
